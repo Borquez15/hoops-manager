@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { HomeComponent } from './features/public/pages/home/home.component';
-import { RouterOutlet } from '@angular/router'; // solo si dejas <router-outlet>
+// Importa RouterOutlet SOLO si vas a usar <router-outlet> en app.html
+// import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HomeComponent, RouterOutlet], // <<-- IMPORTANTE
+  imports: [HomeComponent], // Si no usas <router-outlet>, no lo importes
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {}
+

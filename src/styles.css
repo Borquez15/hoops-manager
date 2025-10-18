@@ -1,4 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
-
+/* styles.css (global) */
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Variables globales: usa :root, NO :host */
+:root{
+  /* NAV */
+  --nav-offset: 0px;
+  --logo-h: 100px;           /* ajusta aquí el tamaño del logo */
+  --nav-pad-y: 12px;
+  --nav-pad-x: 24px;
+  --nav-h: 72px; 
+  --logo-scale: 4.00;   /* prueba 1.4–1.7 hasta que te guste */
+
+  /* HERO */
+  --hero-pos-x: 58%;
+  --hero-pos-y: 34%;
+  --hero-zoom: 112%;
+  --hero-nudge-x: 10px;
+}
