@@ -1,12 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { HomeComponent } from './features/public/pages/home/home.component';
+import { RouterOutlet } from '@angular/router'; // solo si dejas <router-outlet>
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [HomeComponent, RouterOutlet], // <<-- IMPORTANTE
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
-  protected readonly title = signal('hoops-manager');
-}
+export class App {}

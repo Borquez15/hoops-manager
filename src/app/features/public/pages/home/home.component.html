@@ -1,0 +1,50 @@
+<header class="nav">
+  <div class="nav__wrap">
+    <a class="brand" href="#">
+      <span class="brand__logo" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M8 6h8v2a4 4 0 0 1-8 0V6Z"/>
+          <path d="M6 6v2a6 6 0 0 0 12 0V6"/>
+          <path d="M10 14v2a2 2 0 0 0 4 0v-2M9 20h6"/>
+          <path d="M3 6h3v2a3 3 0 0 1-3-3Z"/>
+          <path d="M21 6h-3v2a3 3 0 0 0 3-3Z"/>
+        </svg>
+      </span>
+      <span class="brand__text">Hoops<strong>Manager</strong></span>
+    </a>
+
+    <nav class="menu">
+      <a class="menu__link menu__link--active" href="#">INICIO</a>
+      <a class="menu__link" href="#">CARACTERÍSTICAS</a>
+      <a class="menu__link" href="#">TORNEOS</a>
+      <a class="menu__link" href="#">CONTÁCTANOS</a>
+    </nav>
+
+    <button class="btn btn-primary" (click)="iniciarSesion()">INICIAR SESIÓN</button>
+  </div>
+</header>
+
+<main class="hero">
+  <div class="hero__content">
+    <h1 class="hero__title">
+      ¡EL MEJOR GESTOR<br>
+      DE TORNEOS DE<br>
+      BASKETBALL!
+    </h1>
+
+    <p class="hero__lead">
+      HoopsManager es la plataforma definitiva para organizar y dar seguimiento a tus
+      torneos de baloncesto de manera simple e intuitiva. Olvídate del papeleo y las
+      hojas de cálculo. Con nuestra herramienta, puedes gestionar todo, desde la
+      inscripción de equipos hasta la definición de los campeones.
+    </p>
+
+    <button class="btn btn-primary hero__cta" (click)="crearTorneo()">
+      <span aria-hidden="true">🏆</span> CREAR UN TORNEO
+    </button>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="foot__wrap">© {{year}} HoopsManager</div>
+</footer>
