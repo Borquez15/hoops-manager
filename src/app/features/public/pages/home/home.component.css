@@ -2,9 +2,13 @@
 
 /* ======= NAV ======= */
 .nav{
-  position:absolute; top:0; left:0; right:0; z-index:30;
+  position: fixed;              /* antes absolute */
+  top: 0; left: 0; right: 0;
+  z-index: 9999;                /* bien alto */
   background: transparent;
-  border-bottom:none; backdrop-filter:none;
+  border-bottom: none;
+  backdrop-filter: none;
+  pointer-events: auto;
 }
 
 .nav__wrap{
@@ -65,7 +69,7 @@ grid-column: 1 / 2; justify-self:start;}
   --hero-pos-x: 58%;
   --hero-pos-y: 34%;
   --hero-zoom: 112%;
-
+  --hero-nudge-x: 0px;
   /* NAV */
   --nav-offset: 22px;     /* empuje del menú hacia la derecha */
   --logo-h: 44px;         /* ← tamaño del logo: súbelo/bájalo aquí */
@@ -136,4 +140,34 @@ grid-column: 1 / 2; justify-self:start;}
   display: block;
   transform: scale(var(--logo-scale));
   transform-origin: left center;      /* crece desde la izquierda */
+}
+
+ /* para que cambie el header al fondo */
+.nav--brand-bg{
+  /* mismas capas que el hero */
+  background-image:
+    radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(0deg, rgba(0,0,0,.40), rgba(0,0,0,.40)),
+    url("/public/imagen/fondo.webp");
+  background-repeat: no-repeat, no-repeat, no-repeat;
+
+  /* Opción A: que coincida con el “look” del hero */
+  background-position: center, center, calc(var(--hero-pos-x) + var(--hero-nudge-x, 0px)) var(--hero-pos-y);
+  background-size: auto, auto, var(--hero-zoom) auto;
+
+  /* Opción B (más simple): que siempre cubra el header */
+  /* --- si prefieres esta, comenta la 3ra línea de size arriba y descomenta esta: */
+  /* background-size: auto, auto, cover; */
+
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+
+/* Fallback si webp falla */
+@supports not (background-image: url("/public/imagen/fondo.webp")) {
+  .nav--brand-bg{
+    background-image:
+      radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
+      linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
+      url("/public/imagen/fondo.png");
+  }
 }

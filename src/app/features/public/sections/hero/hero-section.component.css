@@ -1,0 +1,20 @@
+:host{
+  display:block;
+  min-height:100vh;
+  background-color:#0b0e13;
+  background-image:
+    radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(0deg, rgba(0,0,0,.40), rgba(0,0,0,.40)),
+    url("/public/imagen/fondo.webp");
+  background-position:
+    center,
+    center,
+    calc(var(--hero-pos-x) + var(--hero-nudge-x, 0px)) var(--hero-pos-y);
+  background-size: auto, auto, var(--hero-zoom) auto;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+.hero__content{ width:min(680px, 90vw); margin-left: clamp(12px, 8vw, 120px); padding-top: calc(var(--nav-h) + 8px); }
+.hero__title{ font-size: clamp(34px, 6.2vw, 56px); line-height:1.02; margin:0 0 1rem; font-weight:800; color:#fff; }
+.hero__lead{ color:#d7d7d7; max-width:560px; margin:.5rem 0 1.4rem; line-height:1.45; font-weight:600; }
+.hero__cta{ font-size:14px; }

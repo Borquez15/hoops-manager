@@ -1,19 +1,15 @@
-<header class="nav">
+<header class="nav" [class.nav--brand-bg]="active !== 'inicio'">
   <div class="nav__wrap">
-    <a class="brand" href="#">
-  <img
-    class="brand__img"
-    src="/imagen/logo-hoops-manager.png"
-    alt="HoopsManager"
-  />
-</a>
+    <a class="brand" href="" (click)="go('inicio', $event)">
+      <img class="brand__img" src="/imagen/logo-hoops-manager.png" alt="HoopsManager" />
+    </a>
 
 
     <nav class="menu">
-      <a class="menu__link menu__link--active" href="#">INICIO</a>
-      <a class="menu__link" href="#">CARACTERÍSTICAS</a>
-      <a class="menu__link" href="#">TORNEOS</a>
-      <a class="menu__link" href="#">CONTÁCTANOS</a>
+      <a class="menu__link" [class.menu__link--active]="active==='inicio'" (click)="go('inicio')">INICIO</a>
+      <a class="menu__link" [class.menu__link--active]="active==='caracteristicas'" (click)="go('caracteristicas')">CARACTERÍSTICAS</a>
+      <a class="menu__link" [class.menu__link--active]="active==='torneos'" (click)="go('torneos')">TORNEOS</a>
+      <a class="menu__link" [class.menu__link--active]="active==='contacto'" (click)="go('contacto')">CONTÁCTANOS</a>
     </nav>
 
     <button class="btn btn-primary" (click)="iniciarSesion()">INICIAR SESIÓN</button>
@@ -22,6 +18,7 @@
 
 <main class="hero">
   <div class="hero__content">
+    
     <h1 class="hero__title">
       ¡EL MEJOR GESTOR<br>
       DE TORNEOS DE<br>
@@ -34,7 +31,7 @@
       hojas de cálculo. Con nuestra herramienta, puedes gestionar todo, desde la
       inscripción de equipos hasta la definición de los campeones.
     </p>
-
+    
     <button class="btn btn-primary hero__cta" (click)="crearTorneo()">
       <span aria-hidden="true">🏆</span> CREAR UN TORNEO
     </button>
@@ -44,3 +41,18 @@
 <footer class="foot">
   <div class="foot__wrap">© {{year}} HoopsManager</div>
 </footer>
+
+<div class="snap" #snapContainer>
+
+  <section id="caracteristicas" class="snap__section">
+    <app-features-section></app-features-section>
+  </section>
+
+  <section id="torneos" class="snap__section">
+    <app-tournaments-section></app-tournaments-section>
+  </section>
+
+  <section id="contacto" class="snap__section">
+    <app-contact-section></app-contact-section>
+  </section>
+</div>

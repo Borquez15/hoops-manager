@@ -8,7 +8,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/app/features/public/sections/placeholders/contact-section.component"  ],
   "exclude": [
     "src/**/*.spec.ts"
   ]
