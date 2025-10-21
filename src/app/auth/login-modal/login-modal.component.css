@@ -1,0 +1,23 @@
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:1000}
+.modal{position:fixed;inset:0;display:grid;place-items:center;z-index:1001}
+.panel{width:min(460px,92vw);background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.4);overflow:hidden}
+.head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#e57f3d;color:#fff}
+.close{background:transparent;border:0;font-size:24px;color:#fff;cursor:pointer}
+.body{padding:18px 20px 22px}
+.form{display:grid;gap:12px}
+label{font-weight:700;color:#0f172a;display:grid;gap:6px}
+input{height:42px;border-radius:12px;border:1px solid #d1d5db;padding:0 12px;font-weight:600}
+.pwd{position:relative}
+.pwd input{width:100%;padding-right:40px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;cursor:pointer;font-size:18px}
+.btn{height:44px;padding:0 18px;border:0;border-radius:12px;cursor:pointer;font-weight:800}
+.btn-primary{background:#e57f3d;color:#fff;box-shadow:0 8px 18px rgba(229,127,61,.35)}
+.btn-google{background:#1e293b;color:#fff;display:flex;gap:10px;align-items:center;justify-content:center}
+.btn-google .g{width:22px;height:22px;border-radius:4px;background:#fff;color:#ea4335;display:grid;place-items:center;font-weight:900}
+.wfull{width:100%}
+.or{display:flex;align-items:center;gap:12px;color:#6b7280;margin:12px 0}
+.or::before,.or::after{content:'';flex:1;height:1px;background:#e5e7eb}
+.or span{font-weight:800}
+.hint{text-align:center;margin:10px 0 0}
+.link{color:#2563eb;text-decoration:none;font-weight:800}
+.error{margin-top:10px;color:#b91c1c;font-weight:700;text-align:center}

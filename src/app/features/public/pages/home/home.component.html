@@ -12,7 +12,9 @@
       <a class="menu__link" [class.menu__link--active]="active==='contacto'" (click)="go('contacto')">CONTÁCTANOS</a>
     </nav>
 
-    <button class="btn btn-primary" (click)="iniciarSesion()">INICIAR SESIÓN</button>
+    <button class="btn btn-primary" type="button" (click)="iniciarSesion($event)">
+  INICIAR SESIÓN
+</button>
   </div>
 </header>
 
@@ -32,9 +34,9 @@
       inscripción de equipos hasta la definición de los campeones.
     </p>
     
-    <button class="btn btn-primary hero__cta" (click)="crearTorneo()">
-      <span aria-hidden="true">🏆</span> CREAR UN TORNEO
-    </button>
+    <button class="btn btn-primary hero__cta" type="button" (click)="crearTorneo($event)">
+  <span aria-hidden="true">🏆</span> CREAR UN TORNEO
+</button>
   </div>
 </main>
 
@@ -56,3 +58,11 @@
     <app-contact-section></app-contact-section>
   </section>
 </div>
+
+<p style="color:#fff">showLogin: {{ showLogin }}</p>
+
+<app-login-modal
+  [open]="showLogin"
+  (close)="showLogin = false"
+  (success)="onLoginSuccess($event)">
+</app-login-modal>

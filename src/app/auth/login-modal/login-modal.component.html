@@ -1,0 +1,40 @@
+<div class="overlay" *ngIf="open" (click)="close.emit()"></div>
+
+<div class="modal" *ngIf="open" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="panel">
+    <header class="head">
+      <h2 id="loginTitle">Iniciar sesión</h2>
+      <button class="close" (click)="close.emit()" aria-label="Cerrar">×</button>
+    </header>
+
+    <div class="body">
+      <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+        <label>
+          Correo electrónico
+          <input type="email" formControlName="email" placeholder="tucorreo@dominio.com">
+        </label>
+
+        <label>
+          Contraseña
+          <div class="pwd">
+            <input [type]="hide ? 'password':'text'" formControlName="password" placeholder="••••••••">
+            <button type="button" class="eye" (click)="hide=!hide" aria-label="Mostrar/ocultar">👁</button>
+          </div>
+        </label>
+
+        <a class="link" href="#">¿Olvidaste tu contraseña?</a>
+
+        <button class="btn btn-primary wfull" type="submit">Iniciar sesión</button>
+      </form>
+
+      <div class="or"><span>o</span></div>
+
+      <button class="btn btn-google wfull" type="button" (click)="loginWithGoogle()">
+        <span class="g">G</span> Continuar con Google
+      </button>
+
+      <p class="hint">¿No estás registrado? <a class="link" href="#">Registrarse</a></p>
+      <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+    </div>
+  </div>
+</div>

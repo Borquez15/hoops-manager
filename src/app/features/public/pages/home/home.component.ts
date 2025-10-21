@@ -1,9 +1,11 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+
 import { FeaturesSectionComponent } from '../../sections/features/features-section.component';
 import { TournamentsSectionComponent } from '../../sections/tournaments/tournaments-section.component';
 import { ContactSectionComponent } from '../../sections/contact/contact-section.component';
-import { Router } from '@angular/router';
+import { LoginModalComponent } from '../../../../auth/login-modal/login-modal.component';
 
 const SECTION_IDS = ['inicio', 'caracteristicas', 'torneos', 'contacto'] as const;
 type SectionId = typeof SECTION_IDS[number];
@@ -15,22 +17,25 @@ type SectionId = typeof SECTION_IDS[number];
     CommonModule,
     FeaturesSectionComponent,
     TournamentsSectionComponent,
-    ContactSectionComponent
+    ContactSectionComponent,
+    LoginModalComponent,         // <-- importa el modal aquí
   ],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'] // <- plural para compatibilidad
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements AfterViewInit {
   @ViewChild('snapContainer') snapContainer!: ElementRef<HTMLElement>;
+
   active: SectionId = 'inicio';
   year = new Date().getFullYear();
+
+  // estado del modal
+  showLogin = false;
 
   constructor(private router: Router) {}
 
   async go(id: SectionId, ev?: Event) {
     ev?.preventDefault();
-
-    // Si no estás en '/', navega primero y luego haz scroll
     if (this.router.url !== '/') {
       await this.router.navigateByUrl('/');
       setTimeout(() => this.scrollTo(id), 0);
@@ -65,6 +70,18 @@ export class HomeComponent implements AfterViewInit {
     els.forEach(el => observer.observe(el));
   }
 
-  iniciarSesion() {}
-  crearTorneo() {}
+  // --- Modal handlers ---
+  iniciarSesion(ev?: Event) {
+    ev?.preventDefault();
+    this.showLogin = true;
+  }
+
+  crearTorneo(ev?: Event) {
+    ev?.preventDefault();
+    this.showLogin = true; // si quieres exigir login para crear
+  }
+
+  onLoginSuccess(_: any) {
+    this.showLogin = false;
+  }
 }

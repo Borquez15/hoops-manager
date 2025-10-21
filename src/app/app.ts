@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HomeComponent } from './features/public/pages/home/home.component';
 // Importa RouterOutlet SOLO si vas a usar <router-outlet> en app.html
 // import { RouterOutlet } from '@angular/router';
+import { LoginModalComponent } from './auth/login-modal/login-modal.component';
 
 @Component({
   selector: 'app-root',
