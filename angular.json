@@ -16,12 +16,11 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
+                  "src/favicon.ico",
+                  "src/assets",
+                  { "glob": "**/*", "input": "public/imagen", "output": "imagen" }
+                ],
+                "styles": [
               "src/custom-theme.scss",
               "src/styles.css"
             ]
@@ -70,10 +69,8 @@
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/assets",
+              { "glob": "**/*", "input": "public/imagen", "output": "imagen" }
             ],
             "styles": [
               "src/styles.css"

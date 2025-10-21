@@ -27,11 +27,13 @@
 
 /* Fila logo + texto */
 .intro-grid{
-  display:grid;
-  grid-template-columns: 340px 1fr;
-  gap:28px;
-  align-items:center;
-  margin:32px 0 24px;
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(420px, 520px); /* <- limita el ancho del texto */
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  max-width: 960px;
+  margin: 28px auto 12px;
 }
 
 .logo{
@@ -96,4 +98,18 @@
   .text-col{ order:2; }
   .logo-col{ order:1; }
   .logo{ margin:0 auto; }
+}
+
+.brand__img{
+  /* controla el tamaño por ancho */
+  width: clamp(220px, 24vw, 340px);
+  height: auto;
+  display: block;
+
+  /* IMPORTANTES: quitan el comportamiento que rompe el layout */
+  transform: none;        /* o elimina la línea si no la necesitas */
+}
+
+@media (max-width: 560px){
+  .brand__img{ width: 200px; }
 }
