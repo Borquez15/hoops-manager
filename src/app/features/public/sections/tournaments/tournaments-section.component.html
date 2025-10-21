@@ -1,0 +1,16 @@
+<section class="screen">
+  <div class="card-navy">
+    <h2>TORNEOS</h2>
+    <p class="subtitle">Puedes encontrar tus torneos aquí</p>
+
+    <form class="search-row" (ngSubmit)="onSubmit()">
+      <input
+        type="text"
+        [formControl]="query"
+        placeholder="Escribe el nombre del torneo o su ID..."
+        aria-label="Buscar torneo por nombre o ID"
+      />
+      <button class="btn" type="submit">BUSCAR</button>
+    </form>
+  </div>
+</section>

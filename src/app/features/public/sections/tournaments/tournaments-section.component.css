@@ -1,0 +1,88 @@
+:host { display:block; }
+
+/* Altura de pantalla: ocupa todo el alto visible menos el navbar */
+:root { --nav-h: 80px; }           /* ajusta si tu navbar mide distinto */
+
+.screen{
+  background: #ffffff;
+  min-height: calc(100dvh - var(--nav-h));
+  width: 100%;
+  display: flex;
+  align-items: flex-start;          /* como en el mock: card un poco más abajo */
+  justify-content: center;
+  padding: 72px 16px 96px;          /* top / lados / bottom */
+}
+
+/* Card azul centrado, esquinas redondeadas y sombra naranja sutil */
+.card-navy{
+  width: min(800px, 88vw);          /* tamaño muy cercano a la 2a imagen */
+  background: #1e2946;              /* azul marino del diseño */
+  color: #eef2f8;
+  border-radius: 26px;
+  padding: 36px 28px;
+  border: 1px solid rgba(0,0,0,.12);
+  box-shadow:
+    0 18px 36px rgba(0,0,0,.30),
+    0 2px 0 0 #e57f3d inset;        /* filo inferior cálido similar al mock */
+  text-align: center;
+}
+
+h2{
+  margin: 0 0 8px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.subtitle{
+  margin: 0 0 22px;
+  color: #c6cfdf;
+  font-weight: 700;
+}
+
+/* Fila de búsqueda como en el diseño */
+.search-row{
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  gap: 16px;
+  width: min(640px, 100%);
+  margin: 0 auto;
+}
+
+input[type="text"]{
+  height: 52px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  color: #111827;
+  padding: 0 16px;
+  font-weight: 700;
+  outline: none;
+}
+
+input[type="text"]::placeholder{ color:#a0a8b8; font-weight:700; }
+
+input[type="text"]:focus{
+  border-color: #e57f3d;
+  box-shadow: 0 0 0 3px rgba(229,127,61,.20);
+}
+
+/* Botón naranja */
+.btn{
+  height: 52px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 14px;
+  background: #e57f3d;
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: .4px;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(229,127,61,.35);
+  transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+}
+.btn:hover{ filter: brightness(1.02); box-shadow: 0 12px 26px rgba(229,127,61,.45); }
+.btn:active{ transform: translateY(1px); }
+
+@media (max-width: 560px){
+  .search-row{ grid-template-columns: 1fr; }
+}
