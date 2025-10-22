@@ -68,4 +68,15 @@ export class AuthService {
     const url = `${location.origin}/#/verificado`;  // Ajusta si quieres otra ruta
     return sendEmailVerification(user, { url, handleCodeInApp: false });
   }
+  // ---- REGISTRO NATIVO (FastAPI) ----
+registerNative(dto: { nombre: string; email: string; password: string }) {
+  // POST http://127.0.0.1:8000/auth/register
+  return firstValueFrom(
+    this.http.post<{ id_usuario: number; nombre: string; email: string }>(
+      `${environment.apiBase}/auth/register`,
+      dto
+    )
+  );
+}
+
 }

@@ -48,30 +48,18 @@ export class RegisterModalComponent {
     if (this.form.invalid) return;
 
     this.sending = true;
-    this.errorMsg = '';
-    const { nombre, apP, apM, email } = this.form.value;
-    const password = this.gp.get('password')!.value as string;
+  this.errorMsg = '';
 
-    try {
-      // 1) crea usuario en Firebase
-      const cred = await this.auth.register(
-        `${nombre} ${apP}`.trim(),
-        apP!, apM || '', email!, password
-      );
-
-      // 2) idToken para guardar en tu backend
-      const idToken = await this.auth.getIdToken(cred.user);
-      if (idToken) {
-        await this.auth.exchangeWithBackend(idToken);
-      }
-
-      // 3) envía email de verificación (opción cliente)
-      await this.auth.sendVerificationEmail();
-
-      this.success.emit(cred.user);
+  const nombre   = this.form.value.nombre!.trim();
+  const email    = this.form.value.email!.trim().toLowerCase();
+  const password = this.gp.get('password')!.value as string;
+      try {
+      const res = await this.auth.registerNative({ nombre, email, password });
+      this.success.emit(res);
       this.close.emit();
     } catch (e: any) {
-      this.errorMsg = 'No pudimos crear tu cuenta. ' + (e?.message ?? '');
+      // Si el backend manda {detail: 'Email ya registrado'} lo mostramos:
+      this.errorMsg = e?.error?.detail || 'No pudimos crear tu cuenta.';
     } finally {
       this.sending = false;
     }
