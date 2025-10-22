@@ -64,5 +64,13 @@
 <app-login-modal
   [open]="showLogin"
   (close)="showLogin = false"
-  (success)="onLoginSuccess($event)">
+  (success)="onLoginSuccess($event)"
+  (goRegister)="showLogin=false; showRegister=true">
 </app-login-modal>
+
+<app-register-modal
+  [open]="showRegister"
+  (close)="showRegister = false"
+  (success)="onRegisterSuccess($event)"
+  (goLogin)="showRegister=false; showLogin=true">
+</app-register-modal>

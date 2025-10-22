@@ -6,6 +6,7 @@ import { FeaturesSectionComponent } from '../../sections/features/features-secti
 import { TournamentsSectionComponent } from '../../sections/tournaments/tournaments-section.component';
 import { ContactSectionComponent } from '../../sections/contact/contact-section.component';
 import { LoginModalComponent } from '../../../../auth/login-modal/login-modal.component';
+import { RegisterModalComponent } from '../../../../auth/register-modal/register-modal.component';
 
 const SECTION_IDS = ['inicio', 'caracteristicas', 'torneos', 'contacto'] as const;
 type SectionId = typeof SECTION_IDS[number];
@@ -18,10 +19,11 @@ type SectionId = typeof SECTION_IDS[number];
     FeaturesSectionComponent,
     TournamentsSectionComponent,
     ContactSectionComponent,
-    LoginModalComponent,         // <-- importa el modal aquí
+    LoginModalComponent,
+    RegisterModalComponent,
   ],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements AfterViewInit {
   @ViewChild('snapContainer') snapContainer!: ElementRef<HTMLElement>;
@@ -29,11 +31,19 @@ export class HomeComponent implements AfterViewInit {
   active: SectionId = 'inicio';
   year = new Date().getFullYear();
 
-  // estado del modal
+  // Estado de modales
   showLogin = false;
+  showRegister = false;
 
   constructor(private router: Router) {}
 
+  // Botones
+  iniciarSesion(ev?: Event) { ev?.preventDefault(); this.showLogin = true; }
+  crearTorneo(ev?: Event)  { ev?.preventDefault(); this.showRegister = true; }
+  onLoginSuccess(_: any)   { this.showLogin = false; }
+  onRegisterSuccess(_: any){ this.showRegister = false; this.showLogin = false; }
+
+  // Navegación/scroll
   async go(id: SectionId, ev?: Event) {
     ev?.preventDefault();
     if (this.router.url !== '/') {
@@ -54,8 +64,9 @@ export class HomeComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const ids: SectionId[] = [...SECTION_IDS];
-    const els = ids.map(id => document.getElementById(id)).filter((e): e is HTMLElement => !!e);
+    const els = (SECTION_IDS as readonly SectionId[])
+      .map(id => document.getElementById(id))
+      .filter((e): e is HTMLElement => !!e);
 
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
@@ -65,23 +76,8 @@ export class HomeComponent implements AfterViewInit {
           history.replaceState(null, '', `#${id}`);
         }
       });
-    }, { root: null, threshold: 0.6 });
+    }, { threshold: 0.6 });
 
     els.forEach(el => observer.observe(el));
-  }
-
-  // --- Modal handlers ---
-  iniciarSesion(ev?: Event) {
-    ev?.preventDefault();
-    this.showLogin = true;
-  }
-
-  crearTorneo(ev?: Event) {
-    ev?.preventDefault();
-    this.showLogin = true; // si quieres exigir login para crear
-  }
-
-  onLoginSuccess(_: any) {
-    this.showLogin = false;
   }
 }

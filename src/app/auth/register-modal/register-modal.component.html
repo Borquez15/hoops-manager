@@ -1,0 +1,53 @@
+<div *ngIf="open" class="overlay" (click)="close.emit()"></div>
+
+<div *ngIf="open" class="modal" role="dialog" aria-modal="true">
+  <div class="card">
+    <div class="card__header">Crear Cuenta</div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()" (click)="$event.stopPropagation()">
+      <label>Nombre:
+        <input type="text" formControlName="nombre" />
+      </label>
+
+      <label>Apellido Paterno:
+        <input type="text" formControlName="apP" />
+      </label>
+
+      <label>Apellido Materno:
+        <input type="text" formControlName="apM" />
+      </label>
+
+      <label>Correo:
+        <input type="email" formControlName="email" />
+      </label>
+
+      <div formGroupName="groupPass" class="pass-grid">
+        <label>Contraseña:
+          <div class="pass-wrap">
+            <input [type]="hide ? 'password' : 'text'" formControlName="password" />
+            <button type="button" class="eye" (click)="hide=!hide" aria-label="Mostrar/Ocultar">👁</button>
+          </div>
+        </label>
+
+        <label>Confirmar Contraseña:
+          <div class="pass-wrap">
+            <input [type]="hide2 ? 'password' : 'text'" formControlName="confirm" />
+            <button type="button" class="eye" (click)="hide2=!hide2" aria-label="Mostrar/Ocultar">👁</button>
+          </div>
+          <small class="err"
+       *ngIf="gp.hasError('mismatch') && (gp.dirty || gp.touched)">
+  Las contraseñas no coinciden
+</small>
+        </label>
+      </div>
+
+      <div class="err" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+      <button class="btn" type="submit" [disabled]="sending || form.invalid">
+        {{ sending ? 'Registrando…' : 'Registrarse' }}
+      </button>
+
+      <button type="button" class="link" (click)="goLogin.emit()">¿Ya tienes cuenta? Inicia sesión</button>
+    </form>
+  </div>
+</div>

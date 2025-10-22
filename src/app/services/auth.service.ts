@@ -1,32 +1,71 @@
-import { Injectable } from '@angular/core';
-import { Auth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, signOut, User } from '@angular/fire/auth';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environment/environment';
+import {
+  Auth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+} from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environment/environment'; // <-- AJUSTA ESTA RUTA SI ES NECESARIO
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor(private af: Auth, private http: HttpClient) {}
+  private af   = inject(Auth);
+  private http = inject(HttpClient);
 
+  // ---- LOGIN ----
   loginEmail(email: string, password: string) {
     return signInWithEmailAndPassword(this.af, email, password);
   }
+
   loginGoogle() {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     return signInWithPopup(this.af, provider);
   }
-  async logout(){ await signOut(this.af); }
 
+  logout() {
+    return signOut(this.af);
+  }
+
+  // ---- TOKEN ----
   async getIdToken(user?: User) {
-    const u = user ?? this.af.currentUser ?? await new Promise<User|null>(r => {
-      const unsub = this.af.onAuthStateChanged(x => { unsub(); r(x); });
+    const u = user ?? await new Promise<User | null>((resolve) => {
+      const unsub = onAuthStateChanged(this.af, (usr) => { unsub(); resolve(usr); });
     });
     return u ? u.getIdToken() : null;
   }
 
-  // opcional: intercambiar por JWT propio en tu backend Python
+  // ---- BACKEND (opcional) ----
   exchangeWithBackend(idToken: string) {
-    return firstValueFrom(this.http.post<{token:string; user:any}>(`${environment.apiBase}/auth/firebase`, { idToken }));
+    return firstValueFrom(
+      this.http.post<{ token: string; user: any }>(
+        `${environment.apiBase}/auth/firebase`,
+        { idToken },
+        { withCredentials: true }
+      )
+    );
+  }
+
+  // ---- REGISTRO ----
+  async register(nombre: string, apP: string, apM: string, email: string, password: string) {
+    const cred = await createUserWithEmailAndPassword(this.af, email, password);
+    await updateProfile(cred.user, { displayName: nombre });
+    return cred;
+  }
+
+  // ---- VERIFICACIÓN POR CORREO (cliente) ----
+  sendVerificationEmail() {
+    const user = this.af.currentUser;
+    if (!user) return Promise.resolve();
+    const url = `${location.origin}/#/verificado`;  // Ajusta si quieres otra ruta
+    return sendEmailVerification(user, { url, handleCodeInApp: false });
   }
 }

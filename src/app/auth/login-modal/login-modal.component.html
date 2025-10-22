@@ -33,7 +33,9 @@
         <span class="g">G</span> Continuar con Google
       </button>
 
-      <p class="hint">¿No estás registrado? <a class="link" href="#">Registrarse</a></p>
+      <button type="button" class="link" (click)="goRegister.emit()">
+  Registrarse
+</button>
       <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
     </div>
   </div>

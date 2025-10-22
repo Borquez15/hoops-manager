@@ -22,6 +22,7 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
   @Input() open = false;
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<any>();
+  @Output() goRegister = new EventEmitter<void>()
 
   hide = true;
   errorMsg = '';
