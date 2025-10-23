@@ -55,9 +55,9 @@ export class AuthService {
   }
 
   // ---- REGISTRO ----
-  async register(nombre: string, apP: string, apM: string, email: string, password: string) {
+  async register(nombre: string, ap_p: string, ap_m: string, email: string, password: string) {
     const cred = await createUserWithEmailAndPassword(this.af, email, password);
-    await updateProfile(cred.user, { displayName: nombre });
+    await updateProfile(cred.user, { displayName: nombre});
     return cred;
   }
 
@@ -69,10 +69,10 @@ export class AuthService {
     return sendEmailVerification(user, { url, handleCodeInApp: false });
   }
   // ---- REGISTRO NATIVO (FastAPI) ----
-registerNative(dto: { nombre: string; email: string; password: string }) {
+registerNative(dto: { nombre: string; ap_p: string; ap_m: string | null; email: string; password: string }) {
   // POST http://127.0.0.1:8000/auth/register
   return firstValueFrom(
-    this.http.post<{ id_usuario: number; nombre: string; email: string }>(
+    this.http.post<{ id_usuario: number; nombre: string; ap_p: string; ap_m: string | null; email: string }>(
       `${environment.apiBase}/auth/register`,
       dto
     )

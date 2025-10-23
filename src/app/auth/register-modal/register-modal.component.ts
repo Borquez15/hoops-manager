@@ -30,9 +30,9 @@ export class RegisterModalComponent {
   sending = false;
 
   form = this.fb.group({
-    nombre: ['', [Validators.required, Validators.maxLength(40)]],
-    apP: ['', [Validators.required, Validators.maxLength(40)]],
-    apM: ['', [Validators.maxLength(40)]],
+    nombre: ['', [Validators.required, Validators.maxLength(80)]],
+    ap_p: ['', [Validators.required, Validators.maxLength(80)]],
+    ap_m: ['', [Validators.maxLength(80)]],
     email: ['', [Validators.required, Validators.email]],
     groupPass: this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -51,10 +51,12 @@ export class RegisterModalComponent {
   this.errorMsg = '';
 
   const nombre   = this.form.value.nombre!.trim();
+  const ap_p   = this.form.value.ap_p!.trim();              // obligatorio
+  const ap_m   = (this.form.value.ap_m ?? '').trim() || null;
   const email    = this.form.value.email!.trim().toLowerCase();
   const password = this.gp.get('password')!.value as string;
       try {
-      const res = await this.auth.registerNative({ nombre, email, password });
+      const res = await this.auth.registerNative({ nombre, ap_p, ap_m,  email, password });
       this.success.emit(res);
       this.close.emit();
     } catch (e: any) {
