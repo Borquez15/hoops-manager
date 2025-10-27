@@ -1,0 +1,51 @@
+<section class="screen">
+  <div class="card-navy">
+    <div class="header">
+      <button class="back" type="button" (click)="volver()">← Volver</button>
+      <h2 *ngIf="torneo; else titulo">Torneo: {{ torneo?.nombre }}</h2>
+      <ng-template #titulo><h2>Detalle del torneo</h2></ng-template>
+    </div>
+
+    <!-- Estados de carga / error -->
+    <div *ngIf="loading" class="state">Cargando…</div>
+    <div *ngIf="!loading && error" class="state err">{{ error }}</div>
+
+    <!-- Info principal del torneo -->
+    <div *ngIf="!loading && torneo" class="info-grid">
+      <div class="info">
+        <div class="label">Modalidad</div>
+        <div class="value">{{ torneo.modalidad }}</div>
+      </div>
+      <div class="info">
+        <div class="label">Vueltas</div>
+        <div class="value">{{ torneo.vueltas }}</div>
+      </div>
+      <div class="info">
+        <div class="label">Cupos Playoffs</div>
+        <div class="value">{{ torneo.cupos_playoffs }}</div>
+      </div>
+      <div class="info">
+        <div class="label">Estado</div>
+        <div class="value tag">{{ torneo.estado }}</div>
+      </div>
+    </div>
+
+    <!-- Panels secundarios (maquetados; conecta cuando tengas endpoints) -->
+    <div *ngIf="!loading && torneo" class="panels">
+      <div class="panel">
+        <h3>Tabla general</h3>
+        <div class="placeholder">Próximamente: tabla de posiciones.</div>
+      </div>
+
+      <div class="panel">
+        <h3>Campeones canasteros</h3>
+        <div class="placeholder">Próximamente: líderes anotadores.</div>
+      </div>
+
+      <div class="panel span-2">
+        <h3>Próximos juegos</h3>
+        <div class="placeholder">Próximamente: lista de partidos.</div>
+      </div>
+    </div>
+  </div>
+</section>

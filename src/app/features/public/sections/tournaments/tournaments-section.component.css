@@ -86,3 +86,21 @@ input[type="text"]:focus{
 @media (max-width: 560px){
   .search-row{ grid-template-columns: 1fr; }
 }
+
+/* ya tenías estilos; añade lo siguiente para la lista */
+.results { display: grid; place-items: center; margin-top: 1rem; }
+.list { width: min(900px, 92vw); padding: 18px 20px; }
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  padding: 12px 6px;
+}
+.name { font-weight: 600; }
+.enter {
+  padding: 6px 12px; border-radius: 10px;
+  background: #ff7f32; color: #fff; border: none; cursor: pointer;
+}
+.empty { opacity: .7; padding: 16px 0; }
+.err { color: #ffb3b3; }

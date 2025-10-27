@@ -11,14 +11,33 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   sendEmailVerification,
+  // 👇 importa esto:
+  authState
 } from '@angular/fire/auth';
-import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environment/environment'; // <-- AJUSTA ESTA RUTA SI ES NECESARIO
+import { firstValueFrom, from, of } from 'rxjs';
+// 👇 utilidades rxjs
+import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { environment } from '../../environment/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private af   = inject(Auth);
   private http = inject(HttpClient);
+
+  // 👇 Observable del usuario (null si no hay sesión)
+  user$ = authState(this.af).pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
+  // 👇 Booleano derivado (útil en plantillas)
+  isLoggedIn$ = this.user$.pipe(map(Boolean), shareReplay({ bufferSize: 1, refCount: true }));
+
+  // 👇 Token como observable (por si quieres suscribirte puntualmente)
+  idToken$ = this.user$.pipe(
+    switchMap(u => u ? from(u.getIdToken()) : of(null)),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  // Helper: acceso sincrónico
+  get currentUser() { return this.af.currentUser; }
 
   // ---- LOGIN ----
   loginEmail(email: string, password: string) {
@@ -35,7 +54,7 @@ export class AuthService {
     return signOut(this.af);
   }
 
-  // ---- TOKEN ----
+  // ---- TOKEN (Promise) ----
   async getIdToken(user?: User) {
     const u = user ?? await new Promise<User | null>((resolve) => {
       const unsub = onAuthStateChanged(this.af, (usr) => { unsub(); resolve(usr); });
@@ -65,18 +84,17 @@ export class AuthService {
   sendVerificationEmail() {
     const user = this.af.currentUser;
     if (!user) return Promise.resolve();
-    const url = `${location.origin}/#/verificado`;  // Ajusta si quieres otra ruta
+    const url = `${location.origin}/#/verificado`;
     return sendEmailVerification(user, { url, handleCodeInApp: false });
   }
-  // ---- REGISTRO NATIVO (FastAPI) ----
-registerNative(dto: { nombre: string; ap_p: string; ap_m: string | null; email: string; password: string }) {
-  // POST http://127.0.0.1:8000/auth/register
-  return firstValueFrom(
-    this.http.post<{ id_usuario: number; nombre: string; ap_p: string; ap_m: string | null; email: string }>(
-      `${environment.apiBase}/auth/register`,
-      dto
-    )
-  );
-}
 
+  // ---- REGISTRO NATIVO (FastAPI) ----
+  registerNative(dto: { nombre: string; ap_p: string; ap_m: string | null; email: string; password: string }) {
+    return firstValueFrom(
+      this.http.post<{ id_usuario: number; nombre: string; ap_p: string; ap_m: string | null; email: string }>(
+        `${environment.apiBase}/auth/register`,
+        dto
+      )
+    );
+  }
 }

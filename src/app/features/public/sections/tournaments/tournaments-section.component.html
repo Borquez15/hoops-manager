@@ -4,13 +4,30 @@
     <p class="subtitle">Puedes encontrar tus torneos aquí</p>
 
     <form class="search-row" (ngSubmit)="onSubmit()">
-      <input
-        type="text"
-        [formControl]="query"
-        placeholder="Escribe el nombre del torneo o su ID..."
-        aria-label="Buscar torneo por nombre o ID"
-      />
-      <button class="btn" type="submit">BUSCAR</button>
+      <input type="text" [formControl]="query" placeholder="Escribe el nombre del torneo o su ID..." />
+      <button class="btn" type="button" (click)="onSubmit()">BUSCAR</button>
     </form>
+
+    <!-- Resultados aquí, pegadito al buscador -->
+    <div class="results-block">
+      <div *ngIf="loading">Buscando…</div>
+      <div *ngIf="!loading && error" class="err">{{ error }}</div>
+
+      <ng-container *ngIf="!loading && !error">
+        <div *ngIf="match" class="row">
+          <div class="name">{{ match.nombre }}</div>
+          <button class="enter" (click)="goTo(match)">ENTRAR</button>
+        </div>
+
+        <div *ngFor="let t of suggestions" class="row">
+          <div class="name">{{ t.nombre }}</div>
+          <button class="enter" (click)="goTo(t)">ENTRAR</button>
+        </div>
+
+        <div *ngIf="!match && suggestions.length === 0" class="empty">
+          No encontramos torneos con ese criterio.
+        </div>
+      </ng-container>
+    </div>
   </div>
 </section>
