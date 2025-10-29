@@ -1,3 +1,6 @@
+// ============================================
+// login-modal.component.ts - ACTUALIZADO
+// ============================================
 import {
   AfterViewInit, Component, EventEmitter, Input, OnChanges,
   Output, SimpleChanges, inject
@@ -14,20 +17,18 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./login-modal.component.css']
 })
 export class LoginModalComponent implements AfterViewInit, OnChanges {
-
-  // ✅ inyecta sin constructor
   private fb   = inject(FormBuilder);
   private auth = inject(AuthService);
 
   @Input() open = false;
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<any>();
-  @Output() goRegister = new EventEmitter<void>()
+  @Output() goRegister = new EventEmitter<void>();
 
   hide = true;
+  loading = false;
   errorMsg = '';
 
-  // ✅ ya puedes usar fb aquí sin error
   form = this.fb.group({
     email:    ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
@@ -42,32 +43,64 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
     try { document.body.style.overflow = lock ? 'hidden' : ''; } catch {}
   }
 
+  // ✅ MÉTODO ACTUALIZADO - USA loginNative
   async submit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.loading) return;
+
     this.errorMsg = '';
-    const { email, password } = this.form.value;
+    this.form.markAllAsTouched();
+    
+    if (this.form.invalid) {
+      this.errorMsg = 'Revisa los campos marcados.';
+      return;
+    }
+
+    const { email, password } = this.form.value as { email: string; password: string };
+    this.loading = true;
 
     try {
-      const cred    = await this.auth.loginEmail(email!, password!);
-      const idToken = await this.auth.getIdToken(cred.user);
-      // opcional: await this.auth.exchangeWithBackend(idToken!);
-      this.success.emit({ user: cred.user, idToken });
+      // ✅ Llama al método NATIVO (no Firebase)
+      const usuario = await this.auth.loginNative(email, password);
+      
+      console.log('✅ Login exitoso:', usuario);
+      this.success.emit({ user: usuario });
       this.close.emit();
-    } catch {
-      this.errorMsg = 'Credenciales inválidas.';
+      this.form.reset();
+      
+    } catch (error: any) {
+      console.error('❌ Error en login:', error);
+      
+      if (error.status === 401) {
+        this.errorMsg = 'Credenciales inválidas';
+      } else if (error.status === 0) {
+        this.errorMsg = '⚠️ No se puede conectar al servidor';
+      } else {
+        this.errorMsg = error.error?.detail || 'Error al iniciar sesión';
+      }
+    } finally {
+      this.loading = false;
     }
   }
 
+  // ✅ LOGIN CON GOOGLE (usa Firebase + backend)
   async loginWithGoogle() {
+    if (this.loading) return;
+    
     this.errorMsg = '';
+    this.loading = true;
+
     try {
-      const cred    = await this.auth.loginGoogle();
-      const idToken = await this.auth.getIdToken(cred.user);
-      // opcional: await this.auth.exchangeWithBackend(idToken!);
-      this.success.emit({ user: cred.user, idToken });
+      const result = await this.auth.loginGoogle();
+      
+      console.log('✅ Login con Google exitoso');
+      this.success.emit({ user: result.user });
       this.close.emit();
-    } catch {
-      this.errorMsg = 'No se pudo iniciar con Google.';
+      
+    } catch (error: any) {
+      console.error('❌ Error en Google login:', error);
+      this.errorMsg = 'No se pudo iniciar con Google';
+    } finally {
+      this.loading = false;
     }
   }
 }

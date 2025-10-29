@@ -1,53 +1,79 @@
-<div *ngIf="open" class="overlay" (click)="close.emit()"></div>
+<div class="overlay" *ngIf="open" (click)="close.emit()"></div>
 
-<div *ngIf="open" class="modal" role="dialog" aria-modal="true">
-  <div class="card">
-    <div class="card__header">Crear Cuenta</div>
+<div class="modal" *ngIf="open" role="dialog" aria-modal="true"
+     (click)="$event.stopPropagation()">
+  <div class="panel">
+    <header class="head">
+      <h2>Crear cuenta</h2>
+      <button class="close" (click)="close.emit()" aria-label="Cerrar">×</button>
+    </header>
 
-    <form class="form" [formGroup]="form" (ngSubmit)="submit()" (click)="$event.stopPropagation()">
-      <label>Nombre:
-        <input type="text" formControlName="nombre" />
-      </label>
+    <div class="body">
+      <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="row">
+          <label>
+            Nombre(s)
+            <input type="text" formControlName="nombre" placeholder="Juan">
+            <small class="hint error" *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid">
+              Mínimo 2 caracteres
+            </small>
+          </label>
 
-      <label>Apellido Paterno:
-        <input type="text" formControlName="ap_p" />
-      </label>
+          <label>
+            Apellido paterno
+            <input type="text" formControlName="ap_p" placeholder="Pérez">
+            <small class="hint error" *ngIf="form.get('ap_p')?.touched && form.get('ap_p')?.invalid">
+              Requerido
+            </small>
+          </label>
+        </div>
 
-      <label>Apellido Materno:
-        <input type="text" formControlName="ap_m" />
-      </label>
-
-      <label>Correo:
-        <input type="email" formControlName="email" />
-      </label>
-
-      <div formGroupName="groupPass" class="pass-grid">
-        <label>Contraseña:
-          <div class="pass-wrap">
-            <input [type]="hide ? 'password' : 'text'" formControlName="password" />
-            <button type="button" class="eye" (click)="hide=!hide" aria-label="Mostrar/Ocultar">👁</button>
-          </div>
+        <label>
+          Apellido materno (opcional)
+          <input type="text" formControlName="ap_m" placeholder="García">
         </label>
 
-        <label>Confirmar Contraseña:
-          <div class="pass-wrap">
-            <input [type]="hide2 ? 'password' : 'text'" formControlName="confirm" />
-            <button type="button" class="eye" (click)="hide2=!hide2" aria-label="Mostrar/Ocultar">👁</button>
-          </div>
-          <small class="err"
-       *ngIf="gp.hasError('mismatch') && (gp.dirty || gp.touched)">
-  Las contraseñas no coinciden
-</small>
+        <label>
+          Correo electrónico
+          <input type="email" formControlName="email" placeholder="tucorreo@dominio.com">
+          <small class="hint error" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+            Ingresa un correo válido
+          </small>
         </label>
-      </div>
 
-      <div class="err" *ngIf="errorMsg">{{ errorMsg }}</div>
+        <label>
+          Contraseña
+          <div class="pwd">
+            <input [type]="hide ? 'password':'text'" formControlName="password" placeholder="••••••••">
+            <button type="button" class="eye" (click)="hide=!hide" aria-label="Mostrar/ocultar">👁</button>
+          </div>
+          <small class="hint error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+            Mínimo 6 caracteres
+          </small>
+        </label>
 
-      <button class="btn" type="submit" [disabled]="sending || form.invalid">
-        {{ sending ? 'Registrando…' : 'Registrarse' }}
+        <label>
+          Confirmar contraseña
+          <input [type]="hide ? 'password':'text'" formControlName="confirmPassword" placeholder="••••••••">
+        </label>
+
+        <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+        <button class="btn btn-primary wfull" type="submit" [disabled]="loading || form.invalid">
+          <span *ngIf="!loading">Registrarse</span>
+          <span *ngIf="loading">Creando cuenta...</span>
+        </button>
+      </form>
+
+      <div class="or"><span>o</span></div>
+
+      <button class="btn btn-google wfull" type="button" (click)="loginWithGoogle()" [disabled]="loading">
+        <span class="g">G</span> Registrarse con Google
       </button>
 
-      <button type="button" class="link" (click)="goLogin.emit()">¿Ya tienes cuenta? Inicia sesión</button>
-    </form>
+      <button type="button" class="link" (click)="goLogin.emit()" [disabled]="loading">
+        ¿Ya tienes cuenta? Inicia sesión
+      </button>
+    </div>
   </div>
 </div>

@@ -1,69 +1,107 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+// ============================================
+// register-modal.component.ts - NUEVO
+// ============================================
+import {
+  Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-
-function samePassword(ctrl: AbstractControl): ValidationErrors | null {
-  const p = ctrl.get('password')?.value;
-  const c = ctrl.get('confirm')?.value;
-  return p && c && p !== c ? { mismatch: true } : null;
-}
 
 @Component({
   selector: 'app-register-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './register-modal.component.html',
-  styleUrls: ['./register-modal.component.css'],
+  styleUrls: ['./register-modal.component.css']
 })
-export class RegisterModalComponent {
-  @Input() open = false;
-  @Output() close = new EventEmitter<void>();
-  @Output() success = new EventEmitter<any>();          // devuelve user
-  @Output() goLogin = new EventEmitter<void>();         // para saltar a login
-
-  private fb = inject(FormBuilder);
+export class RegisterModalComponent implements OnChanges {
+  private fb   = inject(FormBuilder);
   private auth = inject(AuthService);
 
-  hide = true; hide2 = true;
+  @Input() open = false;
+  @Output() close = new EventEmitter<void>();
+  @Output() success = new EventEmitter<any>();
+  @Output() goLogin = new EventEmitter<void>();
+
+  hide = true;
+  loading = false;
   errorMsg = '';
-  sending = false;
 
   form = this.fb.group({
-    nombre: ['', [Validators.required, Validators.maxLength(80)]],
-    ap_p: ['', [Validators.required, Validators.maxLength(80)]],
-    ap_m: ['', [Validators.maxLength(80)]],
-    email: ['', [Validators.required, Validators.email]],
-    groupPass: this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirm:  ['', [Validators.required]],
-    }, { validators: samePassword })
+    nombre:    ['', [Validators.required, Validators.minLength(2)]],
+    ap_p:      ['', [Validators.required, Validators.minLength(2)]],
+    ap_m:      [''],
+    email:     ['', [Validators.required, Validators.email]],
+    password:  ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', [Validators.required]]
   });
 
-  get f() { return this.form.controls; }
-  get gp() { return (this.form.get('groupPass')!); }
+  ngOnChanges(ch: SimpleChanges) {
+    if (ch['open']) {
+      document.body.style.overflow = ch['open'].currentValue ? 'hidden' : '';
+    }
+  }
 
   async submit() {
+    if (this.loading) return;
+
+    this.errorMsg = '';
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    
+    if (this.form.invalid) {
+      this.errorMsg = 'Revisa los campos marcados.';
+      return;
+    }
 
-    this.sending = true;
-  this.errorMsg = '';
+    const { password, confirmPassword, ap_m, ...rest } = this.form.value;
 
-  const nombre   = this.form.value.nombre!.trim();
-  const ap_p   = this.form.value.ap_p!.trim();              // obligatorio
-  const ap_m   = (this.form.value.ap_m ?? '').trim() || null;
-  const email    = this.form.value.email!.trim().toLowerCase();
-  const password = this.gp.get('password')!.value as string;
-      try {
-      const res = await this.auth.registerNative({ nombre, ap_p, ap_m,  email, password });
-      this.success.emit(res);
+    if (password !== confirmPassword) {
+      this.errorMsg = 'Las contraseñas no coinciden';
+      return;
+    }
+
+    this.loading = true;
+
+    try {
+      const usuario = await this.auth.registerNative({
+        ...rest as any,
+        ap_m: ap_m || null,
+        password: password!
+      });
+      
+      console.log('✅ Registro exitoso:', usuario);
+      this.success.emit({ user: usuario });
       this.close.emit();
-    } catch (e: any) {
-      // Si el backend manda {detail: 'Email ya registrado'} lo mostramos:
-      this.errorMsg = e?.error?.detail || 'No pudimos crear tu cuenta.';
+      this.form.reset();
+      
+    } catch (error: any) {
+      console.error('❌ Error en registro:', error);
+      
+      if (error.status === 409) {
+        this.errorMsg = 'Este email ya está registrado';
+      } else {
+        this.errorMsg = error.error?.detail || 'Error al registrarse';
+      }
     } finally {
-      this.sending = false;
+      this.loading = false;
+    }
+  }
+
+  async loginWithGoogle() {
+    if (this.loading) return;
+    
+    this.errorMsg = '';
+    this.loading = true;
+
+    try {
+      const result = await this.auth.loginGoogle();
+      this.success.emit({ user: result.user });
+      this.close.emit();
+    } catch (error) {
+      this.errorMsg = 'Error al registrarse con Google';
+    } finally {
+      this.loading = false;
     }
   }
 }

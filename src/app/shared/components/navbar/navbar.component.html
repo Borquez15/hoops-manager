@@ -1,0 +1,83 @@
+<nav class="navbar">
+  <div class="container">
+    <!-- Logo -->
+    <a routerLink="/" class="logo">
+      <img src="/assets/logo-hoops-manager.png" alt="Hoops Manager">
+      <span>Hoops Manager</span>
+    </a>
+
+    <!-- Usuario autenticado -->
+    <div class="user-menu" *ngIf="isAuthenticated">
+      <button class="user-btn" (click)="toggleMenu()">
+        <div class="avatar">
+          {{ user?.nombre?.charAt(0) || 'U' }}
+        </div>
+        <span class="user-name">{{ user?.nombre }}</span>
+        <svg class="chevron" [class.open]="menuOpen" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div class="dropdown" *ngIf="menuOpen" (click)="closeMenu()">
+        <div class="dropdown-header">
+          <div class="avatar-large">
+            {{ user?.nombre?.charAt(0) || 'U' }}
+          </div>
+          <div class="user-info">
+            <p class="name">{{ user?.nombre }} {{ user?.ap_p }}</p>
+            <p class="email">{{ user?.email }}</p>
+          </div>
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        <a routerLink="/dashboard" class="dropdown-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a routerLink="/mis-torneos" class="dropdown-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+          </svg>
+          <span>Mis Torneos</span>
+        </a>
+
+        <a routerLink="/crear-torneo" class="dropdown-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>Crear Torneo</span>
+        </a>
+
+        <a routerLink="/perfil" class="dropdown-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+          </svg>
+          <span>Mi Perfil</span>
+        </a>
+
+        <div class="dropdown-divider"></div>
+
+        <button class="dropdown-item danger" (click)="logout()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+          </svg>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Botones para no autenticados -->
+    <div class="auth-buttons" *ngIf="!isAuthenticated">
+      <button class="btn btn-outline" routerLink="/login">Iniciar Sesión</button>
+      <button class="btn btn-primary" routerLink="/register">Registrarse</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Overlay para cerrar el menú al hacer click fuera -->
+<div class="menu-overlay" *ngIf="menuOpen" (click)="closeMenu()"></div>
