@@ -45,7 +45,7 @@ export const routes: Routes = [
     path: 'crear-torneo',
     loadComponent: () => 
       import('./features/create-tournament/create-tournament.component')
-        .then(m => m.CreateTournamentComponent),
+        .then(m => m.CrearTorneoComponent),
     canActivate: [authGuard]
   },
 

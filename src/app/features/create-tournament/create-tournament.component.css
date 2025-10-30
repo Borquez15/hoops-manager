@@ -1,0 +1,928 @@
+:host {
+  display: block;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* ========================================
+   CONTENEDOR PRINCIPAL CON FONDO
+   ======================================== */
+.crear-torneo-container {
+  min-height: 100vh;
+  background-color: #0b0e13;
+  background-image:
+    radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(0deg, rgba(0,0,0,.40), rgba(0,0,0,.40)),
+    url("/imagen/fondo.webp");
+  background-position: center, center, 58% 34%;
+  background-size: auto, auto, 112% auto;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-attachment: scroll, scroll, scroll;
+}
+
+/* Fallback para PNG si webp falla */
+@supports not (background-image: url("/imagen/fondo.webp")) {
+  .crear-torneo-container {
+    background-image:
+      radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
+      linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
+      url("/imagen/fondo.png");
+  }
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+.header {
+  background: rgba(44, 62, 80, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 100;
+}
+
+.header__content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-volver {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 2px solid #ff8c42;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+  background: #ff8c42;
+  transform: translateX(-5px);
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* ========================================
+   CONTENT
+   ======================================== */
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 10;
+}
+
+/* ========================================
+   ALERTAS
+   ======================================== */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  animation: slideDown 0.3s ease;
+  position: relative;
+}
+
+.alert-error {
+  background: #fee;
+  color: #c33;
+  border: 2px solid #fcc;
+}
+
+.alert-success {
+  background: #efe;
+  color: #3c3;
+  border: 2px solid #cfc;
+}
+
+.btn-close-alert {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.btn-close-alert:hover {
+  opacity: 1;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   GRID
+   ======================================== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.card-wide {
+  grid-column: span 2;
+}
+
+/* ========================================
+   CARDS
+   ======================================== */
+.card {
+  background: #2c3e50;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #34495e, #2c3e50);
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.card-body {
+  padding: 24px;
+  background: white;
+}
+
+/* ========================================
+   CONFIGURACIÓN RESUMEN
+   ======================================== */
+.config-resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.config-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.config-value {
+  color: #ff8c42;
+  font-weight: 700;
+}
+
+/* ========================================
+   BOTONES
+   ======================================== */
+.btn-icon {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.btn-edit {
+  background: #ff8c42;
+}
+
+.btn-edit:hover {
+  background: #ff6b35;
+}
+
+.btn-add {
+  background: #ff8c42;
+}
+
+.btn-add:hover {
+  background: #ff6b35;
+  transform: rotate(90deg) scale(1.1);
+}
+
+.btn-icon-small {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: #e1e8ed;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon-small:hover {
+  background: #ff8c42;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-icon-small.active {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #e74c3c !important;
+}
+
+/* ========================================
+   LISTAS
+   ======================================== */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.list-item:hover {
+  background: #e8ecf0;
+  transform: translateX(5px);
+}
+
+.list-item-icon {
+  width: 36px;
+  height: 36px;
+  color: #ff8c42;
+  flex-shrink: 0;
+}
+
+.list-item-text {
+  flex: 1;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.list-item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.equipo-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff8c42, #ff6b35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #95a5a6;
+}
+
+.empty-state p {
+  margin: 8px 0;
+  font-weight: 600;
+}
+
+/* ========================================
+   FOOTER ACTIONS
+   ======================================== */
+.footer-actions {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff8c42, #ff6b35);
+  color: white;
+  box-shadow: 0 4px 16px rgba(255, 140, 66, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 140, 66, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #7f8c8d;
+}
+
+.btn-large {
+  padding: 18px 48px;
+  font-size: 18px;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* ========================================
+   MODAL
+   ======================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-equipo {
+  max-width: 1000px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 2px solid #e1e8ed;
+  background: linear-gradient(135deg, #34495e, #2c3e50);
+}
+
+.modal-header h2 {
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.btn-close {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px;
+  border-top: 2px solid #e1e8ed;
+}
+
+/* ========================================
+   FORMULARIO
+   ======================================== */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #ff8c42;
+  box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.1);
+}
+
+.form-control-sm {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ========================================
+   COUNTER
+   ======================================== */
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-counter {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  background: white;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-counter:hover {
+  background: #ff8c42;
+  border-color: #ff8c42;
+  color: white;
+  transform: scale(1.1);
+}
+
+.counter-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* ========================================
+   TOGGLE GROUP
+   ======================================== */
+.toggle-group {
+  display: flex;
+  gap: 12px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  background: white;
+  color: #2c3e50;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  border-color: #ff8c42;
+  background: rgba(255, 140, 66, 0.1);
+}
+
+.toggle-btn.active {
+  background: #ff8c42;
+  border-color: #ff8c42;
+  color: white;
+}
+
+/* ========================================
+   SECCIÓN DE CANCHAS
+   ======================================== */
+.canchas-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 2px solid #e1e8ed;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.section-title svg {
+  color: #ff8c42;
+}
+
+.canchas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.cancha-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.cancha-item:hover {
+  background: #e8ecf0;
+}
+
+.cancha-info {
+  flex: 1;
+}
+
+.cancha-nombre {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cancha-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #95a5a6;
+  color: white;
+}
+
+.cancha-badge.activa {
+  background: #4caf50;
+}
+
+.cancha-ubicacion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.cancha-ubicacion svg {
+  color: #ff8c42;
+}
+
+.cancha-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.nueva-cancha-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 10px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .nueva-cancha-form {
+    grid-template-columns: 1fr;
+  }
+
+  .toggle-group {
+    flex-direction: column;
+  }
+
+  .btn-large {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ========================================
+   MODAL DE EQUIPOS CON JUGADORES
+   ======================================== */
+.equipo-info-section {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  background: #f5f7fa;
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+
+.equipo-logo-grande {
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.equipo-logo-grande .equipo-logo-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ff8c42, #ff6b35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 48px;
+}
+
+.jugadores-modal-section {
+  margin-top: 32px;
+}
+
+.jugadores-lista-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 12px;
+}
+
+.jugador-item-modal {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.jugador-item-modal:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateX(5px);
+}
+
+.jugador-item-modal.inactive {
+  opacity: 0.5;
+}
+
+.jugador-dorsal {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff8c42, #ff6b35);
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jugador-info {
+  flex: 1;
+}
+
+.jugador-nombre {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.jugador-curp {
+  font-size: 13px;
+  color: #7f8c8d;
+  font-family: monospace;
+}
+
+.jugador-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-state-small {
+  text-align: center;
+  padding: 40px 20px;
+  color: #95a5a6;
+  background: #f5f7fa;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.empty-state-small p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.agregar-jugador-modal-form {
+  padding: 24px;
+  background: #f5f7fa;
+  border-radius: 12px;
+  margin-top: 24px;
+}
+
+.agregar-jugador-modal-form h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ========================================
+   RESPONSIVE PARA MODAL DE EQUIPOS
+   ======================================== */
+@media (max-width: 768px) {
+  .modal-equipo {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .equipo-info-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jugadores-lista-modal {
+    max-height: 200px;
+  }
+}

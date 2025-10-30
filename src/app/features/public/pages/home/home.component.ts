@@ -17,7 +17,7 @@ type SectionId = typeof SECTION_IDS[number];
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule, // ← AGREGAR para routerLink
+    RouterModule,
     FeaturesSectionComponent,
     TournamentsSectionComponent,
     ContactSectionComponent,
@@ -30,7 +30,6 @@ type SectionId = typeof SECTION_IDS[number];
 export class HomeComponent implements AfterViewInit {
   @ViewChild('snapContainer') snapContainer!: ElementRef<HTMLElement>;
 
-  // ✅ NUEVO: Inyectar AuthService
   private auth = inject(AuthService);
   private router = inject(Router);
 
@@ -41,17 +40,16 @@ export class HomeComponent implements AfterViewInit {
   showLogin = false;
   showRegister = false;
 
-  // ✅ NUEVO: Estado de autenticación
+  // Estado de autenticación
   user = this.auth.getCurrentUserNative();
   isAuthenticated = !!this.user;
   menuOpen = false;
 
-  // ✅ ACTUALIZADO: Botones con lógica de autenticación
+  // Botones con lógica de autenticación
   iniciarSesion(ev?: Event) {
     ev?.preventDefault();
     
     if (this.isAuthenticated) {
-      // Si ya está autenticado, ir al dashboard
       this.router.navigate(['/dashboard']);
     } else {
       this.showLogin = true;
@@ -62,46 +60,36 @@ export class HomeComponent implements AfterViewInit {
     ev?.preventDefault();
     
     if (this.isAuthenticated) {
-      // Si ya está autenticado, ir a crear torneo
       this.router.navigate(['/crear-torneo']);
     } else {
-      // Si no, mostrar login
       this.showLogin = true;
     }
   }
 
-  // ✅ ACTUALIZADO: Callbacks de login/registro
+  // Callbacks de login/registro
   onLoginSuccess(data: any) {
-  console.log('✅ Login exitoso:', data.user);
-  this.showLogin = false;
-  
-  // ✅ ACTUALIZA EL ESTADO LOCAL
-  this.user = data.user;
-  this.isAuthenticated = true;
-  
-  // ✅ USA data.user en lugar de this.user
-  console.log('¡Bienvenido!', data.user.nombre);
-  
-  // Opcional: redirigir después de 500ms para que vea el cambio
-  //setTimeout(() => {
-   // this.router.navigate(['/dashboard']);
-  //}, 500);
-}
+    console.log('✅ Login exitoso:', data.user);
+    this.showLogin = false;
+    
+    this.user = data.user;
+    this.isAuthenticated = true;
+    
+    console.log('¡Bienvenido!', data.user.nombre);
+  }
 
   onRegisterSuccess(data: any) {
-  console.log('✅ Registro exitoso:', data.user);
-  this.showRegister = false;
-  
-  // ✅ ACTUALIZA EL ESTADO LOCAL
-  this.user = data.user;
-  this.isAuthenticated = true;
-  
-  setTimeout(() => {
-    this.router.navigate(['/dashboard']);
-  }, 500);
-}
+    console.log('✅ Registro exitoso:', data.user);
+    this.showRegister = false;
+    
+    this.user = data.user;
+    this.isAuthenticated = true;
+    
+    setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 500);
+  }
 
-  // ✅ NUEVO: Métodos del menú de usuario
+  // Métodos del menú de usuario
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
@@ -116,11 +104,10 @@ export class HomeComponent implements AfterViewInit {
     this.user = null;
     this.isAuthenticated = false;
     
-    // Recargar la página en el home
     window.location.href = '/';
   }
 
-  // Navegación/scroll (sin cambios)
+  // Navegación/scroll
   async go(id: SectionId, ev?: Event) {
     ev?.preventDefault();
     if (this.router.url !== '/') {
@@ -145,6 +132,7 @@ export class HomeComponent implements AfterViewInit {
       .map(id => document.getElementById(id))
       .filter((e): e is HTMLElement => !!e);
 
+    // Configuración mejorada del IntersectionObserver
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -153,8 +141,19 @@ export class HomeComponent implements AfterViewInit {
           history.replaceState(null, '', `#${id}`);
         }
       });
-    }, { threshold: 0.6 });
+    }, { 
+      threshold: [0, 0.25, 0.5, 0.75, 1],  // ← Múltiples puntos de detección
+      rootMargin: '-100px 0px -50% 0px'    // ← Detecta cuando está cerca del top
+    });
 
     els.forEach(el => observer.observe(el));
+
+    // Detección adicional de scroll para la sección de inicio
+    window.addEventListener('scroll', () => {
+      if (window.scrollY < 200) {
+        this.active = 'inicio';
+        history.replaceState(null, '', '#inicio');
+      }
+    });
   }
 }
