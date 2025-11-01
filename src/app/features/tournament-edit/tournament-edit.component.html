@@ -1,0 +1,324 @@
+<!-- src/app/features/tournament-edit/tournament-edit.component.html -->
+<div class="page-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      ← Volver
+    </button>
+    <h1 class="page-title" *ngIf="tournament">
+      MI TORNEO - {{ tournament.nombre }}
+    </h1>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando torneo...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-alert">
+    <span>{{ error }}</span>
+    <button (click)="error = null" class="error-close-btn">✕</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && tournament" class="content">
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'config'"
+        (click)="changeTab('config')"
+      >
+        ⚙️ Configuración
+      </button>
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'arbitros'"
+        (click)="changeTab('arbitros')"
+      >
+        👤 Árbitros
+      </button>
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'equipos'"
+        (click)="changeTab('equipos')"
+      >
+        🏆 Equipos
+      </button>
+      <button 
+        class="tab-btn"
+        [class.active]="activeTab === 'calendario'"
+        (click)="changeTab('calendario')"
+      >
+        📅 Calendario
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+
+      <!-- CONFIGURACIÓN -->
+      <div *ngIf="activeTab === 'config'" class="config-panel">
+        <div class="panel">
+          <h2 class="panel-title">Configuración del Torneo</h2>
+
+          <div class="form-group">
+            <label class="form-label">Nombre de la liga</label>
+            <input
+              type="text"
+              [(ngModel)]="tournament.nombre"
+              class="input-text"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Vueltas a jugar</label>
+            <div class="counter-container">
+              <button (click)="decrementar('vueltas')" class="counter-btn">−</button>
+              <span class="counter-value">{{ tournament.vueltas }}</span>
+              <button (click)="incrementar('vueltas')" class="counter-btn">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Clasificación de playoffs</label>
+            <div class="counter-container">
+              <button (click)="decrementar('cupos_playoffs')" class="counter-btn">−</button>
+              <span class="counter-value">{{ tournament.cupos_playoffs }}</span>
+              <button (click)="incrementar('cupos_playoffs')" class="counter-btn">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Modalidad de juego</label>
+            <div class="modalidad-grid">
+              <button
+                *ngFor="let mod of modalidades"
+                (click)="tournament.modalidad = mod"
+                [class.active]="tournament.modalidad === mod"
+                class="modalidad-btn"
+              >
+                {{ mod }}
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cantidad de partidos semanales</label>
+            <div class="counter-container">
+              <button (click)="decrementar('dias_por_semana')" class="counter-btn">−</button>
+              <span class="counter-value">{{ tournament.dias_por_semana }}</span>
+              <button (click)="incrementar('dias_por_semana')" class="counter-btn">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Partidos por día</label>
+            <div class="counter-container">
+              <button (click)="decrementar('partidos_por_dia')" class="counter-btn">−</button>
+              <span class="counter-value">{{ tournament.partidos_por_dia }}</span>
+              <button (click)="incrementar('partidos_por_dia')" class="counter-btn">+</button>
+            </div>
+          </div>
+
+          <div class="horarios-grid">
+            <div class="form-group">
+              <label class="form-label">Hora inicio</label>
+              <input type="time" [(ngModel)]="tournament.hora_ini" class="input-text" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora fin</label>
+              <input type="time" [(ngModel)]="tournament.hora_fin" class="input-text" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Duración de partido (minutos)</label>
+            <input
+              type="number"
+              [(ngModel)]="tournament.slot_min"
+              min="15"
+              step="15"
+              class="input-text"
+            />
+          </div>
+
+          <button 
+            (click)="saveConfig()" 
+            [disabled]="saving"
+            class="save-btn"
+          >
+            {{ saving ? 'Guardando...' : '💾 Guardar Cambios' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ÁRBITROS -->
+      <div *ngIf="activeTab === 'arbitros'" class="arbitros-panel">
+        <div class="panel">
+          <h2 class="panel-title">Árbitros del Torneo</h2>
+
+          <div *ngIf="arbitros.length === 0 && !showArbitroForm" class="empty-state">
+            <p class="empty-state-text">No hay árbitros agregados</p>
+            <p class="empty-state-hint">Haz clic en el botón + para agregar</p>
+          </div>
+
+          <div class="item-list">
+            <div *ngFor="let arbitro of arbitros" class="item-card">
+              <div class="item-content">
+                <div class="item-avatar">👤</div>
+                <span class="item-name">{{ arbitro.nombre }}</span>
+              </div>
+              <button (click)="eliminarArbitro(arbitro.id)" class="item-delete-btn">✕</button>
+            </div>
+          </div>
+
+          <div *ngIf="showArbitroForm" class="form-card">
+            <input
+              type="text"
+              [(ngModel)]="nuevoArbitro"
+              (keyup.enter)="agregarArbitro()"
+              placeholder="Nombre del árbitro"
+              class="form-card-input"
+              autofocus
+            />
+            <div class="form-card-actions">
+              <button (click)="agregarArbitro()" class="btn-submit">Agregar</button>
+              <button (click)="cancelarArbitro()" class="btn-cancel">Cancelar</button>
+            </div>
+          </div>
+
+          <button *ngIf="!showArbitroForm" (click)="showArbitroForm = true" class="add-btn">
+            <span class="add-btn-icon">+</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- EQUIPOS -->
+      <div *ngIf="activeTab === 'equipos'" class="equipos-panel">
+        <div class="panel">
+          <h2 class="panel-title">Equipos del Torneo</h2>
+
+          <div *ngIf="equipos.length === 0 && !showEquipoForm" class="empty-state">
+            <p class="empty-state-text">No hay equipos agregados</p>
+            <p class="empty-state-hint">Haz clic en el botón + para agregar</p>
+          </div>
+
+          <div class="item-list">
+            <div *ngFor="let equipo of equipos" class="item-card">
+              <div class="item-content">
+                <div class="item-avatar logo">{{ equipo.logo }}</div>
+                <span class="item-name">{{ equipo.nombre }}</span>
+              </div>
+              <button (click)="eliminarEquipo(equipo.id_equipo)" class="item-delete-btn">✕</button>
+            </div>
+          </div>
+
+          <div *ngIf="showEquipoForm" class="form-card">
+            <input
+              type="text"
+              [(ngModel)]="nuevoEquipo.nombre"
+              (keyup.enter)="agregarEquipo()"
+              placeholder="Nombre del equipo"
+              class="form-card-input"
+              autofocus
+            />
+            <input
+              type="text"
+              [(ngModel)]="nuevoEquipo.logo"
+              maxlength="2"
+              placeholder="Emoji del equipo"
+              class="form-card-input"
+            />
+            <div class="form-card-actions">
+              <button (click)="agregarEquipo()" class="btn-submit">Agregar</button>
+              <button (click)="cancelarEquipo()" class="btn-cancel">Cancelar</button>
+            </div>
+          </div>
+
+          <button *ngIf="!showEquipoForm" (click)="showEquipoForm = true" class="add-btn">
+            <span class="add-btn-icon">+</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CALENDARIO -->
+      <div *ngIf="activeTab === 'calendario'" class="calendario-panel">
+        <div class="panel">
+          <div class="calendar-header">
+            <h2 class="panel-title">Calendario de Partidos</h2>
+            <button 
+              *ngIf="matches.length === 0"
+              (click)="showScheduleForm = !showScheduleForm" 
+              class="generate-btn"
+            >
+              📅 Generar Calendario
+            </button>
+          </div>
+
+          <!-- Formulario de generación -->
+          <div *ngIf="showScheduleForm" class="schedule-form">
+            <div class="form-group">
+              <label class="form-label">Fecha de inicio del torneo</label>
+              <input
+                type="date"
+                [(ngModel)]="scheduleDate"
+                class="input-text"
+              />
+            </div>
+            <div class="form-card-actions">
+              <button (click)="generarCalendario()" class="btn-submit">
+                ✓ Generar
+              </button>
+              <button (click)="showScheduleForm = false" class="btn-cancel">
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista de partidos -->
+          <div *ngIf="matches.length === 0 && !showScheduleForm" class="empty-state">
+            <div class="empty-icon">📅</div>
+            <p class="empty-state-text">No hay partidos programados</p>
+            <p class="empty-state-hint">Genera el calendario automático para crear los partidos</p>
+          </div>
+
+          <div *ngIf="matches.length > 0" class="matches-list">
+            <div *ngFor="let match of matches" class="match-card">
+              <div class="match-date">
+                <span class="date-text">{{ match.fecha }}</span>
+                <span class="time-text">{{ match.hora }}</span>
+              </div>
+              <div class="match-teams">
+                <div class="team">
+                  <span class="team-name">{{ match.local.nombre }}</span>
+                </div>
+                <div class="vs">VS</div>
+                <div class="team">
+                  <span class="team-name">{{ match.visitante.nombre }}</span>
+                </div>
+              </div>
+              <div class="match-info">
+                <span class="match-status" [class]="'status-' + match.estado.toLowerCase()">
+                  {{ match.estado }}
+                </span>
+                <span class="match-field" *ngIf="match.cancha">
+                  🏟️ {{ match.cancha.nombre }}
+                </span>
+                <span class="match-field" *ngIf="!match.cancha">
+                  🏟️ Sin cancha
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

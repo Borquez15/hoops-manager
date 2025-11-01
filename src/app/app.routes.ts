@@ -35,8 +35,8 @@ export const routes: Routes = [
   {
     path: 'mis-torneos',
     loadComponent: () => 
-      import('./features/tournaments/tournaments.component')
-        .then(m => m.TournamentsComponent),
+      import('./features/tournament-list/tournament-list.component')
+        .then(m => m.TournamentListComponent),
     canActivate: [authGuard]
   },
 

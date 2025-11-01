@@ -1,0 +1,86 @@
+<!-- src/app/features/tournament-list/tournament-list.component.html -->
+<div class="page-container">
+  
+  <div class="page-header">
+    <h1 class="page-title">MIS TORNEOS</h1>
+    <p class="page-subtitle">Podés crear un torneo acá</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando torneos...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-alert">
+    <span>{{ error }}</span>
+    <button (click)="error = null" class="error-close-btn">✕</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && tournaments.length === 0" class="empty-state">
+    <div class="empty-icon">🏆</div>
+    <h2>No hay torneos creados</h2>
+    <p>Crea tu primer torneo para comenzar</p>
+    <button class="create-btn" (click)="createTournament()">
+      Crear Torneo
+    </button>
+  </div>
+
+  <!-- Tournament Grid -->
+  <div *ngIf="!loading && tournaments.length > 0" class="content">
+    <div class="tournaments-grid">
+      <div 
+        *ngFor="let tournament of tournaments" 
+        class="tournament-card"
+        (click)="viewTournament(tournament.id_torneo)"
+      >
+        <div class="card-header">
+          <h3 class="card-title">{{ tournament.nombre }}</h3>
+          <button 
+            class="delete-btn"
+            (click)="deleteTournament(tournament.id_torneo, $event)"
+            title="Eliminar torneo"
+          >
+            🗑️
+          </button>
+        </div>
+        
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">Modalidad:</span>
+            <span class="info-value">{{ tournament.modalidad }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Vueltas:</span>
+            <span class="info-value">{{ tournament.vueltas }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Playoffs:</span>
+            <span class="info-value">{{ tournament.cupos_playoffs }} equipos</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Horario:</span>
+            <span class="info-value">{{ tournament.hora_ini }} - {{ tournament.hora_fin }}</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="enter-btn">
+            Entrar
+            <span class="arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="create-new-container">
+      <button class="create-new-btn" (click)="createTournament()">
+        <span class="plus-icon">+</span>
+        Crear Nuevo Torneo
+      </button>
+    </div>
+  </div>
+
+</div>

@@ -9,6 +9,7 @@
    ======================================== */
 .crear-torneo-container {
   min-height: 100vh;
+  padding-bottom: 60px; /* Espacio adicional al final */
   background-color: #0b0e13;
   background-image:
     radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),

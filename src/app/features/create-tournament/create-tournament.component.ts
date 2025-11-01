@@ -131,21 +131,12 @@ export class CrearTorneoComponent implements OnInit {
 
   ngOnInit(): void {
     // Datos de ejemplo
-    this.arbitros = [
-      { nombre: 'Juan Carlos Montoya' },
-      { nombre: 'Pedro Fernandez' },
-      { nombre: 'Miguel Hernandez' }
-    ];
+    this.arbitros = [];
 
-    this.equipos = [
-      { nombre: 'Dallas Mavericks', jugadores: [] },
-      { nombre: 'Caballeros de Culiacan', jugadores: [] }
-    ];
+    // Equipos inician vacíos - el usuario los agrega manualmente
+    this.equipos = [];
 
-    this.canchas = [
-      { nombre: 'Cancha Principal', ubicacion: 'Domo CU UAS', activa: true },
-      { nombre: 'Cancha Anexa', ubicacion: 'Ingeniería CU UAS', activa: true }
-    ];
+    this.canchas = [];
   }
 
   // ========== MODAL DE CONFIGURACIÓN ==========
