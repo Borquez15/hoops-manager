@@ -130,10 +130,8 @@ export class CrearTorneoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Datos de ejemplo
+    // Árbitros y equipos inician vacíos - el usuario los agrega manualmente
     this.arbitros = [];
-
-    // Equipos inician vacíos - el usuario los agrega manualmente
     this.equipos = [];
 
     this.canchas = [];
@@ -439,24 +437,9 @@ export class CrearTorneoComponent implements OnInit {
 
   // ========== CREAR TORNEO ==========
   async crearTorneo() {
-    // Validaciones
+    // Solo validar configuración básica
     if (!this.config.nombre.trim()) {
       this.error = 'El nombre del torneo es obligatorio';
-      return;
-    }
-
-    if (this.arbitros.length === 0) {
-      this.error = 'Debes agregar al menos un árbitro';
-      return;
-    }
-
-    if (this.equipos.length < 2) {
-      this.error = 'Debes agregar al menos 2 equipos';
-      return;
-    }
-
-    if (this.canchas.length === 0) {
-      this.error = 'Debes agregar al menos una cancha';
       return;
     }
 
@@ -464,7 +447,9 @@ export class CrearTorneoComponent implements OnInit {
     this.error = null;
 
     try {
-      // 1. Crear el torneo
+      console.log('🏀 Creando torneo con configuración:', this.config);
+
+      // 1. Crear torneo (solo configuración básica)
       const torneoResponse = await this.http.post<any>(
         `${this.apiUrl}/tournaments`,
         this.config
@@ -473,25 +458,56 @@ export class CrearTorneoComponent implements OnInit {
       this.idTorneoCreado = torneoResponse.id_torneo;
       console.log('✅ Torneo creado:', torneoResponse);
 
-      // 2. Agregar canchas
-      for (const cancha of this.canchas) {
-        await this.http.post(
-          `${this.apiUrl}/tournaments/${this.idTorneoCreado}/courts`,
-          cancha
-        ).toPromise();
+      // 2. Agregar canchas si las hay (opcional)
+      if (this.canchas.length > 0) {
+        for (const cancha of this.canchas) {
+          await this.http.post(
+            `${this.apiUrl}/tournaments/${this.idTorneoCreado}/courts`,
+            cancha
+          ).toPromise();
+        }
+        console.log('✅ Canchas agregadas');
       }
-      console.log('✅ Canchas agregadas');
 
-      // 3. TODO: Agregar árbitros cuando tengas el endpoint
-      console.log('📝 Árbitros a agregar:', this.arbitros);
+      // 3. Agregar equipos si los hay (opcional)
+      if (this.equipos.length > 0) {
+        for (const equipo of this.equipos) {
+          const equipoResponse: any = await this.http.post(
+            `${this.apiUrl}/tournaments/${this.idTorneoCreado}/teams`,
+            { nombre: equipo.nombre, logo_url: equipo.logo_url }
+          ).toPromise();
 
-      // 4. TODO: Agregar equipos cuando tengas el endpoint
-      console.log('🏀 Equipos a agregar:', this.equipos);
+          // Agregar jugadores del equipo si los tiene
+          if (equipo.jugadores && equipo.jugadores.length > 0) {
+            for (const jugador of equipo.jugadores) {
+              await this.http.post(
+                `${this.apiUrl}/teams/${equipoResponse.id_equipo}/players`,
+                {
+                  curp: jugador.curp,
+                  dorsal: jugador.dorsal,
+                  nombres: jugador.nombres,
+                  ap_p: jugador.ap_p,
+                  ap_m: jugador.ap_m,
+                  edad: jugador.edad
+                }
+              ).toPromise();
+            }
+          }
+        }
+        console.log('🏀 Equipos y jugadores agregados');
+      }
+
+      // 4. Agregar árbitros si los hay (opcional)
+      if (this.arbitros.length > 0) {
+        // TODO: Implementar endpoint de árbitros cuando esté disponible
+        console.log('📝 Árbitros a agregar después:', this.arbitros);
+      }
 
       this.torneoCreado = true;
       
+      // Redirigir al torneo después de 2 segundos
       setTimeout(() => {
-        this.router.navigate(['/mis-torneos']);
+        this.router.navigate(['/torneo', this.idTorneoCreado]);
       }, 2000);
 
     } catch (err: any) {
@@ -510,10 +526,10 @@ export class CrearTorneoComponent implements OnInit {
   }
 
   get esConfigValida(): boolean {
+    // Solo se requiere configuración básica para crear el torneo
+    // Los equipos, jugadores, árbitros y canchas se configuran después
     return this.config.nombre.trim().length > 0 &&
-           this.arbitros.length > 0 &&
-           this.equipos.length >= 2 &&
-           this.canchas.length > 0;
+           this.config.modalidad.length > 0;
   }
 
   // Obtener resumen de configuración
