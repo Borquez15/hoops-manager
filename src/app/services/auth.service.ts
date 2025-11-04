@@ -1,5 +1,5 @@
 // ============================================
-// auth.service.ts - VERSIÓN HÍBRIDA (Firebase + Nativo)
+// auth.service.ts - VERSIÓN HÍBRIDA (Firebase + Nativo) - ACTUALIZADO
 // ============================================
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -29,6 +29,23 @@ export interface UsuarioNativo {
   activo: boolean;
 }
 
+// ========== INTERFACES PARA RESPONSES ==========
+interface LoginResponse {
+  user: UsuarioNativo;
+  access_token: string;
+  token_type: string;
+}
+
+interface FirebaseResponse {
+  user: {
+    id: number;
+    nombre: string;
+    email: string;
+  };
+  access_token: string;
+  token_type: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private af   = inject(Auth);
@@ -45,25 +62,42 @@ export class AuthService {
   get currentUser() { return this.af.currentUser; }
 
   // ========================================
-  // ✅ LOGIN NATIVO (nuevo - usa tu backend)
+  // ✅ LOGIN NATIVO (ACTUALIZADO - guarda token JWT)
   // ========================================
   async loginNative(email: string, password: string): Promise<UsuarioNativo> {
     try {
-      const usuario = await firstValueFrom(
-        this.http.post<UsuarioNativo>(
+      console.log('🔵 Iniciando login nativo...');
+      
+      const response = await firstValueFrom(
+        this.http.post<LoginResponse>(
           `${environment.apiBase}/auth/login`,
           { email, password },
           { withCredentials: true }
         )
       );
       
-      // Guarda en localStorage para persistencia
-      localStorage.setItem('user', JSON.stringify(usuario));
-      localStorage.setItem('auth_method', 'native');
+      console.log('✅ Response del backend:', response);
       
-      return usuario;
+      // ========== GUARDAR TOKEN JWT (CRÍTICO) ==========
+      if (response.access_token) {
+        localStorage.setItem('auth_token', response.access_token);
+        console.log('✅ Token JWT guardado en localStorage');
+      } else {
+        console.error('❌ No se recibió access_token del backend');
+        throw new Error('No se recibió token del servidor');
+      }
+      
+      // Guarda usuario en localStorage para persistencia
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+        localStorage.setItem('auth_method', 'native');
+        console.log('✅ Usuario guardado:', response.user);
+      }
+      
+      return response.user;
+      
     } catch (error) {
-      console.error('Error en loginNative:', error);
+      console.error('❌ Error en loginNative:', error);
       throw error;
     }
   }
@@ -79,6 +113,8 @@ export class AuthService {
     password: string;
   }): Promise<UsuarioNativo> {
     try {
+      console.log('🔵 Registrando usuario nativo...');
+      
       const usuario = await firstValueFrom(
         this.http.post<UsuarioNativo>(
           `${environment.apiBase}/auth/register`,
@@ -86,12 +122,15 @@ export class AuthService {
         )
       );
       
+      console.log('✅ Usuario registrado:', usuario);
+      
       localStorage.setItem('user', JSON.stringify(usuario));
       localStorage.setItem('auth_method', 'native');
       
       return usuario;
+      
     } catch (error) {
-      console.error('Error en registerNative:', error);
+      console.error('❌ Error en registerNative:', error);
       throw error;
     }
   }
@@ -112,45 +151,90 @@ export class AuthService {
   // ========================================
   isAuthenticated(): boolean {
     // Verifica Firebase O autenticación nativa
-    return !!this.currentUser || !!this.getCurrentUserNative();
+    const hasFirebase = !!this.currentUser;
+    const hasNative = !!this.getCurrentUserNative();
+    const hasToken = !!localStorage.getItem('auth_token');
+    
+    return hasFirebase || hasNative || hasToken;
   }
 
   // ========================================
-  // MÉTODOS FIREBASE (los que ya tenías)
+  // ✅ OBTENER TOKEN JWT
+  // ========================================
+  getAuthToken(): string | null {
+    return localStorage.getItem('auth_token');
+  }
+
+  // ========================================
+  // MÉTODOS FIREBASE (actualizados)
   // ========================================
   loginEmail(email: string, password: string) {
     return signInWithEmailAndPassword(this.af, email, password);
   }
 
   async loginGoogle() {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await signInWithPopup(this.af, provider);
-    
-    // Intercambia con backend Firebase
-    const idToken = await result.user.getIdToken();
-    await this.exchangeWithBackend(idToken);
-    
-    localStorage.setItem('auth_method', 'firebase');
-    return result;
+    try {
+      console.log('🔵 Iniciando login con Google...');
+      
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const result = await signInWithPopup(this.af, provider);
+      
+      // Intercambia con backend Firebase
+      const idToken = await result.user.getIdToken();
+      console.log('✅ Token de Firebase obtenido');
+      
+      const response = await firstValueFrom(
+        this.http.post<FirebaseResponse>(
+          `${environment.apiBase}/api/auth/firebase`,
+          { idToken },
+          { withCredentials: true }
+        )
+      );
+      
+      console.log('✅ Response del backend:', response);
+      
+      // ========== GUARDAR TOKEN JWT (CRÍTICO) ==========
+      if (response.access_token) {
+        localStorage.setItem('auth_token', response.access_token);
+        console.log('✅ Token JWT guardado en localStorage');
+      }
+      
+      // Guardar usuario
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+        console.log('✅ Usuario guardado:', response.user);
+      }
+      
+      localStorage.setItem('auth_method', 'firebase');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ Error en loginGoogle:', error);
+      throw error;
+    }
   }
 
   async logout() {
+    console.log('🔵 Cerrando sesión...');
+    
     const method = localStorage.getItem('auth_method');
     
     // Limpia localStorage
     localStorage.removeItem('user');
     localStorage.removeItem('auth_method');
+    localStorage.removeItem('auth_token');  // ← CRÍTICO: Eliminar token
+    
+    console.log('✅ LocalStorage limpio');
     
     // Si era Firebase, cierra sesión
     if (method === 'firebase' && this.currentUser) {
       await signOut(this.af);
+      console.log('✅ Sesión de Firebase cerrada');
     }
     
-    // Opcional: notifica al backend
-    // await firstValueFrom(
-    //   this.http.post(`${environment.apiBase}/auth/logout`, {}, { withCredentials: true })
-    // );
+    console.log('✅ Logout completo');
   }
 
   async getIdToken(user?: User) {
@@ -162,8 +246,8 @@ export class AuthService {
 
   exchangeWithBackend(idToken: string) {
     return firstValueFrom(
-      this.http.post<{ user: UsuarioNativo }>(
-        `${environment.apiBase}/auth/firebase`,
+      this.http.post<FirebaseResponse>(
+        `${environment.apiBase}/api/auth/firebase`,
         { idToken },
         { withCredentials: true }
       )

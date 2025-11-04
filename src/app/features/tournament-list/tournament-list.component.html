@@ -13,13 +13,13 @@
   </div>
 
   <!-- Error -->
-  <div *ngIf="error" class="error-alert">
+  <div *ngIf="error && !loading" class="error-alert">
     <span>{{ error }}</span>
     <button (click)="error = null" class="error-close-btn">✕</button>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!loading && tournaments.length === 0" class="empty-state">
+  <div *ngIf="!loading && !error && tournaments.length === 0" class="empty-state">
     <div class="empty-icon">🏆</div>
     <h2>No hay torneos creados</h2>
     <p>Crea tu primer torneo para comenzar</p>
@@ -29,7 +29,7 @@
   </div>
 
   <!-- Tournament Grid -->
-  <div *ngIf="!loading && tournaments.length > 0" class="content">
+  <div *ngIf="!loading && !error && tournaments.length > 0" class="content">
     <div class="tournaments-grid">
       <div 
         *ngFor="let tournament of tournaments" 
