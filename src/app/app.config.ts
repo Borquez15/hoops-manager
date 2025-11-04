@@ -3,7 +3,7 @@ import { provideRouter, withInMemoryScrolling  } from '@angular/router';
 
 import { routes } from './app.routes';
 
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';  // ← Agregar HTTP_INTERCEPTORS aquí
 
 // ⬇️ IMPORTES DE ANGULARFIRE
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -12,9 +12,19 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 // ⬇️ IMPORTA TU ENVIRONMENT (tu carpeta es singular: environment)
 import { environment } from '../environment/environment';
 
+import { AuthInterceptorService } from './interceptor/auth.interceptor.service';  // ← Tu ruta es correcta
+
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    
+    // ⬇️ REGISTRAR EL INTERCEPTOR DENTRO DEL ARRAY
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true
+    },
+    
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(
@@ -26,9 +36,5 @@ export const appConfig: ApplicationConfig = {
     ),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
-
   ],
 };
-
-
-
