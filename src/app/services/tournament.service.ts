@@ -65,12 +65,9 @@ export class TournamentService {
     return this.http.get<Tournament[]>(`${this.apiUrl}/tournaments`).pipe(
       tap(tournaments => {
         console.log('✅ Torneos obtenidos:', tournaments.length);
-        console.log('✅ Torneos:', tournaments);
       }),
       catchError(error => {
         console.error('❌ Error al obtener torneos:', error);
-        console.error('❌ Status:', error.status);
-        console.error('❌ Message:', error.message);
         return throwError(() => error);
       })
     );
@@ -78,11 +75,8 @@ export class TournamentService {
 
   getTournament(id: number): Observable<Tournament> {
     console.log('🔵 Obteniendo torneo ID:', id);
-    
     return this.http.get<Tournament>(`${this.apiUrl}/tournaments/${id}`).pipe(
-      tap(tournament => {
-        console.log('✅ Torneo obtenido:', tournament);
-      }),
+      tap(tournament => console.log('✅ Torneo obtenido:', tournament)),
       catchError(error => {
         console.error('❌ Error al obtener torneo:', error);
         return throwError(() => error);
@@ -92,11 +86,8 @@ export class TournamentService {
 
   updateTournament(id: number, data: Partial<Tournament>): Observable<Tournament> {
     console.log('🔵 Actualizando torneo ID:', id, 'con data:', data);
-    
     return this.http.put<Tournament>(`${this.apiUrl}/tournaments/${id}`, data).pipe(
-      tap(tournament => {
-        console.log('✅ Torneo actualizado:', tournament);
-      }),
+      tap(tournament => console.log('✅ Torneo actualizado:', tournament)),
       catchError(error => {
         console.error('❌ Error al actualizar torneo:', error);
         return throwError(() => error);
@@ -106,11 +97,8 @@ export class TournamentService {
 
   deleteTournament(id: number): Observable<any> {
     console.log('🔵 Eliminando torneo ID:', id);
-    
     return this.http.delete(`${this.apiUrl}/tournaments/${id}`).pipe(
-      tap(() => {
-        console.log('✅ Torneo eliminado');
-      }),
+      tap(() => console.log('✅ Torneo eliminado')),
       catchError(error => {
         console.error('❌ Error al eliminar torneo:', error);
         return throwError(() => error);
@@ -121,13 +109,8 @@ export class TournamentService {
   // ========== EQUIPOS (TEAMS) ==========
   getEquipos(tournamentId: number): Observable<Equipo[]> {
     console.log('🔵 Obteniendo equipos del torneo:', tournamentId);
-    
-    // ✅ RUTA CORRECTA: /tournaments/{id}/teams
     return this.http.get<Equipo[]>(`${this.apiUrl}/tournaments/${tournamentId}/teams`).pipe(
-      tap(equipos => {
-        console.log('✅ Equipos obtenidos:', equipos.length);
-        console.log('✅ Equipos:', equipos);
-      }),
+      tap(equipos => console.log('✅ Equipos obtenidos:', equipos.length)),
       catchError(error => {
         console.error('❌ Error al obtener equipos:', error);
         return throwError(() => error);
@@ -135,22 +118,29 @@ export class TournamentService {
     );
   }
 
+  // 🔹 Nuevo método: subir equipo con archivo (FormData)
+  addEquipoFormData(tournamentId: number, formData: FormData): Observable<Equipo> {
+    console.log('🔵 Enviando equipo con FormData:', [...formData.entries()]);
+    return this.http.post<Equipo>(`${this.apiUrl}/tournaments/${tournamentId}/teams`, formData).pipe(
+      tap(equipo => console.log('✅ Equipo agregado (FormData):', equipo)),
+      catchError(error => {
+        console.error('❌ Error al agregar equipo (FormData):', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // Versión JSON anterior (por compatibilidad)
   addEquipo(tournamentId: number, data: { nombre: string; logo: string }): Observable<Equipo> {
-    console.log('🔵 Agregando equipo:', data);
-    
-    // ✅ RUTA CORRECTA: /tournaments/{id}/teams
-    // Adaptar el campo 'logo' a 'logo_url' que es lo que espera el backend
+    console.log('🔵 Agregando equipo (JSON):', data);
     const payload = {
       nombre: data.nombre,
       logo_url: data.logo || null
     };
-    
     return this.http.post<Equipo>(`${this.apiUrl}/tournaments/${tournamentId}/teams`, payload).pipe(
-      tap(equipo => {
-        console.log('✅ Equipo agregado:', equipo);
-      }),
+      tap(equipo => console.log('✅ Equipo agregado (JSON):', equipo)),
       catchError(error => {
-        console.error('❌ Error al agregar equipo:', error);
+        console.error('❌ Error al agregar equipo (JSON):', error);
         return throwError(() => error);
       })
     );
@@ -158,12 +148,8 @@ export class TournamentService {
 
   deleteEquipo(tournamentId: number, equipoId: number): Observable<any> {
     console.log('🔵 Eliminando equipo:', equipoId);
-    
-    // ✅ RUTA CORRECTA: /tournaments/{id}/teams/{id_equipo}
     return this.http.delete(`${this.apiUrl}/tournaments/${tournamentId}/teams/${equipoId}`).pipe(
-      tap(() => {
-        console.log('✅ Equipo eliminado');
-      }),
+      tap(() => console.log('✅ Equipo eliminado')),
       catchError(error => {
         console.error('❌ Error al eliminar equipo:', error);
         return throwError(() => error);
@@ -174,38 +160,14 @@ export class TournamentService {
   // ========== ÁRBITROS (REFEREES) ==========
   getArbitros(tournamentId: number): Observable<Arbitro[]> {
     console.log('🔵 Obteniendo árbitros del torneo:', tournamentId);
-    
-    // ✅ RUTA CORRECTA: /tournaments/{id}/referees
     return this.http.get<Arbitro[]>(`${this.apiUrl}/tournaments/${tournamentId}/referees`).pipe(
-      tap(arbitros => {
-        console.log('✅ Árbitros obtenidos:', arbitros.length);
-        console.log('✅ Árbitros:', arbitros);
-      }),
+      tap(arbitros => console.log('✅ Árbitros obtenidos:', arbitros.length)),
       catchError(error => {
         console.error('❌ Error al obtener árbitros:', error);
         return throwError(() => error);
       })
     );
   }
-
-  // Nota: El backend de referees usa un sistema de invitación por email
-  // Por ahora no implementamos agregar árbitros directamente
-  // Para simplificar, comentamos estos métodos
-  
-  /*
-  addArbitro(tournamentId: number, nombre: string): Observable<Arbitro> {
-    console.log('🔵 Agregando árbitro:', nombre);
-    // El backend actual usa invitaciones por email
-    // No hay endpoint directo para agregar árbitros
-    return this.http.post<Arbitro>(`${this.apiUrl}/tournaments/${tournamentId}/referees`, { nombre });
-  }
-
-  deleteArbitro(tournamentId: number, arbitroId: number): Observable<any> {
-    console.log('🔵 Eliminando árbitro:', arbitroId);
-    // El backend usa toggle activo, no elimina directamente
-    return this.http.delete(`${this.apiUrl}/tournaments/${tournamentId}/referees/${arbitroId}`);
-  }
-  */
 
   // ========== PARTIDOS/CALENDARIO ==========
   getMatches(tournamentId: number, start?: string, end?: string): Observable<Match[]> {

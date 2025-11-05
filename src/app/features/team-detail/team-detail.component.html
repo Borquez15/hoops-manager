@@ -1,0 +1,38 @@
+<div class="team-container">
+  <h2>{{ equipoNombre }}</h2>
+
+  <div class="jugadores-section">
+    <h3>Jugadores</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Dorsal</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let j of jugadores">
+          <td>{{ j.dorsal }}</td>
+          <td>{{ j.persona.nombres }} {{ j.persona.ap_p }} {{ j.persona.ap_m }}</td>
+          <td>{{ j.dorsal }}</td>
+          <td>
+            <button (click)="eliminarJugador(j.dorsal)">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="form">
+      <h4>Agregar jugador</h4>
+      <input [(ngModel)]="nuevoJugador.curp" placeholder="CURP" maxlength="18">
+      <input [(ngModel)]="nuevoJugador.nombres" placeholder="Nombres">
+      <input [(ngModel)]="nuevoJugador.ap_p" placeholder="Apellido paterno">
+      <input [(ngModel)]="nuevoJugador.ap_m" placeholder="Apellido materno">
+      <input [(ngModel)]="nuevoJugador.dorsal" placeholder="Dorsal" type="number">
+      <button (click)="agregarJugador()">Agregar</button>
+    </div>
+  </div>
+</div>

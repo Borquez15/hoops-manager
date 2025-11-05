@@ -3,6 +3,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { TournamentService, Tournament, Equipo } from '../../services/tournament.service';
 
 @Component({
@@ -16,23 +17,27 @@ export class TournamentDetailComponent implements OnInit {
   tournamentId!: number;
   tournament: Tournament | null = null;
   equipos: Equipo[] = [];
-  
+
   loading = true;
   error: string | null = null;
-  
+
   // Estado del torneo
   tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
-  
+
   // Estado del calendario
   calendarGenerated = false;
-  
+
   // Forms
   showAddEquipoForm = false;
   newEquipo = { nombre: '', logo: '' };
-  
+
   // Edición de configuración
   editMode = false;
   editForm: Partial<Tournament> = {};
+
+  // ✅ Manejo de logo (archivo + vista previa)
+  previewLogo: string | null = null;
+  selectedLogoFile: File | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -42,45 +47,37 @@ export class TournamentDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('🔵 TournamentDetailComponent inicializado');
-    
-    // Obtener ID del torneo desde la ruta
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe(async params => {
       this.tournamentId = +params['id'];
-      console.log('🔵 Tournament ID:', this.tournamentId);
-      this.loadTournamentData();
+      await this.loadTournamentData();
     });
+  }
+
+  ngAfterViewInit(): void {
+    // (solo debug)
   }
 
   // ========================================
   // CARGA DE DATOS
   // ========================================
-  
   async loadTournamentData(): Promise<void> {
     this.loading = true;
     this.error = null;
-    
+
     try {
-      console.log('🔵 Cargando datos del torneo...');
-      
-      // Cargar torneo
-      this.tournament = await this.tournamentService.getTournament(this.tournamentId).toPromise() || null;
-      console.log('✅ Torneo cargado:', this.tournament);
-      
-      // Determinar estado
+      this.tournament = await firstValueFrom(
+        this.tournamentService.getTournament(this.tournamentId)
+      );
+
       if (this.tournament?.estado) {
         this.tournamentStatus = this.tournament.estado as any;
       }
-      
-      // Cargar equipos
+
       await this.loadEquipos();
-      
-      // Verificar si el calendario ya fue generado
       await this.checkCalendarStatus();
-      
+
       this.loading = false;
       this.cdr.detectChanges();
-      
     } catch (error) {
       console.error('❌ Error al cargar torneo:', error);
       this.error = 'Error al cargar el torneo';
@@ -90,37 +87,79 @@ export class TournamentDetailComponent implements OnInit {
 
   async loadEquipos(): Promise<void> {
     try {
-      this.equipos = await this.tournamentService.getEquipos(this.tournamentId).toPromise() || [];
-      console.log('✅ Equipos cargados:', this.equipos.length);
+      this.equipos = await firstValueFrom(
+        this.tournamentService.getEquipos(this.tournamentId)
+      );
     } catch (error) {
       console.error('❌ Error al cargar equipos:', error);
+      this.equipos = [];
     }
   }
 
   async checkCalendarStatus(): Promise<void> {
     try {
-      // TODO: Hacer llamada al backend para verificar si hay partidos generados
-      // Por ahora, asumimos que si el torneo está "iniciado", el calendario ya fue generado
       if (this.tournamentStatus !== 'configurando') {
         this.calendarGenerated = true;
       }
-      
-      // Puedes implementar algo como:
-      // const partidos = await this.tournamentService.getPartidos(this.tournamentId).toPromise();
-      // this.calendarGenerated = partidos && partidos.length > 0;
-      
+      // Si tienes endpoint para verificar partidos, puedes usarlo aquí.
     } catch (error) {
       console.error('❌ Error al verificar calendario:', error);
     }
   }
 
   // ========================================
+  // VALIDACIONES Y UTILIDADES
+  // ========================================
+  getMinimumTeams(): number {
+    if (!this.tournament) return 2;
+    const minByPlayoffs = this.tournament.cupos_playoffs || 0;
+    const absoluteMin = 2;
+    return Math.max(minByPlayoffs, absoluteMin);
+  }
+
+  getValidationMessage(): string | null {
+    if (!this.tournament) return null;
+
+    const minimumTeams = this.getMinimumTeams();
+    const currentTeams = this.equipos.length;
+
+    if (currentTeams < minimumTeams) {
+      const needed = minimumTeams - currentTeams;
+      return `Necesitas agregar ${needed} equipo${needed > 1 ? 's' : ''} más. Con ${this.tournament.cupos_playoffs} cupos de playoffs, requieres mínimo ${minimumTeams} equipos.`;
+    }
+
+    if (!this.calendarGenerated && currentTeams >= minimumTeams) {
+      return 'Genera el calendario para poder iniciar el torneo.';
+    }
+
+    return null;
+  }
+
+  canStartTournament(): boolean {
+    if (!this.tournament) return false;
+    const hasEnoughTeams = this.equipos.length >= this.getMinimumTeams();
+    const hasCalendar = this.calendarGenerated;
+    const isConfiguring = this.tournamentStatus === 'configurando';
+    return hasEnoughTeams && hasCalendar && isConfiguring;
+  }
+
+  getStatusBadge(): { text: string; class: string } {
+    switch (this.tournamentStatus) {
+      case 'iniciado':
+        return { text: '🟢 Iniciado', class: 'badge-success' };
+      case 'finalizado':
+        return { text: '⚫ Finalizado', class: 'badge-finished' };
+      case 'configurando':
+      default:
+        return { text: '🔴 Configurando', class: 'badge-warning' };
+    }
+  }
+
+  // ========================================
   // CONFIGURACIÓN
   // ========================================
-  
   enableEditMode(): void {
     if (!this.tournament) return;
-    
     this.editMode = true;
     this.editForm = {
       nombre: this.tournament.nombre,
@@ -142,20 +181,26 @@ export class TournamentDetailComponent implements OnInit {
 
   async saveConfig(): Promise<void> {
     if (!this.tournament) return;
-    
+
     try {
-      console.log('🔵 Guardando configuración:', this.editForm);
-      
-      this.tournament = await this.tournamentService
-        .updateTournament(this.tournamentId, this.editForm)
-        .toPromise() || null;
-      
-      console.log('✅ Configuración guardada');
+      if (this.editForm.cupos_playoffs && this.editForm.cupos_playoffs > 0) {
+        const currentTeams = this.equipos.length;
+        if (currentTeams < this.editForm.cupos_playoffs) {
+          const confirmRes = window.confirm(
+            `Atención: Estás configurando ${this.editForm.cupos_playoffs} cupos de playoffs ` +
+            `pero solo tienes ${currentTeams} equipos.\n\n¿Deseas continuar?`
+          );
+          if (!confirmRes) return;
+        }
+      }
+
+      this.tournament = await firstValueFrom(
+        this.tournamentService.updateTournament(this.tournamentId, this.editForm)
+      );
+
       this.editMode = false;
       this.editForm = {};
-      
       alert('✅ Configuración guardada exitosamente');
-      
     } catch (error) {
       console.error('❌ Error al guardar:', error);
       alert('❌ Error al guardar la configuración');
@@ -165,61 +210,78 @@ export class TournamentDetailComponent implements OnInit {
   // ========================================
   // EQUIPOS
   // ========================================
-  
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    this.selectedLogoFile = file;
+
+    const reader = new FileReader();
+    reader.onload = () => (this.previewLogo = reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
   toggleAddEquipoForm(): void {
     this.showAddEquipoForm = !this.showAddEquipoForm;
     if (!this.showAddEquipoForm) {
       this.newEquipo = { nombre: '', logo: '' };
+      this.previewLogo = null;
+      this.selectedLogoFile = null;
     }
   }
 
   async addEquipo(): Promise<void> {
-    if (!this.newEquipo.nombre.trim()) {
-      alert('⚠️ El nombre del equipo es requerido');
-      return;
-    }
-    
-    try {
-      console.log('🔵 Agregando equipo:', this.newEquipo);
-      
-      await this.tournamentService
-        .addEquipo(this.tournamentId, this.newEquipo)
-        .toPromise();
-      
-      console.log('✅ Equipo agregado');
-      
-      // Recargar equipos
-      await this.loadEquipos();
-      
-      // Limpiar form
-      this.newEquipo = { nombre: '', logo: '' };
-      this.showAddEquipoForm = false;
-      
-      this.cdr.detectChanges();
-      
-    } catch (error: any) {
-      console.error('❌ Error al agregar equipo:', error);
-      const errorMsg = error.error?.detail || 'Error al agregar el equipo';
-      alert('❌ ' + errorMsg);
-    }
+  if (!this.newEquipo.nombre.trim()) {
+    alert('⚠️ El nombre del equipo es requerido');
+    return;
   }
 
+  try {
+    const formData = new FormData();
+    formData.append('nombre', this.newEquipo.nombre);
+
+    // 🔹 SOLO si hay logo seleccionado, lo agregamos
+    if (this.selectedLogoFile) {
+      formData.append('logo', this.selectedLogoFile, this.selectedLogoFile.name);
+    }
+
+    await firstValueFrom(
+      this.tournamentService.addEquipoFormData(this.tournamentId, formData)
+    );
+
+    await this.loadEquipos();
+    this.newEquipo = { nombre: '', logo: '' };
+    this.previewLogo = null;
+    this.selectedLogoFile = null;
+    this.showAddEquipoForm = false;
+    this.cdr.detectChanges();
+
+  } catch (error: any) {
+    console.error('❌ Error al agregar equipo:', error);
+    const errorMsg = error?.error?.detail || error?.message || 'Error al agregar el equipo';
+    alert('❌ ' + errorMsg);
+  }
+}
+
+
   async deleteEquipo(equipoId: number): Promise<void> {
-    if (!confirm('¿Estás seguro de eliminar este equipo?')) return;
-    
+    const minTeams = this.getMinimumTeams();
+    if (this.equipos.length <= minTeams) {
+      const confirmMsg =
+        `⚠️ ATENCIÓN: Si eliminas este equipo, quedarás con menos de ${minTeams} equipos.\n\n` +
+        `¿Estás seguro?`;
+      if (!confirm(confirmMsg)) return;
+    } else {
+      if (!confirm('¿Estás seguro de eliminar este equipo?')) return;
+    }
+
     try {
-      console.log('🔵 Eliminando equipo:', equipoId);
-      
-      await this.tournamentService
-        .deleteEquipo(this.tournamentId, equipoId)
-        .toPromise();
-      
-      console.log('✅ Equipo eliminado');
-      
-      // Recargar equipos
+      await firstValueFrom(
+        this.tournamentService.deleteEquipo(this.tournamentId, equipoId)
+      );
       await this.loadEquipos();
       this.cdr.detectChanges();
-      
     } catch (error) {
       console.error('❌ Error al eliminar equipo:', error);
       alert('❌ Error al eliminar el equipo');
@@ -229,41 +291,28 @@ export class TournamentDetailComponent implements OnInit {
   // ========================================
   // CALENDARIO
   // ========================================
-  
-  /**
-   * Genera el calendario automático (SEPARADO de iniciar torneo)
-   * Permite al admin revisar y editar antes de iniciar oficialmente
-   */
   async generateCalendar(): Promise<void> {
-    // Validaciones
-    if (this.equipos.length < 2) {
-      alert('⚠️ Necesitas al menos 2 equipos para generar el calendario');
+    const minimumTeams = this.getMinimumTeams();
+
+    if (this.equipos.length < minimumTeams) {
+      alert(`⚠️ Necesitas al menos ${minimumTeams} equipos para generar el calendario`);
       return;
     }
-    
-    if (!confirm('¿Deseas generar el calendario automático?\n\nPodrás revisarlo y modificarlo antes de iniciar el torneo.')) {
-      return;
-    }
-    
+
+    if (!confirm('¿Deseas generar el calendario automático?')) return;
+
     try {
-      console.log('🔵 Generando calendario...');
-      
-      // Mostrar loading
       this.loading = true;
-      
-      await this.tournamentService
-        .autoSchedule(this.tournamentId, undefined, true)
-        .toPromise();
-      
-      console.log('✅ Calendario generado');
-      
+
+      await firstValueFrom(
+        this.tournamentService.autoSchedule(this.tournamentId, undefined, true)
+      );
+
       this.calendarGenerated = true;
       this.loading = false;
-      
-      alert('✅ Calendario generado exitosamente\n\nPuedes revisarlo y editarlo antes de iniciar el torneo');
-      
+
+      alert('✅ Calendario generado exitosamente');
       this.cdr.detectChanges();
-      
     } catch (error) {
       console.error('❌ Error al generar calendario:', error);
       this.loading = false;
@@ -271,46 +320,24 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
-  /**
-   * Permite editar el calendario (TODO: implementar vista de edición)
-   */
   editCalendar(): void {
-    console.log('🔵 Editando calendario');
-    alert('💡 Próximamente: Aquí podrás editar las fechas del calendario');
-    
-    // TODO: Navegar a vista de edición de calendario
-    // this.router.navigate(['/torneo', this.tournamentId, 'calendario']);
+    alert('💡 Próximamente: edición del calendario');
   }
 
-  /**
-   * Inicia el torneo oficialmente (solo si el calendario ya fue generado)
-   */
   async startTournament(): Promise<void> {
-    // Validaciones
-    if (!this.calendarGenerated) {
-      alert('⚠️ Primero debes generar el calendario');
+    if (!this.canStartTournament()) {
+      alert('⚠️ No se puede iniciar el torneo. Verifica los requisitos.');
       return;
     }
-    
-    if (!confirm('¿Estás seguro de iniciar el torneo?\n\nEsto marcará el torneo como "iniciado" y ya no podrás modificar la configuración básica.')) {
-      return;
-    }
-    
+
+    if (!confirm('¿Iniciar el torneo ahora?')) return;
+
     try {
-      console.log('🔵 Iniciando torneo...');
-      
-      // Actualizar estado del torneo a "iniciado"
-      await this.tournamentService
-        .updateTournament(this.tournamentId, { estado: 'iniciado' })
-        .toPromise();
-      
-      console.log('✅ Torneo iniciado');
-      
-      alert('🚀 ¡Torneo iniciado exitosamente!\n\nEl calendario ahora está activo');
-      
-      // Recargar datos
+      await firstValueFrom(
+        this.tournamentService.updateTournament(this.tournamentId, { estado: 'iniciado' })
+      );
+      alert('🚀 ¡Torneo iniciado!');
       await this.loadTournamentData();
-      
     } catch (error) {
       console.error('❌ Error al iniciar torneo:', error);
       alert('❌ Error al iniciar el torneo');
@@ -320,37 +347,7 @@ export class TournamentDetailComponent implements OnInit {
   // ========================================
   // NAVEGACIÓN
   // ========================================
-  
   goBack(): void {
-    console.log('🔵 Volviendo a mis torneos');
     this.router.navigate(['/mis-torneos']);
-  }
-
-  // ========================================
-  // UTILIDADES
-  // ========================================
-  
-  /**
-   * Puede iniciar el torneo si:
-   * - Hay equipos suficientes (>=2)
-   * - El calendario ya fue generado
-   * - El torneo está en estado "configurando"
-   */
-  canStartTournament(): boolean {
-    return this.equipos.length >= 2 
-      && this.calendarGenerated 
-      && this.tournamentStatus === 'configurando';
-  }
-
-  getStatusBadge(): { text: string; class: string } {
-    switch (this.tournamentStatus) {
-      case 'iniciado':
-        return { text: '🟢 Iniciado', class: 'badge-success' };
-      case 'finalizado':
-        return { text: '⚫ Finalizado', class: 'badge-finished' };
-      case 'configurando':
-      default:
-        return { text: '🔴 Configurando', class: 'badge-warning' };
-    }
   }
 }

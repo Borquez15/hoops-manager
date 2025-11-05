@@ -1,7 +1,6 @@
 /* ===============================================
    TOURNAMENT DETAIL - PANEL DE ADMINISTRACIÓN
-   Diseño: 4 tarjetas en grid 2x2
-   Colores: Negro/Azul oscuro + Naranja
+   CON BOTONES SIEMPRE VISIBLES
    =============================================== */
 
 /* === CONTENEDOR PRINCIPAL === */
@@ -67,6 +66,19 @@
 
 .btn-back:hover {
   transform: scale(1.05);
+}
+
+/* === VALIDATION ALERT === */
+.validation-alert {
+  max-width: 1400px;
+  margin: 0 auto 1.5rem;
+  background: rgba(255, 193, 7, 0.9);
+  color: #000;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  border: 2px solid rgba(255, 193, 7, 1);
 }
 
 /* === CONTENIDO === */
@@ -163,10 +175,16 @@
   box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
 }
 
-.start-tournament-btn:hover {
+.start-tournament-btn:hover:not(:disabled) {
   background: #218838;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
+}
+
+.start-tournament-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* === GRID DE 4 TARJETAS (2x2) === */
@@ -182,18 +200,18 @@
   background: white;
   border-radius: 20px;
   border: 3px solid #2a3f5f;
-  overflow: hidden;
+  overflow: visible; /* IMPORTANTE: permite que botones sean visibles */
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   min-height: 450px;
-  position: relative;
+  position: relative; /* IMPORTANTE: para posicionamiento de botones */
   transition: all 0.3s ease;
 }
 
 .section-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 35px rgba(255, 127, 0, 0.3);
+  box-shadow: 0 12px 35px rgba(255, 127, 0, 0.2);
 }
 
 /* === HEADER DE TARJETA === */
@@ -203,6 +221,9 @@
   padding: 1.5rem;
   text-align: center;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .section-header h2 {
@@ -213,67 +234,64 @@
   letter-spacing: 1px;
 }
 
+.section-header small {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
 /* === CUERPO DE TARJETA === */
 .section-body {
   padding: 2rem;
   flex: 1;
   overflow-y: auto;
+  overflow-x: visible; /* Permite que botones sean visibles */
   max-height: 450px;
+  position: relative;
 }
 
-/* === BOTÓN DE EDITAR (NARANJA CIRCULAR) === */
-.edit-btn-circle {
-  position: absolute;
-  bottom: 2rem;
-  right: 2rem;
-  background: #FF7F00;
-  color: white;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  border: none;
-  font-size: 1.8rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
-.edit-btn-circle:hover {
-  background: #e67300;
-  transform: scale(1.1) rotate(15deg);
-  box-shadow: 0 8px 25px rgba(255, 127, 0, 0.6);
-}
-
-/* === BOTÓN DE AGREGAR (PLUS) === */
+/* === BOTONES CIRCULARES - SIEMPRE VISIBLES === */
+.edit-btn-circle,
 .add-btn-circle {
-  position: absolute;
-  bottom: 2rem;
-  right: 2rem;
-  background: #FF7F00;
-  color: white;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  border: none;
-  font-size: 2.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  font-weight: 300;
+  /* Display controlado por [style.display] en el HTML */
+  position: absolute !important;
+  bottom: 1rem !important;
+  right: 1rem !important;
+  background: #FF7F00 !important;
+  color: white !important;
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  font-size: 1.5rem !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.5) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important; /* Z-index ALTÍSIMO para debugging */
+  font-weight: 300 !important;
+  line-height: 1 !important;
 }
 
+.add-btn-circle {
+  font-size: 2rem !important;
+}
+
+.edit-btn-circle:hover,
 .add-btn-circle:hover {
-  background: #e67300;
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 8px 25px rgba(255, 127, 0, 0.6);
+  background: #e67300 !important;
+  transform: scale(1.15) !important;
+  box-shadow: 0 8px 25px rgba(255, 127, 0, 0.7) !important;
+}
+
+.edit-btn-circle:active,
+.add-btn-circle:active {
+  transform: scale(0.95) !important;
+}
+
+/* Animación especial para botón + */
+.add-btn-circle:hover {
+  transform: scale(1.15) rotate(90deg) !important;
 }
 
 /* === ITEMS EN CONFIGURACIÓN === */
@@ -422,7 +440,8 @@
 .calendar-subtitle {
   font-size: 1rem;
   color: #6c757d;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
 }
 
 .generate-calendar-btn {
@@ -436,18 +455,13 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(255, 127, 0, 0.3);
+  margin-top: 1.5rem;
 }
 
 .generate-calendar-btn:hover {
   background: #e67300;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 127, 0, 0.5);
-}
-
-.generate-calendar-btn:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 /* === FORMULARIO DE EDICIÓN === */
@@ -577,21 +591,15 @@
   .form-row {
     grid-template-columns: 1fr;
   }
-}
-
-@media (max-width: 480px) {
-  .page-container {
-    padding: 1rem;
-  }
-
-  .section-header h2 {
-    font-size: 1.3rem;
-  }
-
+  
   .edit-btn-circle,
   .add-btn-circle {
-    width: 55px;
-    height: 55px;
-    font-size: 1.5rem;
+    width: 55px !important;
+    height: 55px !important;
+    font-size: 1.3rem !important;
+  }
+  
+  .add-btn-circle {
+    font-size: 1.8rem !important;
   }
 }

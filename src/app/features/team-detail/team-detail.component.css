@@ -1,0 +1,107 @@
+.team-container {
+  background: #1f2022;
+  color: #f0f0f0;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  max-width: 900px;
+  margin: 2rem auto;
+}
+
+.team-container h2 {
+  text-align: center;
+  color: #ff8800;
+  margin-bottom: 1rem;
+}
+
+.jugadores-section {
+  background: #2b2d31;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.4);
+}
+
+.jugadores-section h3 {
+  color: #00bfff;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #00bfff;
+  padding-bottom: 0.3rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+thead {
+  background-color: #ff8800;
+  color: white;
+}
+
+th, td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+tbody tr:hover {
+  background-color: rgba(255, 136, 0, 0.15);
+}
+
+button {
+  background-color: #ff8800;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background-color: #ff6600;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: flex-end;
+  background: #252628;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.form input {
+  flex: 1 1 180px;
+  background: #333;
+  border: 1px solid #555;
+  color: white;
+  padding: 0.4rem 0.6rem;
+  border-radius: 5px;
+}
+
+.form input::placeholder {
+  color: #aaa;
+}
+
+.form button {
+  flex: 1 1 100px;
+  background: #00bfff;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+.form button:hover {
+  background: #0099cc;
+}
