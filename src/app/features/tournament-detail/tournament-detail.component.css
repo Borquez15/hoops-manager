@@ -1,12 +1,18 @@
-/* src/app/features/tournament-detail/tournament-detail.component.css */
+/* ===============================================
+   TOURNAMENT DETAIL - PANEL DE ADMINISTRACIÓN
+   Diseño: 4 tarjetas en grid 2x2
+   Colores: Negro/Azul oscuro + Naranja
+   =============================================== */
 
+/* === CONTENEDOR PRINCIPAL === */
 .page-container {
   min-height: 100vh;
-  padding: 2rem;
-  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 2rem 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ========== LOADING ========== */
+/* === LOADING === */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -19,11 +25,10 @@
 .spinner {
   width: 60px;
   height: 60px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ff6b35;
+  border: 5px solid rgba(255, 127, 0, 0.3);
+  border-top-color: #FF7F00;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -31,428 +36,562 @@
 }
 
 .loading-container p {
-  font-size: 1.1rem;
-  margin: 0;
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* ========== ERROR ========== */
+/* === ERROR === */
 .error-alert {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #ff4444;
+  max-width: 600px;
+  margin: 2rem auto;
+  background: rgba(220, 53, 69, 0.9);
   color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid rgba(220, 53, 69, 0.5);
 }
 
-/* ========== HEADER ========== */
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-.back-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+.btn-back {
+  margin-top: 1rem;
+  background: white;
+  color: #dc3545;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 2rem;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  transform: scale(1.05);
+}
+
+/* === CONTENIDO === */
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* === HEADER === */
+.page-header {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.back-btn {
+  background: rgba(255, 127, 0, 0.1);
+  border: 2px solid #FF7F00;
+  color: #FF7F00;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateX(-4px);
+  background: #FF7F00;
+  color: white;
+  transform: translateX(-5px);
 }
 
 .header-info {
   flex: 1;
+  text-align: center;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .page-title {
   font-size: 2rem;
-  font-weight: 700;
-  color: white;
+  font-weight: 800;
+  color: #2a3f5f;
   margin: 0;
+  text-transform: uppercase;
 }
 
 .status-badge {
-  display: inline-block;
-  padding: 0.35rem 0.75rem;
+  padding: 0.5rem 1.5rem;
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  width: fit-content;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-block;
 }
 
 .badge-warning {
   background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-  border: 1px solid rgba(255, 193, 7, 0.5);
+  color: #ff6b00;
+  border: 2px solid #ff6b00;
 }
 
 .badge-success {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
-  border: 1px solid rgba(76, 175, 80, 0.5);
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+  border: 2px solid #28a745;
 }
 
 .badge-finished {
-  background: rgba(158, 158, 158, 0.2);
-  color: #9e9e9e;
-  border: 1px solid rgba(158, 158, 158, 0.5);
+  background: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  border: 2px solid #6c757d;
 }
 
 .start-tournament-btn {
-  background: #ff6b35;
+  background: #28a745;
   color: white;
   border: none;
   padding: 1rem 2rem;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 12px;
   font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
 }
 
 .start-tournament-btn:hover {
-  background: #ff5722;
+  background: #218838;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
 }
 
-/* ========== TABS ========== */
-.tabs-container {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+/* === GRID DE 4 TARJETAS (2x2) === */
+.sections-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-.tab-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px 8px 0 0;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.tab-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.tab-btn.active {
+/* === TARJETA DE SECCIÓN === */
+.section-card {
   background: white;
-  color: #1e3a5f;
+  border-radius: 20px;
+  border: 3px solid #2a3f5f;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  min-height: 450px;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-.tab-btn .badge {
-  background: rgba(255, 107, 53, 0.8);
-  color: white;
-  padding: 0.2rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  min-width: 20px;
-  text-align: center;
+.section-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(255, 127, 0, 0.3);
 }
 
-.tab-btn.active .badge {
-  background: #ff6b35;
-}
-
-/* ========== TAB CONTENT ========== */
-.tab-content {
-  background: white;
-  border-radius: 0 8px 8px 8px;
-  padding: 2rem;
-  min-height: 400px;
-}
-
+/* === HEADER DE TARJETA === */
 .section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  background: #2a3f5f;
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
 }
 
 .section-header h2 {
-  font-size: 1.5rem;
-  color: #1e3a5f;
   margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* ========== BUTTONS ========== */
-.btn-primary {
-  background: #ff6b35;
+/* === CUERPO DE TARJETA === */
+.section-body {
+  padding: 2rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 450px;
+}
+
+/* === BOTÓN DE EDITAR (NARANJA CIRCULAR) === */
+.edit-btn-circle {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  background: #FF7F00;
   color: white;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
+  font-size: 1.8rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
-.btn-primary:hover {
-  background: #ff5722;
-  transform: translateY(-2px);
+.edit-btn-circle:hover {
+  background: #e67300;
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 8px 25px rgba(255, 127, 0, 0.6);
 }
 
-.btn-primary:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-secondary {
-  background: #6c757d;
+/* === BOTÓN DE AGREGAR (PLUS) === */
+.add-btn-circle {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  background: #FF7F00;
   color: white;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
+  font-size: 2.5rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-weight: 300;
 }
 
-.btn-secondary:hover {
-  background: #5a6268;
+.add-btn-circle:hover {
+  background: #e67300;
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 8px 25px rgba(255, 127, 0, 0.6);
 }
 
-.btn-back {
-  background: white;
-  color: #ff4444;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-delete {
-  background: rgba(255, 68, 68, 0.1);
-  color: #ff4444;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.2s;
-}
-
-.btn-delete:hover {
-  background: #ff4444;
-  color: white;
-  transform: scale(1.1);
-}
-
-/* ========== CONFIGURACIÓN ========== */
-.config-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-}
-
+/* === ITEMS EN CONFIGURACIÓN === */
 .config-item {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
+  border-bottom: 2px solid #e9ecef;
+  transition: background 0.2s ease;
+}
+
+.config-item:hover {
+  background: rgba(255, 127, 0, 0.05);
+}
+
+.config-item:last-child {
+  border-bottom: none;
 }
 
 .config-item .label {
   font-weight: 600;
-  color: #666;
-  font-size: 0.9rem;
+  color: #495057;
+  font-size: 1rem;
 }
 
 .config-item .value {
-  color: #333;
+  font-weight: 700;
+  color: #2a3f5f;
   font-size: 1.1rem;
-  font-weight: 500;
+  text-align: right;
 }
 
-/* ========== FORMS ========== */
-.edit-form,
-.add-form {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #ff6b35;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-/* ========== ITEMS GRID (EQUIPOS/ÁRBITROS) ========== */
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.item-card {
+/* === LISTA DE EQUIPOS === */
+.team-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  transition: all 0.2s;
+  border-bottom: 2px solid #e9ecef;
+  transition: all 0.3s ease;
 }
 
-.item-card:hover {
-  background: #e9ecef;
-  transform: translateY(-2px);
+.team-item:hover {
+  background: rgba(255, 127, 0, 0.05);
+  transform: translateX(5px);
 }
 
-.item-info {
+.team-info {
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex: 1;
 }
 
 .team-logo {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #2a3f5f;
 }
 
-.team-icon,
-.arbitro-icon {
-  width: 40px;
-  height: 40px;
+.team-icon {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: #ff6b35;
+  background: #2a3f5f;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
 }
 
-.item-name {
+.team-name {
   font-weight: 600;
-  color: #333;
-  word-break: break-word;
+  color: #2a3f5f;
+  font-size: 1.1rem;
 }
 
-/* ========== EMPTY STATE ========== */
+.delete-team-btn {
+  background: rgba(220, 53, 69, 0.1);
+  border: 2px solid rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-team-btn:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* === EMPTY STATE === */
 .empty-state {
   text-align: center;
   padding: 3rem 2rem;
-  color: #666;
+  color: #6c757d;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
 }
 
 .empty-state p {
   font-size: 1.2rem;
-  margin: 0.5rem 0;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #495057;
 }
 
 .empty-state .subtitle {
   font-size: 1rem;
-  color: #999;
+  font-weight: 400;
+  color: #6c757d;
 }
 
-/* ========== RESPONSIVE ========== */
-@media (max-width: 768px) {
-  .page-container {
-    padding: 1rem;
+/* === CALENDARIO === */
+.calendar-placeholder {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.calendar-icon {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  color: #2a3f5f;
+}
+
+.calendar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2a3f5f;
+  margin-bottom: 1rem;
+}
+
+.calendar-subtitle {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+
+.generate-calendar-btn {
+  background: #FF7F00;
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 127, 0, 0.3);
+}
+
+.generate-calendar-btn:hover {
+  background: #e67300;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.5);
+}
+
+.generate-calendar-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* === FORMULARIO DE EDICIÓN === */
+.edit-form {
+  padding: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #FF7F00;
+  box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-primary {
+  background: #FF7F00;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #e67300;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 127, 0, 0.4);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* === ADD FORM === */
+.add-form {
+  background: rgba(255, 127, 0, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px dashed #FF7F00;
+  margin-bottom: 1.5rem;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+  .sections-grid {
+    grid-template-columns: 1fr;
   }
 
+  .section-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
   .page-header {
     flex-direction: column;
-    align-items: flex-start;
+    text-align: center;
+  }
+
+  .back-btn {
+    width: 100%;
   }
 
   .page-title {
     font-size: 1.5rem;
   }
 
-  .tabs-container {
-    overflow-x: auto;
-    flex-wrap: nowrap;
+  .sections-grid {
+    gap: 1rem;
   }
 
-  .tab-content {
+  .section-body {
     padding: 1rem;
-  }
-
-  .config-grid {
-    grid-template-columns: 1fr;
   }
 
   .form-row {
     grid-template-columns: 1fr;
   }
+}
 
-  .items-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .page-container {
+    padding: 1rem;
   }
 
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .section-header h2 {
+    font-size: 1.3rem;
   }
 
-  .start-tournament-btn {
-    width: 100%;
+  .edit-btn-circle,
+  .add-btn-circle {
+    width: 55px;
+    height: 55px;
+    font-size: 1.5rem;
   }
 }

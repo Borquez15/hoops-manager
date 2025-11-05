@@ -82,6 +82,7 @@ export class AuthService {
       if (response.access_token) {
         localStorage.setItem('auth_token', response.access_token);
         console.log('✅ Token JWT guardado en localStorage');
+        console.log('✅ Token (primeros 50):', response.access_token.substring(0, 50));
       } else {
         console.error('❌ No se recibió access_token del backend');
         throw new Error('No se recibió token del servidor');
@@ -92,7 +93,16 @@ export class AuthService {
         localStorage.setItem('user', JSON.stringify(response.user));
         localStorage.setItem('auth_method', 'native');
         console.log('✅ Usuario guardado:', response.user);
+        console.log('✅ auth_method guardado: native');
       }
+      
+      // VERIFICACIÓN POST-LOGIN
+      console.log('==== VERIFICACIÓN POST-LOGIN ====');
+      console.log('auth_token existe:', !!localStorage.getItem('auth_token'));
+      console.log('user existe:', !!localStorage.getItem('user'));
+      console.log('auth_method:', localStorage.getItem('auth_method'));
+      console.log('isAuthenticated():', this.isAuthenticated());
+      console.log('================================');
       
       return response.user;
       
@@ -147,15 +157,32 @@ export class AuthService {
   }
 
   // ========================================
-  // ✅ VERIFICAR AUTENTICACIÓN (híbrido)
+  // ✅ VERIFICAR AUTENTICACIÓN (CON LOGS DE DEBUG)
   // ========================================
   isAuthenticated(): boolean {
-    // Verifica Firebase O autenticación nativa
+    console.log('==== 🔍 isAuthenticated() EJECUTÁNDOSE ====');
+    
+    // Verificar cada condición por separado
+    const token = localStorage.getItem('auth_token');
+    const method = localStorage.getItem('auth_method');
+    const user = localStorage.getItem('user');
     const hasFirebase = !!this.currentUser;
     const hasNative = !!this.getCurrentUserNative();
-    const hasToken = !!localStorage.getItem('auth_token');
     
-    return hasFirebase || hasNative || hasToken;
+    console.log('🔵 Token existe:', !!token);
+    console.log('🔵 Token (primeros 30):', token ? token.substring(0, 30) + '...' : 'null');
+    console.log('🔵 Método:', method);
+    console.log('🔵 User existe:', !!user);
+    console.log('🔵 Firebase user:', hasFirebase);
+    console.log('🔵 Native user:', hasNative);
+    
+    // Verificar condiciones
+    const isAuth = hasFirebase || hasNative || !!token;
+    
+    console.log('🔵 RESULTADO:', isAuth);
+    console.log('==========================================');
+    
+    return isAuth;
   }
 
   // ========================================

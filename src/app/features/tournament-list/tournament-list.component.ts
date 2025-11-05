@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { TournamentService, Tournament } from '../../services/tournament.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-tournament-list',
@@ -29,7 +30,6 @@ export class TournamentListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     console.log('🔵 ngOnInit - TournamentListComponent inicializado');
-    console.log('🔵 Loading inicial:', this.loading);
     this.loadTournaments();
   }
 
@@ -40,55 +40,76 @@ export class TournamentListComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * ========================================
+   * NAVEGACIÓN
+   * ========================================
+   */
+
+  /**
+   * Navega al HOME de la aplicación
+   */
+  goBack(): void {
+    console.log('🔵 Regresando al HOME');
+    // Ajusta la ruta según tu configuración de rutas
+    // Puede ser '/home', '/inicio', '/', etc.
+    this.router.navigate(['/home']);
+  }
+
+  /**
+   * Navega al panel de administración del torneo
+   */
+  viewTournament(id: number): void {
+    console.log('🔵 Navegando al panel de administración del torneo:', id);
+    this.router.navigate(['/torneo', id, 'admin']);
+  }
+
+  /**
+   * Navega a la página de crear torneo
+   */
+  createTournament(): void {
+    console.log('🔵 Navegando a crear torneo');
+    this.router.navigate(['/crear-torneo']);
+  }
+
+  /**
+   * ========================================
+   * CARGA DE DATOS - OPTIMIZADO
+   * ========================================
+   */
+
   loadTournaments(): void {
     console.log('🔵 loadTournaments() - Iniciando carga...');
     this.loading = true;
     this.error = null;
-    this.cdr.detectChanges();
-    console.log('🔵 Loading establecido a true');
 
-    this.subscription = this.tournamentService.getTournaments().subscribe({
-      next: (data) => {
-        console.log('✅ next() - Datos recibidos:', data);
-        console.log('✅ Cantidad de torneos:', data.length);
-        
-        this.tournaments = data;
-        this.loading = false;
-        
-        console.log('✅ tournaments asignado:', this.tournaments);
-        console.log('✅ loading establecido a:', this.loading);
-        
-        // Forzar detección de cambios
-        this.cdr.detectChanges();
-        console.log('✅ detectChanges() ejecutado');
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('❌ error() - Error recibido:', error);
-        console.error('❌ Status:', error.status);
-        console.error('❌ Message:', error.message);
-        
-        this.error = 'Error al cargar los torneos';
-        this.loading = false;
-        
-        this.cdr.detectChanges();
-        console.log('❌ Error manejado, loading:', this.loading);
-      },
-      complete: () => {
-        console.log('✅ complete() - Observable completado');
-        console.log('✅ Estado final - loading:', this.loading, 'tournaments:', this.tournaments.length);
-      }
-    });
+    // Usar finalize para asegurar que loading siempre se establece a false
+    this.subscription = this.tournamentService.getTournaments()
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+          console.log('✅ Carga finalizada - loading:', this.loading);
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          console.log('✅ Datos recibidos:', data.length, 'torneos');
+          this.tournaments = data;
+          console.log('✅ Torneos asignados correctamente');
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('❌ Error al cargar torneos:', error);
+          this.error = 'Error al cargar los torneos. Por favor, intenta nuevamente.';
+        }
+      });
   }
 
-  viewTournament(id: number): void {
-    console.log('🔵 Navegando al torneo:', id);
-    this.router.navigate(['/tournament-edit', id]);
-  }
-
-  createTournament(): void {
-    console.log('🔵 Navegando a crear torneo');
-    this.router.navigate(['/create-tournament']);
-  }
+  /**
+   * ========================================
+   * OPERACIONES
+   * ========================================
+   */
 
   deleteTournament(id: number, event: Event): void {
     event.stopPropagation();
@@ -96,6 +117,8 @@ export class TournamentListComponent implements OnInit, OnDestroy {
     console.log('🔵 Intentando eliminar torneo:', id);
     
     if (confirm('¿Estás seguro de que deseas eliminar este torneo?')) {
+      this.loading = true; // Mostrar loading durante eliminación
+      
       this.tournamentService.deleteTournament(id).subscribe({
         next: () => {
           console.log('✅ Torneo eliminado exitosamente');
@@ -103,9 +126,56 @@ export class TournamentListComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('❌ Error al eliminar torneo:', error);
-          alert('Error al eliminar el torneo');
+          this.error = 'Error al eliminar el torneo';
+          this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     }
+  }
+
+  /**
+   * ========================================
+   * MÉTODOS PARA ESTADOS (Si necesitas badges)
+   * ========================================
+   */
+  
+  getTournamentStatus(tournament: Tournament): string {
+    if (tournament.estado) {
+      return tournament.estado;
+    }
+    return 'configurando';
+  }
+
+  getStatusBadge(tournament: Tournament): { text: string; class: string } {
+    const status = this.getTournamentStatus(tournament);
+    
+    switch (status) {
+      case 'iniciado':
+        return { text: '🟢 Iniciado', class: 'badge-success' };
+      case 'finalizado':
+        return { text: '⚫ Finalizado', class: 'badge-finished' };
+      case 'configurando':
+      default:
+        return { text: '🔴 Configurar', class: 'badge-warning' };
+    }
+  }
+
+  getButtonText(tournament: Tournament): string {
+    const status = this.getTournamentStatus(tournament);
+    
+    switch (status) {
+      case 'iniciado':
+        return 'Gestionar';
+      case 'finalizado':
+        return 'Ver resultados';
+      case 'configurando':
+      default:
+        return 'Configurar';
+    }
+  }
+
+  isConfigured(tournament: Tournament): boolean {
+    return this.getTournamentStatus(tournament) !== 'configurando';
   }
 }

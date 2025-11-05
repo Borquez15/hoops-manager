@@ -20,11 +20,11 @@ export class TournamentDetailComponent implements OnInit {
   loading = true;
   error: string | null = null;
   
-  // Tabs - Removemos árbitros por ahora
-  activeTab: 'config' | 'equipos' | 'calendario' = 'config';
-  
   // Estado del torneo
   tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
+  
+  // Estado del calendario
+  calendarGenerated = false;
   
   // Forms
   showAddEquipoForm = false;
@@ -52,7 +52,9 @@ export class TournamentDetailComponent implements OnInit {
     });
   }
 
-  // ========== CARGA DE DATOS ==========
+  // ========================================
+  // CARGA DE DATOS
+  // ========================================
   
   async loadTournamentData(): Promise<void> {
     this.loading = true;
@@ -73,6 +75,9 @@ export class TournamentDetailComponent implements OnInit {
       // Cargar equipos
       await this.loadEquipos();
       
+      // Verificar si el calendario ya fue generado
+      await this.checkCalendarStatus();
+      
       this.loading = false;
       this.cdr.detectChanges();
       
@@ -92,15 +97,26 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
-  // ========== TABS ==========
-  
-  changeTab(tab: 'config' | 'equipos' | 'calendario'): void {
-    console.log('🔵 Cambiando a tab:', tab);
-    this.activeTab = tab;
-    this.cdr.detectChanges();
+  async checkCalendarStatus(): Promise<void> {
+    try {
+      // TODO: Hacer llamada al backend para verificar si hay partidos generados
+      // Por ahora, asumimos que si el torneo está "iniciado", el calendario ya fue generado
+      if (this.tournamentStatus !== 'configurando') {
+        this.calendarGenerated = true;
+      }
+      
+      // Puedes implementar algo como:
+      // const partidos = await this.tournamentService.getPartidos(this.tournamentId).toPromise();
+      // this.calendarGenerated = partidos && partidos.length > 0;
+      
+    } catch (error) {
+      console.error('❌ Error al verificar calendario:', error);
+    }
   }
 
-  // ========== CONFIGURACIÓN ==========
+  // ========================================
+  // CONFIGURACIÓN
+  // ========================================
   
   enableEditMode(): void {
     if (!this.tournament) return;
@@ -138,15 +154,17 @@ export class TournamentDetailComponent implements OnInit {
       this.editMode = false;
       this.editForm = {};
       
-      alert('Configuración guardada exitosamente');
+      alert('✅ Configuración guardada exitosamente');
       
     } catch (error) {
       console.error('❌ Error al guardar:', error);
-      alert('Error al guardar la configuración');
+      alert('❌ Error al guardar la configuración');
     }
   }
 
-  // ========== EQUIPOS ==========
+  // ========================================
+  // EQUIPOS
+  // ========================================
   
   toggleAddEquipoForm(): void {
     this.showAddEquipoForm = !this.showAddEquipoForm;
@@ -157,7 +175,7 @@ export class TournamentDetailComponent implements OnInit {
 
   async addEquipo(): Promise<void> {
     if (!this.newEquipo.nombre.trim()) {
-      alert('El nombre del equipo es requerido');
+      alert('⚠️ El nombre del equipo es requerido');
       return;
     }
     
@@ -182,7 +200,7 @@ export class TournamentDetailComponent implements OnInit {
     } catch (error: any) {
       console.error('❌ Error al agregar equipo:', error);
       const errorMsg = error.error?.detail || 'Error al agregar el equipo';
-      alert(errorMsg);
+      alert('❌ ' + errorMsg);
     }
   }
 
@@ -204,25 +222,34 @@ export class TournamentDetailComponent implements OnInit {
       
     } catch (error) {
       console.error('❌ Error al eliminar equipo:', error);
-      alert('Error al eliminar el equipo');
+      alert('❌ Error al eliminar el equipo');
     }
   }
 
-  // ========== CALENDARIO ==========
+  // ========================================
+  // CALENDARIO
+  // ========================================
   
+  /**
+   * Genera el calendario automático (SEPARADO de iniciar torneo)
+   * Permite al admin revisar y editar antes de iniciar oficialmente
+   */
   async generateCalendar(): Promise<void> {
     // Validaciones
     if (this.equipos.length < 2) {
-      alert('Necesitas al menos 2 equipos para generar el calendario');
+      alert('⚠️ Necesitas al menos 2 equipos para generar el calendario');
       return;
     }
     
-    if (!confirm('¿Deseas generar el calendario automático? Esto reemplazará cualquier calendario existente.')) {
+    if (!confirm('¿Deseas generar el calendario automático?\n\nPodrás revisarlo y modificarlo antes de iniciar el torneo.')) {
       return;
     }
     
     try {
       console.log('🔵 Generando calendario...');
+      
+      // Mostrar loading
+      this.loading = true;
       
       await this.tournamentService
         .autoSchedule(this.tournamentId, undefined, true)
@@ -230,63 +257,89 @@ export class TournamentDetailComponent implements OnInit {
       
       console.log('✅ Calendario generado');
       
-      alert('Calendario generado exitosamente');
+      this.calendarGenerated = true;
+      this.loading = false;
       
-      // Cambiar a tab de calendario
-      this.changeTab('calendario');
+      alert('✅ Calendario generado exitosamente\n\nPuedes revisarlo y editarlo antes de iniciar el torneo');
+      
+      this.cdr.detectChanges();
       
     } catch (error) {
       console.error('❌ Error al generar calendario:', error);
-      alert('Error al generar el calendario');
+      this.loading = false;
+      alert('❌ Error al generar el calendario');
     }
   }
 
+  /**
+   * Permite editar el calendario (TODO: implementar vista de edición)
+   */
+  editCalendar(): void {
+    console.log('🔵 Editando calendario');
+    alert('💡 Próximamente: Aquí podrás editar las fechas del calendario');
+    
+    // TODO: Navegar a vista de edición de calendario
+    // this.router.navigate(['/torneo', this.tournamentId, 'calendario']);
+  }
+
+  /**
+   * Inicia el torneo oficialmente (solo si el calendario ya fue generado)
+   */
   async startTournament(): Promise<void> {
     // Validaciones
-    if (this.equipos.length < 2) {
-      alert('Necesitas al menos 2 equipos para iniciar el torneo');
+    if (!this.calendarGenerated) {
+      alert('⚠️ Primero debes generar el calendario');
       return;
     }
     
-    if (!confirm('¿Estás seguro de iniciar el torneo? Se generará el calendario automáticamente.')) {
+    if (!confirm('¿Estás seguro de iniciar el torneo?\n\nEsto marcará el torneo como "iniciado" y ya no podrás modificar la configuración básica.')) {
       return;
     }
     
     try {
       console.log('🔵 Iniciando torneo...');
       
-      // Generar calendario
-      await this.generateCalendar();
-      
-      // Actualizar estado del torneo
+      // Actualizar estado del torneo a "iniciado"
       await this.tournamentService
         .updateTournament(this.tournamentId, { estado: 'iniciado' })
         .toPromise();
       
       console.log('✅ Torneo iniciado');
       
-      alert('¡Torneo iniciado exitosamente!');
+      alert('🚀 ¡Torneo iniciado exitosamente!\n\nEl calendario ahora está activo');
       
       // Recargar datos
       await this.loadTournamentData();
       
     } catch (error) {
       console.error('❌ Error al iniciar torneo:', error);
-      alert('Error al iniciar el torneo');
+      alert('❌ Error al iniciar el torneo');
     }
   }
 
-  // ========== NAVEGACIÓN ==========
+  // ========================================
+  // NAVEGACIÓN
+  // ========================================
   
   goBack(): void {
     console.log('🔵 Volviendo a mis torneos');
     this.router.navigate(['/mis-torneos']);
   }
 
-  // ========== UTILIDADES ==========
+  // ========================================
+  // UTILIDADES
+  // ========================================
   
+  /**
+   * Puede iniciar el torneo si:
+   * - Hay equipos suficientes (>=2)
+   * - El calendario ya fue generado
+   * - El torneo está en estado "configurando"
+   */
   canStartTournament(): boolean {
-    return this.equipos.length >= 2 && this.tournamentStatus === 'configurando';
+    return this.equipos.length >= 2 
+      && this.calendarGenerated 
+      && this.tournamentStatus === 'configurando';
   }
 
   getStatusBadge(): { text: string; class: string } {

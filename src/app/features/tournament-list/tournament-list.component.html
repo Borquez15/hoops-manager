@@ -1,24 +1,29 @@
 <!-- src/app/features/tournament-list/tournament-list.component.html -->
 <div class="page-container">
   
+  <!-- HEADER CON BOTÓN REGRESAR -->
   <div class="page-header">
+    <button class="back-button" (click)="goBack()">
+      <span class="back-arrow">←</span>
+      Volver
+    </button>
     <h1 class="page-title">MIS TORNEOS</h1>
-    <p class="page-subtitle">Podés crear un torneo acá</p>
+    <p class="page-subtitle">Gestiona y crea tus torneos</p>
   </div>
 
-  <!-- Loading -->
+  <!-- LOADING STATE -->
   <div *ngIf="loading" class="loading-container">
     <div class="spinner"></div>
     <p>Cargando torneos...</p>
   </div>
 
-  <!-- Error -->
+  <!-- ERROR STATE -->
   <div *ngIf="error && !loading" class="error-alert">
     <span>{{ error }}</span>
     <button (click)="error = null" class="error-close-btn">✕</button>
   </div>
 
-  <!-- Empty State -->
+  <!-- EMPTY STATE -->
   <div *ngIf="!loading && !error && tournaments.length === 0" class="empty-state">
     <div class="empty-icon">🏆</div>
     <h2>No hay torneos creados</h2>
@@ -28,7 +33,7 @@
     </button>
   </div>
 
-  <!-- Tournament Grid -->
+  <!-- TOURNAMENT GRID -->
   <div *ngIf="!loading && !error && tournaments.length > 0" class="content">
     <div class="tournaments-grid">
       <div 
@@ -36,6 +41,7 @@
         class="tournament-card"
         (click)="viewTournament(tournament.id_torneo)"
       >
+        <!-- Header de la tarjeta -->
         <div class="card-header">
           <h3 class="card-title">{{ tournament.nombre }}</h3>
           <button 
@@ -47,6 +53,7 @@
           </button>
         </div>
         
+        <!-- Cuerpo con información -->
         <div class="card-body">
           <div class="info-row">
             <span class="info-label">Modalidad:</span>
@@ -66,6 +73,7 @@
           </div>
         </div>
 
+        <!-- Footer con botón de acción -->
         <div class="card-footer">
           <button class="enter-btn">
             Entrar
@@ -75,6 +83,7 @@
       </div>
     </div>
 
+    <!-- Botón para crear nuevo torneo -->
     <div class="create-new-container">
       <button class="create-new-btn" (click)="createTournament()">
         <span class="plus-icon">+</span>
@@ -82,5 +91,4 @@
       </button>
     </div>
   </div>
-
 </div>
