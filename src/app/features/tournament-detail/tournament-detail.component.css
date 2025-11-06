@@ -1,605 +1,421 @@
-/* ===============================================
-   TOURNAMENT DETAIL - PANEL DE ADMINISTRACIÓN
-   CON BOTONES SIEMPRE VISIBLES
-   =============================================== */
+/* ======================================================
+   THEME (SOLO EN ESTE COMPONENTE)
+   ====================================================== */
+:host{
+  display:block;
+  background:#0b0e13;
+  min-height:100vh;
 
-/* === CONTENEDOR PRINCIPAL === */
-.page-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  padding: 2rem 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* Tokens del tema (alcance del host) */
+  --nav: #2c3e50;
+  --nav-glass: rgba(44, 62, 80, .95);
+  --card: #2c3e50;
+  --card-h1: #34495e;
+  --white: #ffffff;
+  --surface: #f5f7fa;
+  --muted: #7f8c8d;
+  --muted-2: #95a5a6;
+  --text-dark: #2c3e50;
+  --accent: #ff8c42;
+  --accent-2: #ff6b35;
+  --ok: #28a745;
+  --danger: #e74c3c;
+  --warn: #f1c40f;
 }
 
-/* === LOADING === */
-.loading-container {
+/* ======================================================
+   CONTENEDOR CON FONDO (igual a crear torneo)
+   ====================================================== */
+.crear-torneo-container{
+  min-height:100vh;
+  padding-bottom:60px;
+  background-color:#0b0e13;
+  background-image:
+    radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(0deg, rgba(0,0,0,.40), rgba(0,0,0,.40)),
+    url("/imagen/fondo.webp");
+  background-position:center, center, 58% 34%;
+  background-size:auto, auto, 112% auto;
+  background-repeat:no-repeat, no-repeat, no-repeat;
+}
+
+/* Fallback a PNG si falla webp */
+@supports not (background-image: url("/imagen/fondo.webp")) {
+  .crear-torneo-container{
+    background-image:
+      radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
+      linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
+      url("/imagen/fondo.png");
+  }
+}
+
+/* ======================================================
+   HEADER
+   ====================================================== */
+.header{
+  background: var(--nav-glass, rgba(44,62,80,.95));
+  backdrop-filter: blur(10px);
+  padding:16px 20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+  position:sticky; top:0; z-index:40;
+}
+.header__content{
+  max-width:1400px; margin:0 auto;
+  display:flex; align-items:center; gap:16px;
+}
+.page-title{
+  margin:0; color:#fff; font-weight:800; letter-spacing:.5px;
+  font-size:22px; text-transform:uppercase;
+}
+.btn-volver{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 14px; background:transparent;
+  border:2px solid var(--accent, #ff8c42);
+  border-radius:10px; color:#fff; font-weight:800; cursor:pointer;
+  transition:.2s ease;
+}
+.btn-volver:hover{ background:var(--accent, #ff8c42); transform:translateX(-3px); }
+
+/* Badge de estado a la derecha */
+.status-badge{
+  margin-left:auto; padding:6px 10px; border-radius:12px;
+  color:#fff; font-size:12px; font-weight:800;
+}
+.badge-warning{ background:#d9534f; }
+.badge-success{ background: var(--ok, #28a745); }
+.badge-finished{ background:#6c757d; }
+
+/* ======================================================
+   CONTENT + GRID
+   ====================================================== */
+.content{ max-width:1400px; margin:0 auto; padding:32px 20px; position:relative; z-index:1; }
+.grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(420px,1fr)); gap:24px; margin-bottom:40px; }
+.card-wide{ grid-column:span 2; }
+
+/* ======================================================
+   ALERTAS / LOADING / ERROR
+   ====================================================== */
+.alert{
+  display:flex; align-items:center; gap:10px; padding:12px 14px;
+  border-radius:12px; font-weight:700;
+}
+.alert-warning{
+  background:rgba(241,196,15,.15);
+  color:#f6c85d;
+  border:1px solid rgba(241,196,15,.35);
+}
+.loading-container{ display:flex; flex-direction:column; align-items:center; gap:12px; color:#dce4ea; padding:40px; }
+.spinner{
+  width:34px; height:34px; border-radius:50%;
+  border:3px solid rgba(255,255,255,.2); border-top-color:#fff;
+  animation:spin .9s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.error-alert{
+  margin:24px auto; max-width:900px; background:#fee; color:#c33;
+  border:2px solid #fcc; border-radius:12px; padding:16px 18px;
+}
+.btn-back{ margin-top:8px; background:#e1e8ed; color:#2c3e50; border:none; padding:8px 12px; border-radius:8px; font-weight:800; }
+
+/* ======================================================
+   CARDS
+   ====================================================== */
+.card{
+  background: var(--card, #2c3e50);
+  border-radius:16px; overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,.18);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.card:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.22); }
+.card-header{
+  display:flex; align-items:center; gap:10px; padding:18px 20px;
+  background: linear-gradient(135deg, var(--card-h1, #34495e), var(--card, #2c3e50));
+  border-bottom:2px solid rgba(255,255,255,.08);
+}
+.card-title{ color:#fff; margin:0; font-size:20px; font-weight:800; }
+.card-body{ background:#fff; padding:18px 20px; }
+
+/* Contador en header de "Equipos" */
+.badge-count{
+  margin-left:auto; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.10); color:#cfe0f0;
+  font-size:12px; font-weight:800;
+}
+
+/* Botones circulares naranjas en headers */
+.btn-icon{
+  margin-left:8px; width:36px; height:36px; border-radius:50%; border:none; color:#fff; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+  background: var(--accent, #ff8c42);
+  box-shadow:0 8px 24px rgba(255,140,66,.35);
+  transition:transform .15s ease, background .2s ease;
+}
+.btn-icon:hover{ transform:translateY(-1px) scale(1.05); background:var(--accent-2, #ff6b35); }
+.btn-add, .btn-edit{ background: var(--accent, #ff8c42); }
+
+/* ======================================================
+   CONFIGURACIÓN (lista compacta)
+   ====================================================== */
+.config-resumen{ border:1px solid #e9edf3; border-radius:12px; overflow:hidden; }
+.config-item{
+  display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px;
+  padding:12px 14px; background:#fff; border-bottom:1px solid #edf1f6;
+}
+.config-item:last-child{ border-bottom:none; }
+.config-label{ color:var(--text-dark, #2c3e50); font-weight:700; font-size:13px; }
+.config-value{ color:var(--accent, #ff8c42); font-weight:800; font-size:13px; }
+
+/* ======================================================
+   LISTAS (árbitros / equipos)
+   ====================================================== */
+.list{ display:flex; flex-direction:column; gap:12px; }
+.list-item{
+  display:flex; align-items:center; gap:12px; padding:14px;
+  background: var(--surface, #f5f7fa);
+  border:1px solid #e9edf3; border-radius:12px;
+  transition:background .15s ease, transform .15s ease;
+}
+.list-item:hover{ background:#eef3f8; transform:translateX(2px); }
+.list-item-icon{ width:32px; height:32px; color:var(--accent, #ff8c42); flex-shrink:0; }
+.list-item-text{ flex:1; color:var(--text-dark, #2c3e50); font-weight:800; }
+.jugadores-count{ display:block; margin-top:2px; font-size:12px; color:#7f8c9a; font-weight:700; }
+.list-item-actions{ display:flex; gap:8px; }
+
+/* Avatar de equipo */
+.equipo-logo{
+  width:40px; height:40px; border-radius:10px; overflow:hidden;
+  display:grid; place-items:center; color:#fff; font-weight:900;
+  background: linear-gradient(135deg, var(--accent, #ff8c42), var(--accent-2, #ff6b35));
+  flex-shrink:0;
+}
+.equipo-logo img{ width:100%; height:100%; object-fit:cover; }
+
+/* Estado vacío */
+.empty-state{
+  text-align:center; color:#95a5a6; background:#fff;
+  border:1px dashed #e1e8ed; border-radius:12px; padding:36px 16px;
+}
+.empty-state small{ display:block; margin-top:4px; color:#7f8c9a; font-weight:700; }
+
+/* ======================================================
+   FOOTER / BOTONES
+   ====================================================== */
+.footer-actions{ display:flex; justify-content:center; padding:26px; }
+.btn{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:12px 22px; border:none; border-radius:12px;
+  font-weight:800; cursor:pointer; transition:.15s ease;
+}
+.btn-primary{
+  background: linear-gradient(135deg, var(--accent, #ff8c42), var(--accent-2, #ff6b35));
+  color:#fff; box-shadow:0 10px 28px rgba(255,140,66,.35);
+}
+.btn-primary:hover:not(:disabled){ transform:translateY(-2px); }
+.btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
+.btn-secondary{ background:#95a5a6; color:#fff; }
+.btn-secondary:hover{ background:#7f8c8d; }
+.btn-large{ padding:16px 42px; font-size:16px; }
+.btn-sm{ padding:8px 14px; font-size:14px; border-radius:10px; }
+
+/* ======================================================
+   MODALES
+   ====================================================== */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.7);
+  display:flex; align-items:center; justify-content:center;
+  z-index:1000; overflow-y:auto; padding:20px; animation:fadeIn .25s ease;
+}
+@keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+.modal{
+  background:#fff; border-radius:16px; width:100%; max-width:900px; max-height:90vh;
+  display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,.3); animation:slideUp .25s ease;
+}
+.modal-equipo{ max-width:1000px; }
+@keyframes slideUp{ from{opacity:0; transform:translateY(40px)} to{opacity:1; transform:none} }
+.modal-header{
+  display:flex; justify-content:space-between; align-items:center; padding:20px;
+  background: linear-gradient(135deg, var(--card-h1, #34495e), var(--card, #2c3e50));
+}
+.modal-header h2{ margin:0; color:#fff; font-weight:800; font-size:20px; }
+.btn-close{
+  width:40px; height:40px; border-radius:10px; border:none; background:rgba(255,255,255,.12);
+  color:#fff; display:grid; place-items:center; cursor:pointer; transition:.15s ease;
+}
+.btn-close:hover{ background:rgba(255,255,255,.22); transform:rotate(90deg); }
+.modal-body{ padding:20px; overflow-y:auto; flex:1; background:#fff; }
+.modal-footer{ padding:20px; border-top:2px solid #e1e8ed; display:flex; justify-content:flex-end; gap:12px; }
+
+/* ======================================================
+   FORMULARIOS / CONTROLES
+   ====================================================== */
+.form-group{ margin-bottom:18px; }
+.form-group label{ display:block; font-weight:700; color:var(--text-dark, #2c3e50); margin-bottom:8px; font-size:14px; }
+.form-control{
+  width:100%; padding:12px 14px; font-size:16px; box-sizing:border-box;
+  border:2px solid #e1e8ed; border-radius:8px; transition:.15s ease; background:#fff;
+}
+.form-control:focus{ outline:none; border-color:var(--accent, #ff8c42); box-shadow:0 0 0 3px rgba(255,140,66,.12); }
+.form-control-sm{ padding:8px 12px; font-size:14px; }
+.form-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+.counter{ display:flex; align-items:center; gap:12px; }
+.btn-counter{
+  width:40px; height:40px; border-radius:8px; font-size:22px; font-weight:800;
+  border:2px solid #e1e8ed; background:#fff; color:var(--text-dark, #2c3e50);
+  cursor:pointer; transition:.15s ease;
+}
+.btn-counter:hover{ background:var(--accent, #ff8c42); border-color:var(--accent, #ff8c42); color:#fff; transform:scale(1.05); }
+.counter-value{ min-width:56px; text-align:center; font-weight:800; color:var(--text-dark, #2c3e50); }
+
+.toggle-group{ display:flex; gap:10px; }
+.toggle-btn{
+  flex:1; padding:12px 16px; border:2px solid #e1e8ed; border-radius:8px; background:#fff;
+  color:var(--text-dark, #2c3e50); font-weight:800; cursor:pointer; transition:.15s ease;
+}
+.toggle-btn:hover{ border-color:var(--accent, #ff8c42); background:rgba(255,140,66,.08); }
+.toggle-btn.active{ background:var(--accent, #ff8c42); color:#fff; border-color:var(--accent, #ff8c42); }
+
+.input-with-button{ display:grid; grid-template-columns:1fr auto; gap:8px; }
+.form-hint{ color:#6c8297; font-size:12px; font-weight:700; margin-top:6px; }
+
+/* ======================================================
+   CANCHAS
+   ====================================================== */
+.canchas-section{ margin-top:24px; padding-top:20px; border-top:2px solid #e1e8ed; }
+.section-title{ display:flex; align-items:center; gap:10px; color:var(--text-dark, #2c3e50); font-weight:800; margin:0 0 14px; }
+.section-title svg{ color:var(--accent, #ff8c42); }
+.canchas-list{ display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto; }
+.cancha-item{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:14px; background:var(--surface, #f5f7fa); border:1px solid #e9edf3; border-radius:12px;
+}
+.cancha-item:hover{ background:#eef3f8; }
+.cancha-info{ flex:1; }
+.cancha-nombre{ display:flex; align-items:center; gap:10px; font-weight:800; color:var(--text-dark, #2c3e50); margin-bottom:6px; }
+.cancha-badge{ padding:4px 12px; border-radius:12px; font-size:12px; font-weight:800; background:var(--muted-2, #95a5a6); color:#fff; }
+.cancha-badge.activa{ background:var(--ok, #28a745); }
+.cancha-ubicacion{ display:flex; align-items:center; gap:6px; color:#7f8c9a; font-size:14px; }
+.cancha-ubicacion svg{ color:var(--accent, #ff8c42); }
+.cancha-actions{ display:flex; gap:8px; }
+.nueva-cancha-form{
+  display:grid; grid-template-columns:1fr 1fr auto auto; gap:10px;
+  background:var(--surface, #f5f7fa); border:1px solid #e9edf3; border-radius:12px; padding:14px; margin-top:14px;
+}
+
+/* ======================================================
+   MODAL EQUIPO / JUGADORES
+   ====================================================== */
+.equipo-info-section{
+  display:flex; align-items:center; gap:20px; padding:18px;
+  background:var(--surface, #f5f7fa); border-radius:12px; margin-bottom:20px;
+}
+.equipo-logo-grande{ width:100px; height:100px; border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,.08); flex-shrink:0; }
+.equipo-logo-placeholder{
+  width:100%; height:100%; display:grid; place-items:center; color:#fff; font-size:48px; font-weight:900;
+  background: linear-gradient(135deg, var(--accent, #ff8c42), var(--accent-2, #ff6b35));
+}
+.jugadores-modal-section{ margin-top:24px; }
+.jugadores-lista-modal{
+  display:flex; flex-direction:column; gap:10px; margin-bottom:16px;
+  max-height:300px; overflow-y:auto; padding:12px;
+  background:var(--surface, #f5f7fa); border-radius:12px;
+}
+.jugador-item-modal{
+  display:flex; align-items:center; gap:12px; background:#fff; border-radius:10px; padding:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05); transition:.15s ease;
+}
+.jugador-item-modal:hover{ transform:translateX(3px); box-shadow:0 4px 12px rgba(0,0,0,.08); }
+.jugador-item-modal.inactive{ opacity:.55; }
+.jugador-dorsal{
+  width:56px; height:56px; border-radius:10px; flex-shrink:0; display:grid; place-items:center;
+  color:#fff; font-weight:900; font-size:18px;
+  background: linear-gradient(135deg, var(--accent, #ff8c42), var(--accent-2, #ff6b35));
+}
+.jugador-info{ flex:1; }
+.jugador-nombre{ font-weight:800; color:var(--text-dark, #2c3e50); }
+.jugador-curp{ font-size:12px; color:#7f8c9a; font-family:monospace; }
+.jugador-actions{ display:flex; gap:8px; }
+
+.empty-state-small{
+  text-align:center; color:#95a5a6; background:var(--surface, #f5f7fa);
+  border-radius:12px; padding:22px; margin-bottom:14px;
+}
+.agregar-jugador-modal-form{ padding:18px; background:var(--surface, #f5f7fa); border-radius:12px; }
+.agregar-jugador-modal-form h4{ margin:0 0 10px; color:var(--text-dark, #2c3e50); font-weight:800; font-size:18px; }
+.btn-block{ width:100%; justify-content:center; }
+
+/* ======================================================
+   RESPONSIVE
+   ====================================================== */
+@media (max-width:1200px){
+  .grid{ grid-template-columns:1fr; }
+  .card-wide{ grid-column:span 1; }
+}
+@media (max-width:768px){
+  .modal, .modal-equipo{ max-width:100%; max-height:100vh; border-radius:0; }
+  .form-row{ grid-template-columns:1fr; }
+  .nueva-cancha-form{ grid-template-columns:1fr; }
+  .toggle-group{ flex-direction:column; }
+  .btn-large{ width:100%; justify-content:center; }
+  .badge-count{ display:none; }
+  .page-title{ font-size:18px; }
+}
+
+/* =======================
+   BALANCE / SIMETRÍA
+   ======================= */
+
+/* 1) Estructura de 12 columnas para controlar spans exactos */
+.content .grid{
+  grid-template-columns: repeat(12, minmax(0,1fr));
+  align-items: stretch;        /* estira las cards a la misma altura por fila */
+}
+
+/* 2) Spans por posición (con tu mismo orden de HTML) */
+.content .grid > section.card:nth-child(1){ grid-column: span 6; } /* Configuración */
+.content .grid > section.card:nth-child(2){ grid-column: span 6; } /* Árbitros */
+.content .grid > section.card:nth-child(3){ grid-column: span 8; } /* Equipos */
+.content .grid > section.card:nth-child(4){ grid-column: span 4; } /* Calendario */
+
+/* 3) Que las cards rellenen verticalmente y sus bodies crezcan */
+.content .grid > section.card{
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: white;
 }
-
-.spinner {
-  width: 60px;
-  height: 60px;
-  border: 5px solid rgba(255, 127, 0, 0.3);
-  border-top-color: #FF7F00;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-container p {
-  margin-top: 1.5rem;
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* === ERROR === */
-.error-alert {
-  max-width: 600px;
-  margin: 2rem auto;
-  background: rgba(220, 53, 69, 0.9);
-  color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  text-align: center;
-  border: 2px solid rgba(220, 53, 69, 0.5);
-}
-
-.btn-back {
-  margin-top: 1rem;
-  background: white;
-  color: #dc3545;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-back:hover {
-  transform: scale(1.05);
-}
-
-/* === VALIDATION ALERT === */
-.validation-alert {
-  max-width: 1400px;
-  margin: 0 auto 1.5rem;
-  background: rgba(255, 193, 7, 0.9);
-  color: #000;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 600;
-  border: 2px solid rgba(255, 193, 7, 1);
-}
-
-/* === CONTENIDO === */
-.content {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* === HEADER === */
-.page-header {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.back-btn {
-  background: rgba(255, 127, 0, 0.1);
-  border: 2px solid #FF7F00;
-  color: #FF7F00;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.back-btn:hover {
-  background: #FF7F00;
-  color: white;
-  transform: translateX(-5px);
-}
-
-.header-info {
-  flex: 1;
-  text-align: center;
+.content .grid > section.card .card-body{
+  flex: 1;              /* ocupa el alto disponible */
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
 }
 
-.page-title {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #2a3f5f;
-  margin: 0;
-  text-transform: uppercase;
+/* 4) Alturas mínimas consistentes por fila (ajústalas a tu gusto) */
+.content .grid > section.card:nth-child(1),
+.content .grid > section.card:nth-child(2){
+  min-height: 270px;    /* fila superior */
+}
+.content .grid > section.card:nth-child(3),
+.content .grid > section.card:nth-child(4){
+  min-height: 360px;    /* fila inferior: Equipos y Calendario quedan iguales */
 }
 
-.status-badge {
-  padding: 0.5rem 1.5rem;
-  border-radius: 20px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: inline-block;
-}
-
-.badge-warning {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ff6b00;
-  border: 2px solid #ff6b00;
-}
-
-.badge-success {
-  background: rgba(40, 167, 69, 0.2);
-  color: #28a745;
-  border: 2px solid #28a745;
-}
-
-.badge-finished {
-  background: rgba(108, 117, 125, 0.2);
-  color: #6c757d;
-  border: 2px solid #6c757d;
-}
-
-.start-tournament-btn {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-}
-
-.start-tournament-btn:hover:not(:disabled) {
-  background: #218838;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
-}
-
-.start-tournament-btn:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* === GRID DE 4 TARJETAS (2x2) === */
-.sections-grid {
+/* 5) Marcos internos “vacíos” con la misma altura visual */
+.card .empty-state{
+  flex: 1;              /* llena el alto del body */
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  margin-top: 2rem;
+  place-items: center;  /* centra el contenido */
 }
 
-/* === TARJETA DE SECCIÓN === */
-.section-card {
-  background: white;
-  border-radius: 20px;
-  border: 3px solid #2a3f5f;
-  overflow: visible; /* IMPORTANTE: permite que botones sean visibles */
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  min-height: 450px;
-  position: relative; /* IMPORTANTE: para posicionamiento de botones */
-  transition: all 0.3s ease;
-}
+/* 6) Ajuste fino de paddings para que los encabezados midan igual */
+.card-header{ min-height: 58px; }
+.card-title{ line-height: 1; }
 
-.section-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 35px rgba(255, 127, 0, 0.2);
-}
-
-/* === HEADER DE TARJETA === */
-.section-header {
-  background: #2a3f5f;
-  color: white;
-  padding: 1.5rem;
-  text-align: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.section-header h2 {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.section-header small {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-}
-
-/* === CUERPO DE TARJETA === */
-.section-body {
-  padding: 2rem;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: visible; /* Permite que botones sean visibles */
-  max-height: 450px;
-  position: relative;
-}
-
-/* === BOTONES CIRCULARES - SIEMPRE VISIBLES === */
-.edit-btn-circle,
-.add-btn-circle {
-  /* Display controlado por [style.display] en el HTML */
-  position: absolute !important;
-  bottom: 1rem !important;
-  right: 1rem !important;
-  background: #FF7F00 !important;
-  color: white !important;
-  width: 60px !important;
-  height: 60px !important;
-  border-radius: 50% !important;
-  border: none !important;
-  font-size: 1.5rem !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.5) !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 9999 !important; /* Z-index ALTÍSIMO para debugging */
-  font-weight: 300 !important;
-  line-height: 1 !important;
-}
-
-.add-btn-circle {
-  font-size: 2rem !important;
-}
-
-.edit-btn-circle:hover,
-.add-btn-circle:hover {
-  background: #e67300 !important;
-  transform: scale(1.15) !important;
-  box-shadow: 0 8px 25px rgba(255, 127, 0, 0.7) !important;
-}
-
-.edit-btn-circle:active,
-.add-btn-circle:active {
-  transform: scale(0.95) !important;
-}
-
-/* Animación especial para botón + */
-.add-btn-circle:hover {
-  transform: scale(1.15) rotate(90deg) !important;
-}
-
-/* === ITEMS EN CONFIGURACIÓN === */
-.config-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 2px solid #e9ecef;
-  transition: background 0.2s ease;
-}
-
-.config-item:hover {
-  background: rgba(255, 127, 0, 0.05);
-}
-
-.config-item:last-child {
-  border-bottom: none;
-}
-
-.config-item .label {
-  font-weight: 600;
-  color: #495057;
-  font-size: 1rem;
-}
-
-.config-item .value {
-  font-weight: 700;
-  color: #2a3f5f;
-  font-size: 1.1rem;
-  text-align: right;
-}
-
-/* === LISTA DE EQUIPOS === */
-.team-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 2px solid #e9ecef;
-  transition: all 0.3s ease;
-}
-
-.team-item:hover {
-  background: rgba(255, 127, 0, 0.05);
-  transform: translateX(5px);
-}
-
-.team-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.team-logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #2a3f5f;
-}
-
-.team-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: #2a3f5f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-}
-
-.team-name {
-  font-weight: 600;
-  color: #2a3f5f;
-  font-size: 1.1rem;
-}
-
-.delete-team-btn {
-  background: rgba(220, 53, 69, 0.1);
-  border: 2px solid rgba(220, 53, 69, 0.3);
-  color: #dc3545;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.delete-team-btn:hover {
-  background: #dc3545;
-  color: white;
-  transform: scale(1.1);
-}
-
-/* === EMPTY STATE === */
-.empty-state {
-  text-align: center;
-  padding: 3rem 2rem;
-  color: #6c757d;
-}
-
-.empty-state-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
-}
-
-.empty-state p {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #495057;
-}
-
-.empty-state .subtitle {
-  font-size: 1rem;
-  font-weight: 400;
-  color: #6c757d;
-}
-
-/* === CALENDARIO === */
-.calendar-placeholder {
-  text-align: center;
-  padding: 3rem 2rem;
-}
-
-.calendar-icon {
-  font-size: 5rem;
-  margin-bottom: 1rem;
-  color: #2a3f5f;
-}
-
-.calendar-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #2a3f5f;
-  margin-bottom: 1rem;
-}
-
-.calendar-subtitle {
-  font-size: 1rem;
-  color: #6c757d;
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-
-.generate-calendar-btn {
-  background: #FF7F00;
-  color: white;
-  border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 127, 0, 0.3);
-  margin-top: 1.5rem;
-}
-
-.generate-calendar-btn:hover {
-  background: #e67300;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.5);
-}
-
-/* === FORMULARIO DE EDICIÓN === */
-.edit-form {
-  padding: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #FF7F00;
-  box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.1);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.btn-primary {
-  background: #FF7F00;
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  background: #e67300;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(255, 127, 0, 0.4);
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background: #5a6268;
-  transform: translateY(-2px);
-}
-
-/* === ADD FORM === */
-.add-form {
-  background: rgba(255, 127, 0, 0.05);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 2px dashed #FF7F00;
-  margin-bottom: 1.5rem;
-}
-
-/* === RESPONSIVE === */
-@media (max-width: 1200px) {
-  .sections-grid {
+/* 7) Responsive: cuando se apila, vuelve a una sola columna limpia */
+@media (max-width: 1200px){
+  .content .grid{
     grid-template-columns: 1fr;
   }
-
-  .section-card {
+  .content .grid > section.card:nth-child(n){
+    grid-column: auto;
     min-height: auto;
-  }
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .back-btn {
-    width: 100%;
-  }
-
-  .page-title {
-    font-size: 1.5rem;
-  }
-
-  .sections-grid {
-    gap: 1rem;
-  }
-
-  .section-body {
-    padding: 1rem;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .edit-btn-circle,
-  .add-btn-circle {
-    width: 55px !important;
-    height: 55px !important;
-    font-size: 1.3rem !important;
-  }
-  
-  .add-btn-circle {
-    font-size: 1.8rem !important;
   }
 }
