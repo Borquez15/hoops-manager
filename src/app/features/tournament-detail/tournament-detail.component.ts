@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { TournamentService, Tournament } from '../../services/tournament.service';
+import { RefereeModalComponent } from './modal/referee-modal/referee-modal.component';
 
 // ========== INTERFACES ADICIONALES ==========
 interface Arbitro {
@@ -57,7 +58,7 @@ interface LookupResponse {
 @Component({
   selector: 'app-tournament-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RefereeModalComponent],
   templateUrl: './tournament-detail.component.html',
   styleUrls: ['./tournament-detail.component.css']
 })
@@ -81,6 +82,18 @@ export class TournamentDetailComponent implements OnInit {
   modalEquipoAbierto = false;
   editandoCancha = false;
   canchaEditando: Cancha | null = null;
+
+  modalArbitroAbierto = false;
+modalCalendarioAbierto = false;
+
+// Árbitros
+nuevoArbitroEmail = '';
+enviandoInvitacion = false;
+
+// Calendario
+calendario: any = null;
+anioCalendario = new Date().getFullYear();
+mesCalendario = new Date().getMonth() + 1;
   
   // Formularios
   editForm: Partial<Tournament> = {};
@@ -133,58 +146,113 @@ export class TournamentDetailComponent implements OnInit {
   // CARGA DE DATOS
   // ========================================
   
-  async loadTournamentData(): Promise<void> {
-    console.log('🟡 ========== INICIO CARGA ==========');
+  // ========================================
+// VERSIÓN MEJORADA - loadTournamentData()
+// Reemplazar desde línea 148 hasta línea 199
+// ========================================
+
+async loadTournamentData(): Promise<void> {
+  console.log('🟡 ========== INICIO CARGA ==========');
+  
+  // FORZAR estado inicial
+  this.loading = true;
+  this.error = null;
+  this.cdr.markForCheck();
+  this.cdr.detectChanges();
+  
+  // Timeout de seguridad
+  const timeoutId = setTimeout(() => {
+    if (this.loading) {
+      console.error('⏰ TIMEOUT: La carga tomó más de 10 segundos');
+      this.loading = false;
+      this.error = 'La carga está tomando demasiado tiempo. Por favor, recarga la página.';
+      this.cdr.markForCheck();
+      this.cdr.detectChanges();
+    }
+  }, 10000);
+  
+  try {
+    // Cargar torneo
+    const tournamentData = await this.tournamentService
+      .getTournament(this.tournamentId)
+      .toPromise();
     
-    this.loading = true;
-    this.error = null;
+    this.tournament = tournamentData || null;
+    console.log('✅ Torneo recibido:', this.tournament);
+    
+    if (!this.tournament) {
+      throw new Error('No se encontró el torneo');
+    }
+    
+    // Estado
+    if (this.tournament.estado) {
+      this.tournamentStatus = this.tournament.estado as any;
+    }
+    
+    // Cargar todos los datos en paralelo con manejo individual de errores
+    await Promise.race([
+      Promise.all([
+        this.loadEquipos().catch(err => {
+          console.error('❌ Error en loadEquipos:', err);
+          this.equipos = [];
+        }),
+        this.loadArbitros().catch(err => {
+          console.error('❌ Error en loadArbitros:', err);
+          this.arbitros = [];
+        }),
+        this.loadCanchas().catch(err => {
+          console.error('❌ Error en loadCanchas:', err);
+          this.canchas = [];
+        }),
+        this.checkCalendarStatus().catch(err => {
+          console.error('❌ Error en checkCalendarStatus:', err);
+        })
+      ]),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout en carga de datos')), 8000)
+      )
+    ]);
+    
+    console.log('✅ CARGA EXITOSA');
+    console.log('📊 Equipos:', this.equipos.length);
+    console.log('👨‍⚖️ Árbitros:', this.arbitros.length);
+    console.log('🏟️ Canchas:', this.canchas.length);
+    
+  } catch (error: any) {
+    console.error('❌ ERROR en carga:', error);
+    this.error = error?.message || 'Error al cargar el torneo';
+  } finally {
+    clearTimeout(timeoutId);
+    
+    // FORZAR actualización del estado loading
+    this.loading = false;
+    console.log('🔄 Setting loading = false');
+    
+    // Triple forzado de detección de cambios
+    this.cdr.markForCheck();
     this.cdr.detectChanges();
     
-    try {
-      // Cargar torneo
-      const tournamentData = await this.tournamentService
-        .getTournament(this.tournamentId)
-        .toPromise();
-      
-      this.tournament = tournamentData || null;
-      console.log('✅ Torneo recibido:', this.tournament);
-      
-      if (!this.tournament) {
-        throw new Error('No se encontró el torneo');
-      }
-      
-      // Estado
-      if (this.tournament.estado) {
-        this.tournamentStatus = this.tournament.estado as any;
-      }
-      
-      // Cargar todos los datos en paralelo
-      await Promise.all([
-        this.loadEquipos(),
-        this.loadArbitros(),
-        this.loadCanchas(),
-        this.checkCalendarStatus()
-      ]);
-      
-      console.log('✅ CARGA EXITOSA');
-      
-    } catch (error: any) {
-      console.error('❌ ERROR en carga:', error);
-      this.error = error?.message || 'Error al cargar el torneo';
-    } finally {
+    // Segundo intento después de un tick
+    setTimeout(() => {
       this.loading = false;
+      this.cdr.markForCheck();
       this.cdr.detectChanges();
-      
-      setTimeout(() => {
-        if (this.loading) {
-          console.warn('⚠️ WARNING: loading todavía es true!');
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
-        console.log('🟢 ========== FIN CARGA ==========');
-      }, 100);
-    }
+      console.log('🔄 Second update: loading =', this.loading);
+    }, 0);
+    
+    // Tercer intento como última verificación
+    setTimeout(() => {
+      if (this.loading) {
+        console.warn('⚠️ WARNING: loading todavía es true después de 2 intentos!');
+        this.loading = false;
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      }
+      console.log('🟢 ========== FIN CARGA ==========');
+      console.log('🔍 Estado final: loading =', this.loading, 'error =', this.error);
+    }, 100);
   }
+}
 
   async loadEquipos(): Promise<void> {
     try {
@@ -235,14 +303,22 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   async loadArbitros(): Promise<void> {
-    try {
-      // TODO: Implementar endpoint de árbitros cuando esté disponible
-      this.arbitros = [];
-    } catch (error) {
-      console.error('❌ Error al cargar árbitros:', error);
-      this.arbitros = [];
-    }
+  try {
+    const response = await this.http.get<any[]>(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/referees`
+    ).toPromise();
+
+    this.arbitros = (response || []).map(a => ({
+      id_arbitro: a.id_usuario,
+      nombre: `${a.nombre} ${a.ap_p} ${a.ap_m || ''}`.trim()
+    }));
+
+    console.log('✅ Árbitros:', this.arbitros);
+  } catch (error) {
+    console.error('❌ Error al cargar árbitros:', error);
+    this.arbitros = [];
   }
+}
 
   async loadCanchas(): Promise<void> {
     try {
@@ -905,6 +981,110 @@ export class TournamentDetailComponent implements OnInit {
       alert('❌ Error al iniciar');
     }
   }
+
+  abrirModalArbitro(): void {
+  this.modalArbitroAbierto = true;
+  this.nuevoArbitroEmail = '';
+  this.error = null;
+}
+
+cerrarModalArbitro(): void {
+  this.modalArbitroAbierto = false;
+  this.nuevoArbitroEmail = '';
+  this.error = null;
+}
+
+async enviarInvitacion(): Promise<void> {
+  const email = this.nuevoArbitroEmail.trim().toLowerCase();
+
+  if (!email) {
+    this.error = 'Ingresa un email válido';
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    this.error = 'Formato de email inválido';
+    return;
+  }
+
+  this.enviandoInvitacion = true;
+  this.error = null;
+
+  try {
+    await this.http.post(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/referee-invites`,
+      { email, dias_validez: 7 }
+    ).toPromise();
+
+    alert(`✅ Invitación enviada a ${email}`);
+    this.cerrarModalArbitro();
+    await this.loadArbitros();
+
+  } catch (err: any) {
+    console.error('❌ Error:', err);
+    this.error = err.error?.detail || 'Error al enviar invitación';
+  } finally {
+    this.enviandoInvitacion = false;
+  }
+}
+
+// ========== CALENDARIO ==========
+
+abrirModalCalendario(): void {
+  this.modalCalendarioAbierto = true;
+  this.loadCalendario();
+}
+
+cerrarModalCalendario(): void {
+  this.modalCalendarioAbierto = false;
+}
+
+async loadCalendario(): Promise<void> {
+  try {
+    if (!this.calendarGenerated) return;
+
+    const response = await this.http.get<any>(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/calendar/month/${this.anioCalendario}/${this.mesCalendario}`
+    ).toPromise();
+
+    this.calendario = response;
+  } catch (error) {
+    console.error('❌ Error al cargar calendario:', error);
+    this.calendario = null;
+  }
+}
+
+async mesAnterior(): Promise<void> {
+  if (this.mesCalendario === 1) {
+    this.anioCalendario--;
+    this.mesCalendario = 12;
+  } else {
+    this.mesCalendario--;
+  }
+  await this.loadCalendario();
+}
+
+async mesSiguiente(): Promise<void> {
+  if (this.mesCalendario === 12) {
+    this.anioCalendario++;
+    this.mesCalendario = 1;
+  } else {
+    this.mesCalendario++;
+  }
+  await this.loadCalendario();
+}
+
+getMatchColor(estado: string): string {
+  switch (estado.toUpperCase()) {
+    case 'PROGRAMADO': return '#3498db';
+    case 'JUGADO':
+    case 'FINALIZADO': return '#2ecc71';
+    case 'SUSPENDIDO': return '#f39c12';
+    case 'CANCELADO': return '#e74c3c';
+    default: return '#95a5a6';
+  }
+}
 
   // ========================================
   // NAVEGACIÓN

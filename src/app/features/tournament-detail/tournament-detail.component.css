@@ -419,3 +419,672 @@
     min-height: auto;
   }
 }
+
+
+/* ========================================
+   ESTILOS PARA ÁRBITROS Y CALENDARIO
+   Agregar a tournament-detail.component.css
+   ======================================== */
+
+/* ==================== MODAL DE ÁRBITROS ==================== */
+
+.modal-arbitro {
+  max-width: 500px;
+}
+
+.invite-info {
+  background-color: #e7f3ff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.invite-info svg {
+  margin-bottom: 15px;
+}
+
+.invite-info p {
+  margin: 0;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.form-invite {
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.form-group label svg {
+  color: #3498db;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.form-input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.spinner-small {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+/* ==================== SECCIÓN DE ÁRBITROS ==================== */
+
+.card-arbitros {
+  min-height: 200px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  color: #95a5a6;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.arbitros-section,
+.invitaciones-section {
+  margin-bottom: 24px;
+}
+
+.section-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #ecf0f1;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.section-subtitle svg {
+  color: #3498db;
+}
+
+.arbitro-item,
+.invitacion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: white;
+  border: 1px solid #ecf0f1;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.3s;
+}
+
+.arbitro-item:hover,
+.invitacion-item:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.arbitro-info,
+.invitacion-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.arbitro-avatar,
+.invitacion-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #e7f3ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arbitro-detalles,
+.invitacion-detalles {
+  display: flex;
+  flex-direction: column;
+}
+
+.arbitro-nombre,
+.invitacion-email {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.arbitro-email,
+.invitacion-fecha {
+  font-size: 13px;
+  color: #7f8c8d;
+}
+
+.arbitro-actions,
+.invitacion-estado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-icon-small {
+  padding: 6px;
+  border: none;
+  background-color: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-icon-small:hover {
+  background-color: #ecf0f1;
+}
+
+.btn-icon-small.btn-success {
+  color: #2ecc71;
+}
+
+.btn-icon-small.btn-warning {
+  color: #f39c12;
+}
+
+.btn-icon-small.btn-delete {
+  color: #e74c3c;
+}
+
+.btn-icon-small.btn-delete:hover {
+  background-color: #ffe5e5;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.badge-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.badge-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.badge-secondary {
+  background-color: #e7e7e7;
+  color: #6c757d;
+}
+
+/* ==================== MODAL DE CALENDARIO ==================== */
+
+.modal-fullscreen .modal-content {
+  max-width: 1200px;
+  width: 95%;
+  max-height: 90vh;
+}
+
+.modal-calendario {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-calendario-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.calendario-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.calendario-container {
+  padding: 20px;
+}
+
+.calendario-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.btn-nav {
+  padding: 8px;
+  background-color: white;
+  border: 1px solid #dfe6e9;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-nav:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.calendario-titulo {
+  margin: 0;
+  font-size: 24px;
+  color: #2c3e50;
+}
+
+.calendario-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+  border-left: 4px solid #3498db;
+}
+
+.stat-item.stat-programado {
+  border-left-color: #3498db;
+}
+
+.stat-item.stat-jugado {
+  border-left-color: #2ecc71;
+}
+
+.stat-item.stat-suspendido {
+  border-left-color: #f39c12;
+}
+
+.stat-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.calendario-grid {
+  background-color: white;
+  border: 1px solid #dfe6e9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.calendario-dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: #1e3a5f;
+  color: white;
+}
+
+.dia-semana {
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.calendario-body {
+  background-color: white;
+}
+
+.calendario-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.calendario-semana:last-child {
+  border-bottom: none;
+}
+
+.calendario-dia {
+  min-height: 100px;
+  padding: 8px;
+  border-right: 1px solid #ecf0f1;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.calendario-dia:last-child {
+  border-right: none;
+}
+
+.calendario-dia:hover {
+  background-color: #f8f9fa;
+}
+
+.calendario-dia.dia-otro-mes {
+  background-color: #fafafa;
+  opacity: 0.5;
+}
+
+.calendario-dia.dia-con-partidos {
+  background-color: #fff8e7;
+}
+
+.dia-numero {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+.dia-otro-mes .dia-numero {
+  color: #95a5a6;
+}
+
+.dia-partidos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.partido-mini {
+  padding: 4px 6px;
+  background-color: white;
+  border-left: 3px solid #3498db;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.partido-mini:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.partido-hora {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+
+.partido-equipos {
+  display: block;
+  color: #7f8c8d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.partido-mas {
+  background-color: #ecf0f1;
+  border-left-color: #95a5a6;
+  text-align: center;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.calendario-leyenda {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #2c3e50;
+}
+
+.leyenda-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+/* ==================== PÁGINA DE ACEPTACIÓN ==================== */
+
+.invite-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.invite-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.invite-card {
+  background-color: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.card-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.invite-card h1 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-size: 28px;
+}
+
+.invite-info {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+  text-align: left;
+}
+
+.invite-torneo {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.invite-descripcion {
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.invite-email,
+.invite-expira {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.invite-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.success-message,
+.declined-message,
+.expired-message {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.redirect-message {
+  font-size: 14px;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.card-error .card-icon svg {
+  color: #e74c3c;
+}
+
+.card-pending .card-icon {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.card-success .card-icon svg {
+  animation: checkmark 0.5s ease-in-out;
+}
+
+.card-declined .card-icon svg {
+  opacity: 0.6;
+}
+
+.card-expired .card-icon svg {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== RESPONSIVO ==================== */
+
+@media (max-width: 768px) {
+  .calendario-dia {
+    min-height: 80px;
+    padding: 4px;
+  }
+
+  .partido-mini {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+
+  .calendario-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .invite-card {
+    padding: 24px;
+  }
+
+  .btn-large {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+}

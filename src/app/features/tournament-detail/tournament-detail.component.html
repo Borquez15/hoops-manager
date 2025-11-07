@@ -660,3 +660,239 @@
     </div>
   </div>
 </div>
+
+<!-- ========================================
+     MODAL DE INVITACIÓN DE ÁRBITRO
+     Agrégalo al HTML principal de tournament-detail
+     ======================================== -->
+
+<div class="modal-overlay" *ngIf="modalArbitroAbierto" (click)="cerrarModalArbitro()">
+  <div class="modal-content modal-arbitro" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Invitar Árbitro</h2>
+      <button class="btn-close" (click)="cerrarModalArbitro()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Descripción -->
+      <div class="invite-info">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="#3498db">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+        <p>
+          Ingresa el correo electrónico del árbitro que deseas invitar.
+          Recibirá un email con un link para aceptar la invitación.
+        </p>
+      </div>
+
+      <!-- Error -->
+      <div class="error-message" *ngIf="error">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        {{ error }}
+      </div>
+
+      <!-- Formulario -->
+      <form (ngSubmit)="enviarInvitacion()" class="form-invite">
+        <div class="form-group">
+          <label for="emailArbitro">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            id="emailArbitro"
+            class="form-input"
+            [(ngModel)]="nuevoArbitroEmail"
+            name="emailArbitro"
+            placeholder="correo@ejemplo.com"
+            [disabled]="enviandoInvitacion"
+            required
+          />
+        </div>
+
+        <!-- Botones -->
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cerrarModalArbitro()"
+            [disabled]="enviandoInvitacion"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="enviandoInvitacion || !nuevoArbitroEmail.trim()"
+          >
+            <span *ngIf="!enviandoInvitacion">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+              Enviar Invitación
+            </span>
+            <span *ngIf="enviandoInvitacion">
+              <div class="spinner-small"></div>
+              Enviando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     MODAL DE CALENDARIO
+     Agrégalo al HTML principal de tournament-detail
+     ======================================== -->
+
+<div class="modal-overlay modal-fullscreen" *ngIf="modalCalendarioAbierto" (click)="cerrarModalCalendario()">
+  <div class="modal-content modal-calendario" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+        </svg>
+        Calendario del Torneo
+      </h2>
+      <button class="btn-close" (click)="cerrarModalCalendario()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body modal-calendario-body">
+      <!-- Loading -->
+      <div *ngIf="!calendario" class="calendario-loading">
+        <div class="spinner"></div>
+        <p>Cargando calendario...</p>
+      </div>
+
+      <!-- Calendario -->
+      <div *ngIf="calendario" class="calendario-container">
+        <!-- Controles de navegación -->
+        <div class="calendario-header">
+          <button class="btn-nav" (click)="mesAnterior()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+          </button>
+          
+          <h3 class="calendario-titulo">
+            {{ calendario.nombre_mes }} {{ calendario.anio}}
+          </h3>
+          
+          <button class="btn-nav" (click)="mesSiguiente()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Estadísticas del mes -->
+        <div class="calendario-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{ calendario.total_partidos }}</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat-item stat-programado">
+            <span class="stat-value">{{ calendario.partidos_programados }}</span>
+            <span class="stat-label">Programados</span>
+          </div>
+          <div class="stat-item stat-jugado">
+            <span class="stat-value">{{ calendario.partidos_jugados }}</span>
+            <span class="stat-label">Jugados</span>
+          </div>
+          <div class="stat-item stat-suspendido">
+            <span class="stat-value">{{ calendario.partidos_suspendidos }}</span>
+            <span class="stat-label">Suspendidos</span>
+          </div>
+        </div>
+
+        <!-- Grid del calendario -->
+        <div class="calendario-grid">
+          <!-- Encabezado (días de la semana) -->
+          <div class="calendario-dias-semana">
+            <div class="dia-semana">Lun</div>
+            <div class="dia-semana">Mar</div>
+            <div class="dia-semana">Mié</div>
+            <div class="dia-semana">Jue</div>
+            <div class="dia-semana">Vie</div>
+            <div class="dia-semana">Sáb</div>
+            <div class="dia-semana">Dom</div>
+          </div>
+
+          <!-- Semanas -->
+          <div class="calendario-body">
+            <div class="calendario-semana" *ngFor="let semana of calendario.semanas">
+              <div
+                class="calendario-dia"
+                *ngFor="let dia of semana"
+                [class.dia-otro-mes]="!dia.es_mes_actual"
+                [class.dia-con-partidos]="dia.tiene_partidos"
+              >
+                <div class="dia-numero">{{ dia.dia }}</div>
+                
+                <!-- Partidos del día -->
+                <div class="dia-partidos" *ngIf="dia.partidos.length > 0">
+                  <div
+                    class="partido-mini"
+                    *ngFor="let partido of dia.partidos"
+                    [style.border-left-color]="getMatchColor(partido.estado)"
+                    [title]="partido.local.nombre + ' vs ' + partido.visitante.nombre + ' - ' + partido.hora"
+                  >
+                    <span class="partido-hora">{{ partido.hora.substring(0, 5) }}</span>
+                    <span class="partido-equipos">
+                      {{ partido.local.nombre }} vs {{ partido.visitante.nombre }}
+                    </span>
+                  </div>
+                  
+                  <!-- Mostrar "+" si hay más de 3 partidos -->
+                  <div class="partido-mini partido-mas" *ngIf="dia.partidos.length > 3">
+                    +{{ dia.partidos.length - 3 }} más
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leyenda -->
+        <div class="calendario-leyenda">
+          <div class="leyenda-item">
+            <span class="leyenda-color" style="background-color: #3498db;"></span>
+            <span>Programado</span>
+          </div>
+          <div class="leyenda-item">
+            <span class="leyenda-color" style="background-color: #2ecc71;"></span>
+            <span>Jugado</span>
+          </div>
+          <div class="leyenda-item">
+            <span class="leyenda-color" style="background-color: #f39c12;"></span>
+            <span>Suspendido</span>
+          </div>
+          <div class="leyenda-item">
+            <span class="leyenda-color" style="background-color: #e74c3c;"></span>
+            <span>Cancelado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrarModalCalendario()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
