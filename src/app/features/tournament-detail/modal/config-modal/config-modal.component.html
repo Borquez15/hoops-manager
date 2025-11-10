@@ -1,0 +1,18 @@
+<app-modal-base [isOpen]="isOpen" title="Configuración del Torneo" size="medium" (closeModal)="close()">
+  <form (ngSubmit)="save()">
+    <div *ngIf="error" class="alert-error">{{ error }}</div>
+    <div class="form-group">
+      <label>Nombre*</label>
+      <input type="text" [(ngModel)]="editForm.nombre" name="nombre" required />
+    </div>
+    <div class="form-group">
+      <label>Modalidad*</label>
+      <label><input type="radio" name="modalidad" value="3v3" [(ngModel)]="editForm.modalidad" /> 3v3</label>
+      <label><input type="radio" name="modalidad" value="5v5" [(ngModel)]="editForm.modalidad" /> 5v5</label>
+    </div>
+    <div slot="footer">
+      <button type="button" (click)="close()">Cancelar</button>
+      <button type="submit">Guardar</button>
+    </div>
+  </form>
+</app-modal-base>

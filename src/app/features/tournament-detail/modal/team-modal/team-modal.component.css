@@ -1,0 +1,436 @@
+/* team-modal.component.css - COMPLETO */
+
+/* Contenedor principal del modal */
+.team-content {
+  padding: 0;
+}
+
+/* Sección del equipo (logo y nombre) */
+.team-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.team-logo-container {
+  position: relative;
+}
+
+.team-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: rgba(255, 127, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #FF7F00;
+  overflow: hidden;
+}
+
+.team-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.team-info {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #FF7F00;
+  box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.1);
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-file {
+  padding: 10px 20px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-file:hover {
+  background: #e0e0e0;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Sección de jugadores */
+.jugadores-section {
+  margin-top: 32px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jugadores-count {
+  background: rgba(255, 127, 0, 0.2);
+  color: #FF7F00;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Lista de jugadores */
+.jugadores-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Scroll personalizado */
+.jugadores-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.jugadores-list::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 3px;
+}
+
+.jugadores-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.jugadores-list::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.jugador-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.jugador-item:hover {
+  background: #eeeeee;
+}
+
+.jugador-dorsal {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(255, 127, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #FF7F00;
+}
+
+.jugador-info {
+  flex: 1;
+}
+
+.jugador-nombre {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.jugador-curp {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.jugador-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon svg {
+  color: #666;
+}
+
+.btn-icon:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-icon:hover svg {
+  color: #333;
+}
+
+.btn-delete:hover {
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.btn-delete:hover svg {
+  color: #f44336;
+}
+
+/* Estado vacío */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.empty-state p {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #666;
+}
+
+.empty-state small {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* Formulario de agregar jugador */
+.agregar-jugador-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px dashed #e0e0e0;
+}
+
+.agregar-jugador-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-grid-full {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-field {
+  position: relative;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #FF7F00;
+  box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.1);
+}
+
+.form-field input::placeholder {
+  color: #ccc;
+}
+
+.lookup-button {
+  position: absolute;
+  right: 4px;
+  top: 32px;
+  padding: 6px 12px;
+  background: rgba(33, 150, 243, 0.1);
+  color: #2196F3;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.lookup-button:hover {
+  background: rgba(33, 150, 243, 0.2);
+}
+
+.btn-agregar-jugador {
+  width: 100%;
+  padding: 12px;
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1rem;
+}
+
+.btn-agregar-jugador:hover {
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.btn-agregar-jugador:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn {
+  padding: 12px 28px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.btn-cancelar {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.btn-cancelar:hover {
+  background: #d0d0d0;
+}
+
+.btn-guardar {
+  background: #FF7F00;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background: #e67300;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 127, 0, 0.3);
+}
+
+/* Mensajes de ayuda/info */
+.help-text {
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.help-text svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Mensaje de error */
+.error-message {
+  padding: 10px 12px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 6px;
+  color: #f44336;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+/* Mensaje de éxito */
+.success-message {
+  padding: 10px 12px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 6px;
+  color: #4caf50;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}

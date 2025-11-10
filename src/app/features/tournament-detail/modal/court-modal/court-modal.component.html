@@ -1,0 +1,10 @@
+<app-modal-base [isOpen]="isOpen" title="Gestión de Canchas" size="large" (closeModal)="close()">
+  <div *ngIf="error" class="alert-error">{{ error }}</div>
+  <form (ngSubmit)="agregarCancha()">
+    <input type="text" [(ngModel)]="nuevaCancha.nombre" name="nombre" placeholder="Nombre de cancha" required />
+    <input type="text" [(ngModel)]="nuevaCancha.ubicacion" name="ubicacion" placeholder="Ubicación" />
+    <button type="submit" [disabled]="loading">Agregar</button>
+  </form>
+  <div *ngFor="let c of canchas">{{ c.nombre }} - {{ c.ubicacion }}</div>
+  <div slot="footer"><button (click)="close()">Cerrar</button></div>
+</app-modal-base>

@@ -1,0 +1,8 @@
+<app-modal-base [isOpen]="isOpen" title="Calendario del Torneo" size="fullscreen" (closeModal)="close()">
+  <div *ngIf="loading">Cargando...</div>
+  <div *ngIf="!loading && calendario">
+    <h3>{{ calendario.nombre_mes }} {{ calendario.anio }}</h3>
+    <p>Total de partidos: {{ calendario.total_partidos }}</p>
+  </div>
+  <div slot="footer"><button (click)="close()">Cerrar</button></div>
+</app-modal-base>

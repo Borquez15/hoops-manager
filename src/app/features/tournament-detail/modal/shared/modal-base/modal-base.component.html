@@ -1,0 +1,10 @@
+<div class="modal-overlay" [class.modal-fullscreen]="size === 'fullscreen'" *ngIf="isOpen" (click)="onOverlayClick()">
+  <div class="modal-content" [ngClass]="'modal-' + size" (click)="onContentClick($event)">
+    <div class="modal-header">
+      <h2><ng-content select="[slot='icon']"></ng-content>{{ title }}</h2>
+      <button class="btn-close" (click)="close()">❌</button>
+    </div>
+    <div class="modal-body"><ng-content></ng-content></div>
+    <div class="modal-footer" *ngIf="showFooter"><ng-content select="[slot='footer']"></ng-content></div>
+  </div>
+</div>

@@ -1,0 +1,3 @@
+.alert-error { padding: 12px; background: #fee; color: #c33; }
+input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; }
+button { padding: 12px 24px; background: #FF7F00; color: white; border: none; border-radius: 8px; cursor: pointer; }

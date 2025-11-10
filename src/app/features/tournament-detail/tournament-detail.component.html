@@ -1,4 +1,4 @@
-<!-- src/app/features/tournament-detail/tournament-detail.component.html -->
+<!-- tournament-detail.component.html -->
 <div class="crear-torneo-container">
   <!-- HEADER -->
   <header class="header">
@@ -40,7 +40,7 @@
     </div>
 
     <div class="grid">
-      <!-- CONFIGURACIÓN (Compacta) -->
+      <!-- CONFIGURACIÓN -->
       <section class="card">
         <div class="card-header">
           <h2 class="card-title">Configuración</h2>
@@ -74,6 +74,14 @@
               <span class="config-value">{{ tournament.hora_ini }} - {{ tournament.hora_fin }}</span>
             </div>
           </div>
+          
+          <!-- Botón de Canchas -->
+          <button class="btn btn-secondary mt-3" (click)="abrirModalCanchas()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            Gestionar Canchas ({{ canchas.length }})
+          </button>
         </div>
       </section>
 
@@ -81,7 +89,7 @@
       <section class="card">
         <div class="card-header">
           <h2 class="card-title">Árbitros</h2>
-          <button class="btn-icon btn-add" (click)="agregarArbitro()">
+          <button class="btn-icon btn-add" (click)="abrirModalArbitro()">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
             </svg>
@@ -95,11 +103,6 @@
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
               <span class="list-item-text">{{ arbitro.nombre }}</span>
-              <button class="btn-icon-small btn-delete" (click)="eliminarArbitro(i)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-              </button>
             </div>
 
             <div class="empty-state" *ngIf="arbitros.length === 0">
@@ -161,10 +164,10 @@
           <button 
             class="btn-icon btn-edit" 
             *ngIf="calendarGenerated"
-            (click)="editCalendar()"
+            (click)="abrirModalCalendario()"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
             </svg>
           </button>
         </div>
@@ -185,714 +188,85 @@
               <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
             </svg>
             <p>¿Listo para generar el calendario?</p>
-            <button class="btn btn-primary btn-sm" (click)="generateCalendar()" style="margin-top: 1rem;">
-              🗓️ Generar Calendario
+            <button class="btn btn-primary mt-2" (click)="generateCalendar()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
+              </svg>
+              Generar Calendario
             </button>
           </div>
 
           <!-- Calendario generado -->
-          <div *ngIf="calendarGenerated" class="empty-state">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: #28a745;">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          <div *ngIf="calendarGenerated" class="calendar-status">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: #2ecc71;">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
             </svg>
             <p>Calendario generado exitosamente</p>
-            <small>Aquí aparecerá el calendario completo</small>
+            <button class="btn btn-secondary mt-2" (click)="abrirModalCalendario()">
+              Ver Calendario Completo
+            </button>
           </div>
         </div>
       </section>
     </div>
 
-    <!-- BOTÓN INICIAR TORNEO -->
-    <div class="footer-actions" *ngIf="canStartTournament()">
+    <!-- BOTÓN DE INICIO -->
+    <div class="action-bar" *ngIf="tournamentStatus === 'configurando'">
       <button 
-        class="btn btn-primary btn-large" 
+        class="btn btn-lg btn-success"
         (click)="startTournament()"
+        [disabled]="!canStartTournament()"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+          <path d="M8 5v14l11-7z"/>
         </svg>
-        🚀 INICIAR TORNEO
+        Iniciar Torneo
       </button>
     </div>
   </main>
 </div>
 
 <!-- ========================================
-     MODAL DE CONFIGURACIÓN
-     ======================================== -->
-<div class="modal-overlay" *ngIf="modalConfigAbierto" (click)="cerrarModalConfig()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Configuración del Torneo</h2>
-      <button class="btn-close" (click)="cerrarModalConfig()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <!-- Alerta de error -->
-      <div class="alert alert-error" *ngIf="error" style="margin-bottom: 1rem;">
-        {{ error }}
-        <button class="btn-close-alert" (click)="error = null">✕</button>
-      </div>
-
-      <div class="form-group">
-        <label>Nombre del torneo *</label>
-        <input 
-          type="text" 
-          class="form-control" 
-          [(ngModel)]="editForm.nombre" 
-          placeholder="Nombre del torneo"
-        />
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Vueltas a jugar</label>
-          <div class="counter">
-            <button class="btn-counter" (click)="decrementar('vueltas')">−</button>
-            <span class="counter-value">{{ editForm.vueltas }}</span>
-            <button class="btn-counter" (click)="incrementar('vueltas')">+</button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Clasificación de playoffs</label>
-          <div class="counter">
-            <button class="btn-counter" (click)="decrementar('cupos_playoffs')">−</button>
-            <span class="counter-value">{{ editForm.cupos_playoffs }}</span>
-            <button class="btn-counter" (click)="incrementar('cupos_playoffs')">+</button>
-          </div>
-          <small style="color: #6c757d; margin-top: 0.25rem; display: block;">
-            💡 Necesitarás al menos {{ editForm.cupos_playoffs || 0 }} equipos
-          </small>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Modalidad de juego</label>
-        <div class="toggle-group">
-          <button 
-            class="toggle-btn" 
-            [class.active]="editForm.modalidad === '3vs3'"
-            (click)="cambiarModalidad('3vs3')"
-          >
-            3 vs 3
-          </button>
-          <button 
-            class="toggle-btn" 
-            [class.active]="editForm.modalidad === '5vs5'"
-            (click)="cambiarModalidad('5vs5')"
-          >
-            5 vs 5
-          </button>
-          <button 
-            class="toggle-btn" 
-            [class.active]="editForm.modalidad === '7vs7'"
-            (click)="cambiarModalidad('7vs7')"
-          >
-            7 vs 7
-          </button>
-          <button 
-            class="toggle-btn" 
-            [class.active]="editForm.modalidad === '11vs11'"
-            (click)="cambiarModalidad('11vs11')"
-          >
-            11 vs 11
-          </button>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Días por semana</label>
-          <div class="counter">
-            <button class="btn-counter" (click)="decrementar('dias_por_semana')">−</button>
-            <span class="counter-value">{{ editForm.dias_por_semana }}</span>
-            <button class="btn-counter" (click)="incrementar('dias_por_semana')">+</button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Partidos por día</label>
-          <div class="counter">
-            <button class="btn-counter" (click)="decrementar('partidos_por_dia')">−</button>
-            <span class="counter-value">{{ editForm.partidos_por_dia }}</span>
-            <button class="btn-counter" (click)="incrementar('partidos_por_dia')">+</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Hora de inicio</label>
-          <input type="time" class="form-control" [(ngModel)]="editForm.hora_ini" />
-        </div>
-
-        <div class="form-group">
-          <label>Hora de fin</label>
-          <input type="time" class="form-control" [(ngModel)]="editForm.hora_fin" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Duración de partido (minutos)</label>
-        <div class="counter">
-          <button class="btn-counter" (click)="decrementarSlotMin()">−</button>
-          <span class="counter-value">{{ editForm.slot_min }} min</span>
-          <button class="btn-counter" (click)="incrementarSlotMin()">+</button>
-        </div>
-      </div>
-
-      <!-- Sección de Canchas -->
-      <div class="canchas-section">
-        <h3 class="section-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-          </svg>
-          Canchas del Torneo
-        </h3>
-
-        <!-- Lista de canchas -->
-        <div class="canchas-list">
-          <div class="cancha-item" *ngFor="let cancha of canchas; let i = index">
-            <div class="cancha-info">
-              <div class="cancha-nombre">
-                {{ cancha.nombre }}
-                <span class="cancha-badge" [class.activa]="cancha.activa">
-                  {{ cancha.activa ? 'Activa' : 'Inactiva' }}
-                </span>
-              </div>
-              <div class="cancha-ubicacion">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                </svg>
-                {{ cancha.ubicacion || 'Sin ubicación' }}
-              </div>
-            </div>
-            <div class="cancha-actions">
-              <button 
-                class="btn-icon-small" 
-                (click)="toggleEstadoCancha(i)"
-                [class.active]="cancha.activa"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </button>
-              <button class="btn-icon-small" (click)="editarCancha(i)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
-                </svg>
-              </button>
-              <button class="btn-icon-small btn-delete" (click)="eliminarCancha(i)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="empty-state" *ngIf="canchas.length === 0">
-            <p>No hay canchas agregadas</p>
-          </div>
-        </div>
-
-        <!-- Formulario para agregar cancha -->
-        <div class="nueva-cancha-form">
-          <input 
-            type="text" 
-            class="form-control form-control-sm" 
-            [(ngModel)]="nombreCanchaActual" 
-            placeholder="Nombre de la cancha"
-          />
-          <input 
-            type="text" 
-            class="form-control form-control-sm" 
-            [(ngModel)]="ubicacionCanchaActual" 
-            placeholder="Ubicación"
-          />
-          <button 
-            class="btn btn-secondary btn-sm" 
-            (click)="editandoCancha ? guardarEdicionCancha() : agregarCancha()"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-            </svg>
-            {{ editandoCancha ? 'Guardar' : 'Agregar' }}
-          </button>
-          <button 
-            *ngIf="editandoCancha"
-            class="btn btn-secondary btn-sm" 
-            (click)="cancelarEdicionCancha()"
-          >
-            Cancelar
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="cerrarModalConfig()">
-        Cancelar
-      </button>
-      <button class="btn btn-primary" (click)="guardarConfiguracion()">
-        Guardar Configuración
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ========================================
-     MODAL DE EQUIPOS CON JUGADORES
-     ======================================== -->
-<div class="modal-overlay" *ngIf="modalEquipoAbierto" (click)="cerrarModalEquipo()">
-  <div class="modal modal-equipo" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>{{ indiceEquipoEditando === -1 ? 'Agregar Equipo' : 'Editar Equipo' }}</h2>
-      <button class="btn-close" (click)="cerrarModalEquipo()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <!-- Alerta de error -->
-      <div class="alert alert-error" *ngIf="error" style="margin-bottom: 1rem;">
-        {{ error }}
-        <button class="btn-close-alert" (click)="error = null">✕</button>
-      </div>
-
-      <!-- Información del equipo -->
-      <div class="equipo-info-section">
-        <div class="equipo-logo-grande">
-          <div class="equipo-logo-placeholder" *ngIf="!previewLogo && !equipoEditando?.logo_url">
-            {{ (equipoEditando?.nombre || '?').charAt(0).toUpperCase() }}
-          </div>
-          <img *ngIf="previewLogo || equipoEditando?.logo_url" 
-               [src]="previewLogo || equipoEditando?.logo_url" 
-               alt="Logo">
-        </div>
-        
-        <div class="form-group">
-          <label>Nombre del Equipo *</label>
-          <input 
-            type="text" 
-            class="form-control form-control-lg" 
-            [(ngModel)]="equipoEditando!.nombre"
-            placeholder="Ej: Dallas Mavericks"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Logo del Equipo (opcional)</label>
-          <input 
-            type="file" 
-            accept="image/*" 
-            (change)="onLogoSelected($event)" 
-            class="form-control"
-          />
-        </div>
-      </div>
-
-      <!-- Sección de Jugadores -->
-      <div class="jugadores-modal-section">
-        <h3 class="section-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-          </svg>
-          Jugadores ({{ jugadoresOrdenados.length }})
-        </h3>
-
-        <!-- Lista de jugadores -->
-        <div class="jugadores-lista-modal" *ngIf="jugadoresOrdenados.length > 0">
-          <div 
-            class="jugador-item-modal" 
-            *ngFor="let jugador of jugadoresOrdenados; let i = index"
-            [class.inactive]="!jugador.activo"
-          >
-            <div class="jugador-dorsal">#{{ jugador.dorsal < 10 ? '0' : '' }}{{ jugador.dorsal }}</div>
-            <div class="jugador-info">
-              <div class="jugador-nombre">{{ nombreCompletoJugador(jugador) }}</div>
-              <div class="jugador-curp">CURP: {{ jugador.curp }}</div>
-            </div>
-            <div class="jugador-actions">
-              <button 
-                class="btn-icon-small"
-                [class.active]="jugador.activo"
-                (click)="toggleJugadorActivo(i)"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </button>
-              <button 
-                class="btn-icon-small btn-delete"
-                (click)="eliminarJugadorDelEquipo(i)"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="empty-state-small" *ngIf="jugadoresOrdenados.length === 0">
-          <p>No hay jugadores en este equipo</p>
-        </div>
-
-        <!-- Formulario para agregar jugador -->
-        <div class="agregar-jugador-modal-form">
-          <h4>Agregar Jugador</h4>
-
-          <div class="form-row">
-            <div class="form-group form-group-curp">
-              <label>CURP *</label>
-              <div class="input-with-button">
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  [(ngModel)]="nuevoJugador.curp"
-                  placeholder="18 caracteres"
-                  maxlength="18"
-                  (input)="nuevoJugador.curp = nuevoJugador.curp.toUpperCase()"
-                />
-                <button 
-                  class="btn btn-secondary btn-sm"
-                  (click)="buscarPorCURP()"
-                  [disabled]="buscandoCURP || nuevoJugador.curp.length !== 18"
-                >
-                  <span *ngIf="!buscandoCURP">🔍</span>
-                  <span *ngIf="buscandoCURP">...</span>
-                </button>
-              </div>
-              <small class="form-hint" *ngIf="jugadorEncontrado">
-                ✓ Jugador encontrado en el sistema
-              </small>
-            </div>
-
-            <div class="form-group">
-              <label>Dorsal *</label>
-              <input 
-                type="number" 
-                class="form-control" 
-                [(ngModel)]="nuevoJugador.dorsal"
-                min="0"
-                max="99"
-              />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Nombres *</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="nuevoJugador.nombres"
-                placeholder="Nombres"
-                [disabled]="!!jugadorEncontrado"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Apellido Paterno *</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="nuevoJugador.ap_p"
-                placeholder="Apellido paterno"
-                [disabled]="!!jugadorEncontrado"
-              />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Apellido Materno</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="nuevoJugador.ap_m"
-                placeholder="Apellido materno (opcional)"
-                [disabled]="!!jugadorEncontrado"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Edad</label>
-              <input 
-                type="number" 
-                class="form-control" 
-                [(ngModel)]="nuevoJugador.edad"
-                placeholder="Edad"
-                min="5"
-                max="99"
-                [disabled]="!!jugadorEncontrado"
-              />
-            </div>
-          </div>
-
-          <button 
-            class="btn btn-secondary btn-block"
-            (click)="agregarJugadorAlEquipo()"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-            </svg>
-            Agregar Jugador
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="cerrarModalEquipo()">
-        Cancelar
-      </button>
-      <button class="btn btn-primary" (click)="guardarEquipo()">
-        {{ indiceEquipoEditando === -1 ? 'Crear Equipo' : 'Guardar Cambios' }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ========================================
-     MODAL DE INVITACIÓN DE ÁRBITRO
-     Agrégalo al HTML principal de tournament-detail
+     MODALES
      ======================================== -->
 
-<div class="modal-overlay" *ngIf="modalArbitroAbierto" (click)="cerrarModalArbitro()">
-  <div class="modal-content modal-arbitro" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Invitar Árbitro</h2>
-      <button class="btn-close" (click)="cerrarModalArbitro()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-    </div>
+<!-- Modal de Configuración -->
+<app-config-modal
+  [isOpen]="modalConfigAbierto"
+  [tournament]="tournament"
+  (closeModal)="cerrarModalConfig()"
+  (saveTournament)="actualizarConfiguracion($event)"
+></app-config-modal>
 
-    <div class="modal-body">
-      <!-- Descripción -->
-      <div class="invite-info">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="#3498db">
-          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-        </svg>
-        <p>
-          Ingresa el correo electrónico del árbitro que deseas invitar.
-          Recibirá un email con un link para aceptar la invitación.
-        </p>
-      </div>
+<!-- Modal de Canchas -->
+<app-court-modal
+  [isOpen]="modalCanchaAbierto"
+  [tournamentId]="tournamentId"
+  [canchas]="canchas"
+  (closeModal)="cerrarModalCanchas()"
+  (canchasUpdated)="onCanchasUpdated()"
+></app-court-modal>
 
-      <!-- Error -->
-      <div class="error-message" *ngIf="error">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-        </svg>
-        {{ error }}
-      </div>
+<!-- Modal de Equipos -->
+<app-team-modal
+  [isOpen]="modalEquipoAbierto"
+  [tournamentId]="tournamentId"
+  [equipo]="equipoEditando"
+  (closeModal)="cerrarModalEquipo()"
+  (equipoUpdated)="onEquipoUpdated()"
+></app-team-modal>
 
-      <!-- Formulario -->
-      <form (ngSubmit)="enviarInvitacion()" class="form-invite">
-        <div class="form-group">
-          <label for="emailArbitro">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-            </svg>
-            Correo Electrónico
-          </label>
-          <input
-            type="email"
-            id="emailArbitro"
-            class="form-input"
-            [(ngModel)]="nuevoArbitroEmail"
-            name="emailArbitro"
-            placeholder="correo@ejemplo.com"
-            [disabled]="enviandoInvitacion"
-            required
-          />
-        </div>
+<!-- Modal de Árbitros -->
+<app-referee-modal
+  [isOpen]="modalArbitroAbierto"
+  [tournamentId]="tournamentId"
+  (closeModal)="cerrarModalArbitro()"
+  (refereesUpdated)="onArbitrosUpdated()"
+></app-referee-modal>
 
-        <!-- Botones -->
-        <div class="modal-actions">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            (click)="cerrarModalArbitro()"
-            [disabled]="enviandoInvitacion"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="enviandoInvitacion || !nuevoArbitroEmail.trim()"
-          >
-            <span *ngIf="!enviandoInvitacion">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-              </svg>
-              Enviar Invitación
-            </span>
-            <span *ngIf="enviandoInvitacion">
-              <div class="spinner-small"></div>
-              Enviando...
-            </span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- ========================================
-     MODAL DE CALENDARIO
-     Agrégalo al HTML principal de tournament-detail
-     ======================================== -->
-
-<div class="modal-overlay modal-fullscreen" *ngIf="modalCalendarioAbierto" (click)="cerrarModalCalendario()">
-  <div class="modal-content modal-calendario" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-        </svg>
-        Calendario del Torneo
-      </h2>
-      <button class="btn-close" (click)="cerrarModalCalendario()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="modal-body modal-calendario-body">
-      <!-- Loading -->
-      <div *ngIf="!calendario" class="calendario-loading">
-        <div class="spinner"></div>
-        <p>Cargando calendario...</p>
-      </div>
-
-      <!-- Calendario -->
-      <div *ngIf="calendario" class="calendario-container">
-        <!-- Controles de navegación -->
-        <div class="calendario-header">
-          <button class="btn-nav" (click)="mesAnterior()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-            </svg>
-          </button>
-          
-          <h3 class="calendario-titulo">
-            {{ calendario.nombre_mes }} {{ calendario.anio}}
-          </h3>
-          
-          <button class="btn-nav" (click)="mesSiguiente()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Estadísticas del mes -->
-        <div class="calendario-stats">
-          <div class="stat-item">
-            <span class="stat-value">{{ calendario.total_partidos }}</span>
-            <span class="stat-label">Total</span>
-          </div>
-          <div class="stat-item stat-programado">
-            <span class="stat-value">{{ calendario.partidos_programados }}</span>
-            <span class="stat-label">Programados</span>
-          </div>
-          <div class="stat-item stat-jugado">
-            <span class="stat-value">{{ calendario.partidos_jugados }}</span>
-            <span class="stat-label">Jugados</span>
-          </div>
-          <div class="stat-item stat-suspendido">
-            <span class="stat-value">{{ calendario.partidos_suspendidos }}</span>
-            <span class="stat-label">Suspendidos</span>
-          </div>
-        </div>
-
-        <!-- Grid del calendario -->
-        <div class="calendario-grid">
-          <!-- Encabezado (días de la semana) -->
-          <div class="calendario-dias-semana">
-            <div class="dia-semana">Lun</div>
-            <div class="dia-semana">Mar</div>
-            <div class="dia-semana">Mié</div>
-            <div class="dia-semana">Jue</div>
-            <div class="dia-semana">Vie</div>
-            <div class="dia-semana">Sáb</div>
-            <div class="dia-semana">Dom</div>
-          </div>
-
-          <!-- Semanas -->
-          <div class="calendario-body">
-            <div class="calendario-semana" *ngFor="let semana of calendario.semanas">
-              <div
-                class="calendario-dia"
-                *ngFor="let dia of semana"
-                [class.dia-otro-mes]="!dia.es_mes_actual"
-                [class.dia-con-partidos]="dia.tiene_partidos"
-              >
-                <div class="dia-numero">{{ dia.dia }}</div>
-                
-                <!-- Partidos del día -->
-                <div class="dia-partidos" *ngIf="dia.partidos.length > 0">
-                  <div
-                    class="partido-mini"
-                    *ngFor="let partido of dia.partidos"
-                    [style.border-left-color]="getMatchColor(partido.estado)"
-                    [title]="partido.local.nombre + ' vs ' + partido.visitante.nombre + ' - ' + partido.hora"
-                  >
-                    <span class="partido-hora">{{ partido.hora.substring(0, 5) }}</span>
-                    <span class="partido-equipos">
-                      {{ partido.local.nombre }} vs {{ partido.visitante.nombre }}
-                    </span>
-                  </div>
-                  
-                  <!-- Mostrar "+" si hay más de 3 partidos -->
-                  <div class="partido-mini partido-mas" *ngIf="dia.partidos.length > 3">
-                    +{{ dia.partidos.length - 3 }} más
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Leyenda -->
-        <div class="calendario-leyenda">
-          <div class="leyenda-item">
-            <span class="leyenda-color" style="background-color: #3498db;"></span>
-            <span>Programado</span>
-          </div>
-          <div class="leyenda-item">
-            <span class="leyenda-color" style="background-color: #2ecc71;"></span>
-            <span>Jugado</span>
-          </div>
-          <div class="leyenda-item">
-            <span class="leyenda-color" style="background-color: #f39c12;"></span>
-            <span>Suspendido</span>
-          </div>
-          <div class="leyenda-item">
-            <span class="leyenda-color" style="background-color: #e74c3c;"></span>
-            <span>Cancelado</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="cerrarModalCalendario()">
-        Cerrar
-      </button>
-    </div>
-  </div>
-</div>
+<!-- Modal de Calendario -->
+<app-calendar-modal
+  [isOpen]="modalCalendarioAbierto"
+  [tournamentId]="tournamentId"
+  (closeModal)="cerrarModalCalendario()"
+></app-calendar-modal>

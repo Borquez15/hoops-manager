@@ -2,66 +2,39 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
 
 @Component({
   selector: 'app-referee-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalBaseComponent],
   templateUrl: './referee-modal.component.html',
   styleUrls: ['./referee-modal.component.css']
 })
 export class RefereeModalComponent {
   @Input() isOpen = false;
   @Input() tournamentId!: number;
-  @Output() close = new EventEmitter<void>();
-  @Output() invitationSent = new EventEmitter<void>();
-
-  email = '';
-  loading = false;
-  error: string | null = null;
+  @Output() closeModal = new EventEmitter<void>();
+  @Output() refereesUpdated = new EventEmitter<void>();
 
   private apiUrl = 'http://localhost:8000';
+  nuevoArbitroEmail = '';
+  enviando = false;
 
   constructor(private http: HttpClient) {}
 
-  async sendInvitation(): Promise<void> {
-    const emailTrim = this.email.trim().toLowerCase();
+  close(): void { this.closeModal.emit(); }
 
-    if (!emailTrim) {
-      this.error = 'Ingresa un email válido';
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailTrim)) {
-      this.error = 'Formato de email inválido';
-      return;
-    }
-
-    this.loading = true;
-    this.error = null;
-
+  async enviarInvitacion(): Promise<void> {
+    this.enviando = true;
     try {
-      await this.http.post(
-        `${this.apiUrl}/tournaments/${this.tournamentId}/referee-invites`,
-        { email: emailTrim, dias_validez: 7 }
-      ).toPromise();
-
-      alert(`✅ Invitación enviada a ${emailTrim}`);
-      this.closeModal();
-      this.invitationSent.emit();
-
-    } catch (err: any) {
-      console.error('❌ Error:', err);
-      this.error = err.error?.detail || 'Error al enviar invitación';
+      await this.http.post(`${this.apiUrl}/tournaments/${this.tournamentId}/referees/invite`, { email: this.nuevoArbitroEmail }).toPromise();
+      alert('Invitación enviada');
+      this.close();
+    } catch (err) {
+      console.error(err);
     } finally {
-      this.loading = false;
+      this.enviando = false;
     }
-  }
-
-  closeModal(): void {
-    this.email = '';
-    this.error = null;
-    this.close.emit();
   }
 }

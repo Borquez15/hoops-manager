@@ -1,0 +1,9 @@
+<app-modal-base [isOpen]="isOpen" title="Gestión de Jugadores" size="large" (closeModal)="close()">
+  <form (ngSubmit)="agregarJugador()">
+    <input type="text" [(ngModel)]="nuevoJugador.curp" name="curp" placeholder="CURP" />
+    <input type="number" [(ngModel)]="nuevoJugador.dorsal" name="dorsal" placeholder="Dorsal" />
+    <button type="submit">Agregar</button>
+  </form>
+  <div *ngFor="let j of equipo?.jugadores">{{ j.persona.nombres }} - #{{ j.dorsal }}</div>
+  <div slot="footer"><button (click)="close()">Cerrar</button></div>
+</app-modal-base>

@@ -2,7 +2,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TournamentService, Tournament } from '../../services/tournament.service';
+import { TournamentService } from '../../services/tournament.service';
+import { Tournament } from '../../models/tournament.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';

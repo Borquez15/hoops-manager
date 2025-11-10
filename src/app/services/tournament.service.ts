@@ -3,48 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environment/environment';
-
-export interface Tournament {
-  id_torneo: number;
-  nombre: string;
-  vueltas: number;
-  cupos_playoffs: number;
-  modalidad: string;
-  dias_por_semana: number;
-  partidos_por_dia: number;
-  hora_ini: string;
-  hora_fin: string;
-  slot_min: number;
-  estado?: string;
-  creado_por?: number;
-  creado_en?: string;
-  usuario_id?: string;
-  created_at?: string;
-}
-
-export interface Equipo {
-  id_equipo: number;
-  nombre: string;
-  logo_url?: string;
-  id_torneo?: number;
-}
-
-export interface Arbitro {
-  id_torneo: number;
-  id_usuario: number;
-  activo: number;
-}
-
-export interface Match {
-  id_partido: number;
-  id_torneo: number;
-  fecha: string;
-  hora: string;
-  estado: string;
-  cancha: { id: number; nombre: string } | null;
-  local: { id: number; nombre: string };
-  visitante: { id: number; nombre: string };
-}
+import { Tournament, Equipo, Arbitro, Match } from '../models/tournament.model';
 
 @Injectable({
   providedIn: 'root'
