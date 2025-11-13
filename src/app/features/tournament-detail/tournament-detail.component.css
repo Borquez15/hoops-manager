@@ -514,3 +514,479 @@
   margin-right: 8px;
   vertical-align: middle;
 }
+
+/* ==================== IMPORTAR ESTILOS DE CREATE-TOURNAMENT ==================== */
+@import '../create-tournament/create-tournament.component.css';
+
+/* ==================== CALENDAR PREVIEW STYLES ==================== */
+.calendar-preview {
+  margin-top: 20px;
+}
+
+.calendar-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #f5f7fa;
+  border-radius: 12px;
+}
+
+.calendar-preview-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.btn-nav-small {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: #fff;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-nav-small:hover:not(:disabled) {
+  background: #ff8c42;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-nav-small:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Calendar Stats Mini */
+.calendar-stats-mini {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 12px;
+}
+
+.stat-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-mini-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ff8c42;
+}
+
+.stat-mini-label {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+/* Mini Calendar */
+.mini-calendar {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e1e8ed;
+}
+
+.mini-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #34495e;
+  padding: 8px 0;
+}
+
+.mini-weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+}
+
+.mini-weeks {
+  padding: 8px;
+}
+
+.mini-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.mini-week:last-child {
+  margin-bottom: 0;
+}
+
+.mini-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #f5f7fa;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px;
+}
+
+.mini-day:hover {
+  background: #e8ecf0;
+  transform: scale(1.05);
+}
+
+.mini-day.other-month {
+  opacity: 0.3;
+}
+
+.mini-day.has-matches {
+  background: #fff5e6;
+  border: 2px solid #ff8c42;
+}
+
+.mini-day.has-matches:hover {
+  background: #ffe5cc;
+}
+
+.mini-day-number {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.mini-day-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: #ff8c42;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* Loading Preview */
+.loading-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #7f8c8d;
+}
+
+.spinner-small {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e1e8ed;
+  border-top-color: #ff8c42;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-preview p {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Card Header Actions */
+.card-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-calendar {
+  background: #3498db;
+}
+
+.btn-calendar:hover {
+  background: #2980b9;
+}
+
+.btn-regenerate {
+  background: #9b59b6;
+}
+
+.btn-regenerate:hover {
+  background: #8e44ad;
+}
+
+/* Badge Count */
+.badge-count {
+  background: rgba(255, 140, 66, 0.1);
+  color: #ff8c42;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+/* List Item Styles */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.list-item:hover {
+  background: #e8ecf0;
+  transform: translateX(5px);
+}
+
+.list-item-icon {
+  width: 36px;
+  height: 36px;
+  color: #ff8c42;
+  flex-shrink: 0;
+}
+
+.list-item-text {
+  flex: 1;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.list-item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.equipo-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff8c42, #ff6b35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.equipo-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.jugadores-count {
+  display: block;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.btn-icon-small {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: #e1e8ed;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon-small:hover {
+  background: #ff8c42;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-icon-small.btn-delete:hover {
+  background: #e74c3c;
+}
+
+.btn-icon.btn-edit {
+  background: #ff8c42;
+}
+
+.btn-icon.btn-add {
+  background: #ff8c42;
+}
+
+.btn-icon.btn-add:hover {
+  transform: rotate(90deg) scale(1.1);
+}
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Config Resumen */
+.config-resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.config-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.config-value {
+  color: #ff8c42;
+  font-weight: 700;
+}
+
+/* Alert Styles */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  animation: slideDown 0.3s ease;
+  position: relative;
+}
+
+.alert-warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 2px solid #ffeaa7;
+}
+
+.alert-error {
+  background: #fee;
+  color: #c33;
+  border: 2px solid #fcc;
+}
+
+.btn-close-alert {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.btn-close-alert:hover {
+  opacity: 1;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: white;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(255, 140, 66, 0.3);
+  border-top-color: #ff8c42;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.loading-container p {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Error Alert */
+.error-alert {
+  max-width: 600px;
+  margin: 40px auto;
+  background: rgba(220, 53, 69, 0.1);
+  border: 2px solid #dc3545;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.error-alert h2 {
+  color: #dc3545;
+  margin: 0 0 12px 0;
+}
+
+.error-alert p {
+  color: white;
+  margin: 0 0 20px 0;
+}
+
+.error-alert .btn-back {
+  margin: 0 auto;
+}
