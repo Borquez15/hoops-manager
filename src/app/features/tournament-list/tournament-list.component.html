@@ -1,94 +1,139 @@
-<!-- src/app/features/tournament-list/tournament-list.component.html -->
-<div class="page-container">
-  
-  <!-- HEADER CON BOTÓN REGRESAR -->
-  <div class="page-header">
-    <button class="back-button" (click)="goBack()">
-      <span class="back-arrow">←</span>
-      Volver
-    </button>
-    <h1 class="page-title">MIS TORNEOS</h1>
-    <p class="page-subtitle">Gestiona y crea tus torneos</p>
-  </div>
+<div class="mis-torneos-container">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header__content">
+      <button class="btn-volver" (click)="goBack()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Volver
+      </button>
+      <h1 class="page-title">MIS TORNEOS</h1>
+    </div>
+  </header>
 
-  <!-- LOADING STATE -->
-  <div *ngIf="loading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Cargando torneos...</p>
-  </div>
-
-  <!-- ERROR STATE -->
-  <div *ngIf="error && !loading" class="error-alert">
-    <span>{{ error }}</span>
-    <button (click)="error = null" class="error-close-btn">✕</button>
-  </div>
-
-  <!-- EMPTY STATE -->
-  <div *ngIf="!loading && !error && tournaments.length === 0" class="empty-state">
-    <div class="empty-icon">🏆</div>
-    <h2>No hay torneos creados</h2>
-    <p>Crea tu primer torneo para comenzar</p>
-    <button class="create-btn" (click)="createTournament()">
-      Crear Torneo
-    </button>
-  </div>
-
-  <!-- TOURNAMENT GRID -->
-  <div *ngIf="!loading && !error && tournaments.length > 0" class="content">
-    <div class="tournaments-grid">
-      <div 
-        *ngFor="let tournament of tournaments" 
-        class="tournament-card"
-        (click)="viewTournament(tournament.id_torneo)"
-      >
-        <!-- Header de la tarjeta -->
-        <div class="card-header">
-          <h3 class="card-title">{{ tournament.nombre }}</h3>
-          <button 
-            class="delete-btn"
-            (click)="deleteTournament(tournament.id_torneo, $event)"
-            title="Eliminar torneo"
-          >
-            🗑️
-          </button>
-        </div>
-        
-        <!-- Cuerpo con información -->
-        <div class="card-body">
-          <div class="info-row">
-            <span class="info-label">Modalidad:</span>
-            <span class="info-value">{{ tournament.modalidad }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Vueltas:</span>
-            <span class="info-value">{{ tournament.vueltas }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Playoffs:</span>
-            <span class="info-value">{{ tournament.cupos_playoffs }} equipos</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Horario:</span>
-            <span class="info-value">{{ tournament.hora_ini }} - {{ tournament.hora_fin }}</span>
-          </div>
-        </div>
-
-        <!-- Footer con botón de acción -->
-        <div class="card-footer">
-          <button class="enter-btn">
-            Entrar
-            <span class="arrow">→</span>
-          </button>
-        </div>
-      </div>
+  <main class="content">
+    <!-- ALERTAS -->
+    <div class="alert alert-error" *ngIf="error && !loading">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      {{ error }}
+      <button class="btn-close-alert" (click)="error = null">✕</button>
     </div>
 
-    <!-- Botón para crear nuevo torneo -->
-    <div class="create-new-container">
-      <button class="create-new-btn" (click)="createTournament()">
-        <span class="plus-icon">+</span>
-        Crear Nuevo Torneo
+    <!-- LOADING STATE -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando torneos...</p>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div *ngIf="!loading && !error && tournaments.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+        </svg>
+      </div>
+      <h2>No hay torneos creados</h2>
+      <p>Crea tu primer torneo para comenzar</p>
+      <button class="btn btn-primary btn-large" (click)="createTournament()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Crear Torneo
       </button>
     </div>
-  </div>
+
+    <!-- TOURNAMENT GRID -->
+    <div *ngIf="!loading && !error && tournaments.length > 0">
+      <div class="grid">
+        <section
+          *ngFor="let tournament of tournaments"
+          class="card"
+        >
+          <div class="card-header">
+            <h2 class="card-title">{{ tournament.nombre }}</h2>
+            <div class="card-header-actions">
+              <button
+                class="btn-icon btn-calendar"
+                (click)="openCalendar(tournament.id_torneo)"
+                title="Ver calendario"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                </svg>
+              </button>
+              <button
+                class="btn-icon btn-delete"
+                (click)="deleteTournament(tournament.id_torneo, $event)"
+                title="Eliminar torneo"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="config-resumen">
+              <div class="config-item">
+                <span class="config-label">Modalidad:</span>
+                <span class="config-value">{{ tournament.modalidad }}</span>
+              </div>
+              <div class="config-item">
+                <span class="config-label">Vueltas:</span>
+                <span class="config-value">{{ tournament.vueltas }}</span>
+              </div>
+              <div class="config-item">
+                <span class="config-label">Playoffs:</span>
+                <span class="config-value">{{ tournament.cupos_playoffs }} equipos</span>
+              </div>
+              <div class="config-item">
+                <span class="config-label">Horario:</span>
+                <span class="config-value">{{ tournament.hora_ini }} - {{ tournament.hora_fin }}</span>
+              </div>
+              <div class="config-item">
+                <span class="config-label">Estado:</span>
+                <span class="status-badge" [ngClass]="getStatusBadge(tournament).class">
+                  {{ getStatusBadge(tournament).text }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer-actions">
+            <button
+              class="btn btn-primary btn-block"
+              (click)="viewTournament(tournament.id_torneo)"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+              </svg>
+              {{ getButtonText(tournament) }}
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <!-- BOTÓN CREAR NUEVO TORNEO -->
+      <div class="footer-actions">
+        <button class="btn btn-secondary btn-large" (click)="createTournament()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          Crear Nuevo Torneo
+        </button>
+      </div>
+    </div>
+  </main>
 </div>
+
+<!-- MODAL DE CALENDARIO -->
+<app-calendar-modal
+  *ngIf="calendarModalOpen"
+  [isOpen]="calendarModalOpen"
+  [tournamentId]="selectedTournamentId"
+  (closeModal)="closeCalendar()"
+></app-calendar-modal>

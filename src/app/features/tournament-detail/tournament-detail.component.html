@@ -74,13 +74,13 @@
               <span class="config-value">{{ tournament.hora_ini }} - {{ tournament.hora_fin }}</span>
             </div>
           </div>
-          
+
           <!-- Botón de Canchas -->
-          <button class="btn btn-secondary mt-3" (click)="abrirModalCanchas()">
+          <button class="btn btn-secondary mt-3 btn-block" (click)="abrirModalCanchas()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
             </svg>
-            Gestionar Canchas ({{ canchas.length }})
+            Canchas ({{ canchas.length }})
           </button>
         </div>
       </section>
@@ -112,7 +112,7 @@
         </div>
       </section>
 
-      <!-- EQUIPOS -->
+      <!-- EQUIPOS (ocupa todo el ancho) -->
       <section class="card card-wide">
         <div class="card-header">
           <h2 class="card-title">Equipos</h2>
@@ -157,19 +157,32 @@
         </div>
       </section>
 
-      <!-- CALENDARIO -->
-      <section class="card">
+      <!-- CALENDARIO (ocupa todo el ancho) -->
+      <section class="card card-wide">
         <div class="card-header">
-          <h2 class="card-title">Calendario</h2>
-          <button 
-            class="btn-icon btn-edit" 
-            *ngIf="calendarGenerated"
-            (click)="abrirModalCalendario()"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
-            </svg>
-          </button>
+          <h2 class="card-title">Calendario del Torneo</h2>
+          <div class="card-header-actions">
+            <button
+              class="btn-icon btn-calendar"
+              *ngIf="calendarGenerated"
+              (click)="abrirModalCalendario()"
+              title="Ver calendario completo"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+              </svg>
+            </button>
+            <button
+              class="btn-icon btn-regenerate"
+              *ngIf="calendarGenerated"
+              (click)="regenerateCalendar()"
+              title="Regenerar calendario"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="card-body">
@@ -188,23 +201,89 @@
               <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
             </svg>
             <p>¿Listo para generar el calendario?</p>
-            <button class="btn btn-primary mt-2" (click)="generateCalendar()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <button class="btn btn-primary mt-2" (click)="generateCalendar()" [disabled]="generatingCalendar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" *ngIf="!generatingCalendar">
                 <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
               </svg>
-              Generar Calendario
+              <span *ngIf="generatingCalendar">Generando...</span>
+              <span *ngIf="!generatingCalendar">Generar Calendario</span>
             </button>
           </div>
 
-          <!-- Calendario generado -->
-          <div *ngIf="calendarGenerated" class="calendar-status">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: #2ecc71;">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-            </svg>
-            <p>Calendario generado exitosamente</p>
-            <button class="btn btn-secondary mt-2" (click)="abrirModalCalendario()">
+          <!-- Vista previa del calendario -->
+          <div *ngIf="calendarGenerated && currentMonthPreview" class="calendar-preview">
+            <!-- Header con navegación del mes -->
+            <div class="calendar-preview-header">
+              <button class="btn-nav-small" (click)="previousMonth()" [disabled]="loadingPreview">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+              </button>
+              <h3 class="calendar-preview-title">{{ currentMonthPreview.nombre_mes }} {{ currentMonthPreview.anio }}</h3>
+              <button class="btn-nav-small" (click)="nextMonth()" [disabled]="loadingPreview">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Estadísticas del mes -->
+            <div class="calendar-stats-mini">
+              <div class="stat-mini">
+                <span class="stat-mini-value">{{ currentMonthPreview.total_partidos }}</span>
+                <span class="stat-mini-label">Total</span>
+              </div>
+              <div class="stat-mini">
+                <span class="stat-mini-value">{{ currentMonthPreview.partidos_programados }}</span>
+                <span class="stat-mini-label">Programados</span>
+              </div>
+              <div class="stat-mini">
+                <span class="stat-mini-value">{{ currentMonthPreview.partidos_jugados }}</span>
+                <span class="stat-mini-label">Jugados</span>
+              </div>
+            </div>
+
+            <!-- Mini calendario -->
+            <div class="mini-calendar">
+              <div class="mini-weekdays">
+                <div class="mini-weekday">D</div>
+                <div class="mini-weekday">L</div>
+                <div class="mini-weekday">M</div>
+                <div class="mini-weekday">X</div>
+                <div class="mini-weekday">J</div>
+                <div class="mini-weekday">V</div>
+                <div class="mini-weekday">S</div>
+              </div>
+              <div class="mini-weeks">
+                <div *ngFor="let semana of currentMonthPreview.semanas" class="mini-week">
+                  <div
+                    *ngFor="let dia of semana"
+                    class="mini-day"
+                    [class.other-month]="!dia.es_mes_actual"
+                    [class.has-matches]="dia.tiene_partidos"
+                  >
+                    <span class="mini-day-number">{{ dia.dia }}</span>
+                    <span class="mini-day-indicator" *ngIf="dia.tiene_partidos">
+                      {{ dia.partidos.length }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón para ver calendario completo -->
+            <button class="btn btn-secondary btn-block mt-3" (click)="abrirModalCalendario()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+              </svg>
               Ver Calendario Completo
             </button>
+          </div>
+
+          <!-- Loading de vista previa -->
+          <div *ngIf="calendarGenerated && !currentMonthPreview && loadingPreview" class="loading-preview">
+            <div class="spinner-small"></div>
+            <p>Cargando calendario...</p>
           </div>
         </div>
       </section>

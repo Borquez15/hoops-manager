@@ -52,6 +52,25 @@ interface EquipoConJugadores {
   jugadores: JugadorEquipo[];
 }
 
+interface CalendarDay {
+  dia: number;
+  fecha: string;
+  partidos: any[];
+  tiene_partidos: boolean;
+  es_mes_actual: boolean;
+}
+
+interface CalendarMonth {
+  anio: number;
+  mes: number;
+  nombre_mes: string;
+  semanas: CalendarDay[][];
+  total_partidos: number;
+  partidos_programados: number;
+  partidos_jugados: number;
+  partidos_suspendidos: number;
+}
+
 @Component({
   selector: 'app-tournament-detail',
   standalone: true,
@@ -75,23 +94,30 @@ export class TournamentDetailComponent implements OnInit {
   equipos: EquipoConJugadores[] = [];
   arbitros: Arbitro[] = [];
   canchas: Cancha[] = [];
-  
+
   // Estados
   loading = false;
   error: string | null = null;
   tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
   calendarGenerated = false;
-  
+  generatingCalendar = false;
+  loadingPreview = false;
+
   // Control de modales
   modalConfigAbierto = false;
   modalCanchaAbierto = false;
   modalEquipoAbierto = false;
   modalArbitroAbierto = false;
   modalCalendarioAbierto = false;
-  
+
   // Equipo en edición (para modal de equipo)
   equipoEditando: EquipoConJugadores | null = null;
   indiceEquipoEditando: number = -1;
+
+  // Vista previa del calendario
+  currentMonthPreview: CalendarMonth | null = null;
+  previewYear: number = new Date().getFullYear();
+  previewMonth: number = new Date().getMonth() + 1;
 
   constructor(
     private route: ActivatedRoute,
@@ -223,8 +249,13 @@ export class TournamentDetailComponent implements OnInit {
       const response = await this.http.get<any[]>(
         `${this.apiUrl}/tournaments/${this.tournamentId}/matches`
       ).toPromise();
-      
+
       this.calendarGenerated = (response || []).length > 0;
+
+      // Si hay calendario generado, cargar vista previa
+      if (this.calendarGenerated) {
+        await this.loadCalendarPreview();
+      }
     } catch (error) {
       console.error('❌ Error al verificar calendario:', error);
       this.calendarGenerated = false;
@@ -303,11 +334,22 @@ export class TournamentDetailComponent implements OnInit {
   async onEquipoUpdated(): Promise<void> {
     await this.loadEquipos();
     this.cerrarModalEquipo();
+
+    // Si hay calendario generado, preguntar si quiere regenerarlo
+    if (this.calendarGenerated) {
+      const shouldRegenerate = confirm(
+        '⚠️ El equipo ha sido modificado. ¿Deseas regenerar el calendario para incluir los cambios?'
+      );
+
+      if (shouldRegenerate) {
+        await this.regenerateCalendar();
+      }
+    }
   }
 
   async eliminarEquipo(index: number, id?: number): Promise<void> {
     if (!id) return;
-    
+
     if (!confirm('¿Eliminar este equipo?')) return;
 
     try {
@@ -316,6 +358,17 @@ export class TournamentDetailComponent implements OnInit {
       ).toPromise();
 
       await this.loadEquipos();
+
+      // Si hay calendario generado, avisar que debe regenerarlo
+      if (this.calendarGenerated) {
+        const shouldRegenerate = confirm(
+          '⚠️ Has eliminado un equipo. Se recomienda regenerar el calendario. ¿Deseas hacerlo ahora?'
+        );
+
+        if (shouldRegenerate) {
+          await this.regenerateCalendar();
+        }
+      }
     } catch (error) {
       console.error('❌ Error al eliminar equipo:', error);
       alert('❌ Error al eliminar equipo');
@@ -356,33 +409,114 @@ export class TournamentDetailComponent implements OnInit {
 
   async generateCalendar(): Promise<void> {
     const minimumTeams = this.getMinimumTeams();
-    
+
     if (this.equipos.length < minimumTeams) {
       alert(`⚠️ Necesitas al menos ${minimumTeams} equipos`);
       return;
     }
-    
+
     if (!confirm('¿Generar calendario automático?')) {
       return;
     }
-    
+
     try {
-      this.loading = true;
-      
+      this.generatingCalendar = true;
+
       await this.tournamentService
         .autoSchedule(this.tournamentId, undefined, true)
         .toPromise();
-      
+
       this.calendarGenerated = true;
-      this.loading = false;
-      
+      this.generatingCalendar = false;
+
+      // Cargar vista previa del mes actual
+      await this.loadCalendarPreview();
+
       alert('✅ Calendario generado');
-      
+
     } catch (error) {
       console.error('❌ Error al generar calendario:', error);
-      this.loading = false;
+      this.generatingCalendar = false;
       alert('❌ Error al generar calendario');
     }
+  }
+
+  async regenerateCalendar(): Promise<void> {
+    if (!confirm('¿Regenerar el calendario? Esto eliminará el calendario actual y creará uno nuevo.')) {
+      return;
+    }
+
+    try {
+      this.generatingCalendar = true;
+
+      // Eliminar calendario actual
+      await this.http.delete(
+        `${this.apiUrl}/tournaments/${this.tournamentId}/matches/all`
+      ).toPromise();
+
+      // Generar nuevo calendario
+      await this.tournamentService
+        .autoSchedule(this.tournamentId, undefined, true)
+        .toPromise();
+
+      this.calendarGenerated = true;
+      this.generatingCalendar = false;
+
+      // Recargar vista previa
+      await this.loadCalendarPreview();
+
+      alert('✅ Calendario regenerado exitosamente');
+
+    } catch (error) {
+      console.error('❌ Error al regenerar calendario:', error);
+      this.generatingCalendar = false;
+      alert('❌ Error al regenerar calendario');
+    }
+  }
+
+  // ========================================
+  // VISTA PREVIA DEL CALENDARIO
+  // ========================================
+
+  async loadCalendarPreview(): Promise<void> {
+    if (!this.calendarGenerated) return;
+
+    this.loadingPreview = true;
+
+    try {
+      const url = `${this.apiUrl}/tournaments/${this.tournamentId}/calendar/month/${this.previewYear}/${this.previewMonth}`;
+      console.log('🔵 Cargando vista previa del calendario:', url);
+
+      this.currentMonthPreview = await this.http.get<CalendarMonth>(url).toPromise() as CalendarMonth;
+      console.log('✅ Vista previa cargada:', this.currentMonthPreview);
+
+    } catch (err: any) {
+      console.error('❌ Error al cargar vista previa:', err);
+      this.currentMonthPreview = null;
+    } finally {
+      this.loadingPreview = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async previousMonth(): Promise<void> {
+    if (this.previewMonth === 1) {
+      this.previewMonth = 12;
+      this.previewYear--;
+    } else {
+      this.previewMonth--;
+    }
+    await this.loadCalendarPreview();
+  }
+
+  async nextMonth(): Promise<void> {
+    if (this.previewMonth === 12) {
+      this.previewMonth = 1;
+      this.previewYear++;
+    } else {
+      this.previewMonth++;
+    }
+    await this.loadCalendarPreview();
   }
 
   // ========================================
