@@ -1,18 +1,173 @@
-<app-modal-base [isOpen]="isOpen" title="Configuración del Torneo" size="medium" (closeModal)="close()">
+<app-modal-base
+  [isOpen]="isOpen"
+  title="Configuración del Torneo"
+  size="large"
+  (closeModal)="close()"
+>
   <form (ngSubmit)="save()">
-    <div *ngIf="error" class="alert-error">{{ error }}</div>
-    <div class="form-group">
-      <label>Nombre*</label>
-      <input type="text" [(ngModel)]="editForm.nombre" name="nombre" required />
+    <div class="modal-body">
+      <!-- 🏆 Datos principales -->
+      <div class="form-section">
+        <div class="form-group">
+          <label>Nombre del torneo *</label>
+          <input
+            type="text"
+            [(ngModel)]="editForm.nombre"
+            name="nombre"
+            placeholder="Ej: Liga Primavera 2025"
+          />
+        </div>
+
+        <!-- Contadores principales -->
+        <div class="form-grid">
+          <div class="form-counter">
+            <label>Vueltas a jugar</label>
+            <div class="counter">
+              <button type="button" (click)="decrementar('vueltas')">−</button>
+              <span>{{ editForm.vueltas }}</span>
+              <button type="button" (click)="incrementar('vueltas')">+</button>
+            </div>
+          </div>
+
+          <div class="form-counter">
+            <label>Clasificación de playoffs</label>
+            <div class="counter">
+              <button type="button" (click)="decrementar('cupos_playoffs')">−</button>
+              <span>{{ editForm.cupos_playoffs }}</span>
+              <button type="button" (click)="incrementar('cupos_playoffs')">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modalidad -->
+        <div class="form-group">
+          <label>Modalidad de juego</label>
+          <div class="mode-buttons">
+            <input type="text" [readonly]="true" value="3 vs 3" class="mode-input" />
+            <button
+              type="button"
+              class="mode-btn"
+              [class.active]="editForm.modalidad === '5v5'"
+              (click)="editForm.modalidad = '5v5'"
+            >
+              5 vs 5
+            </button>
+          </div>
+        </div>
+
+        <!-- Horario y frecuencia -->
+        <div class="form-grid">
+          <div class="form-counter">
+            <label>Días por semana</label>
+            <div class="counter">
+              <button type="button" (click)="decrementar('dias_por_semana')">−</button>
+              <span>{{ editForm.dias_por_semana }}</span>
+              <button type="button" (click)="incrementar('dias_por_semana')">+</button>
+            </div>
+          </div>
+
+          <div class="form-counter">
+            <label>Partidos por día</label>
+            <div class="counter">
+              <button type="button" (click)="decrementar('partidos_por_dia')">−</button>
+              <span>{{ editForm.partidos_por_dia }}</span>
+              <button type="button" (click)="incrementar('partidos_por_dia')">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Horas -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Hora de inicio</label>
+            <input
+              type="time"
+              [(ngModel)]="editForm.hora_ini"
+              name="hora_ini"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Hora de fin</label>
+            <input
+              type="time"
+              [(ngModel)]="editForm.hora_fin"
+              name="hora_fin"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Duración -->
+        <div class="form-counter">
+          <label>Duración de partido (minutos)</label>
+          <div class="counter">
+            <button
+              type="button"
+              (click)="editForm.slot_min = Math.max(10, (editForm.slot_min ?? 0) - 10)"
+            >
+              −
+            </button>
+            <span>{{ editForm.slot_min ?? 0 }} min</span>
+            <button
+              type="button"
+              (click)="editForm.slot_min = (editForm.slot_min ?? 0) + 10"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div> <!-- ← aquí faltaba cerrar el div anterior -->
+
+      <hr />
+
+      <!-- 🏟️ Canchas del torneo -->
+      <div class="form-section">
+        <h4 class="section-title">
+          <span class="icon">🏟️</span> Canchas del Torneo
+        </h4>
+
+        <div *ngIf="canchas.length === 0" class="empty-state">
+          <p>No hay canchas agregadas</p>
+        </div>
+
+        <ul *ngIf="canchas.length > 0" class="cancha-list">
+          <li *ngFor="let cancha of canchas" class="cancha-item">
+            <strong>{{ cancha.nombre }}</strong>
+            <span class="cancha-ubicacion">{{ cancha.ubicacion }}</span>
+          </li>
+        </ul>
+
+        <!-- Formulario agregar cancha -->
+        <div class="form-grid cancha-form">
+          <input
+            type="text"
+            placeholder="Nombre de la cancha"
+            [(ngModel)]="nuevaCancha.nombre"
+            name="nombre_cancha"
+          />
+          <input
+            type="text"
+            placeholder="Ubicación"
+            [(ngModel)]="nuevaCancha.ubicacion"
+            name="ubicacion"
+          />
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="agregarCancha()"
+          >
+            + Agregar
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Modalidad*</label>
-      <label><input type="radio" name="modalidad" value="3v3" [(ngModel)]="editForm.modalidad" /> 3v3</label>
-      <label><input type="radio" name="modalidad" value="5v5" [(ngModel)]="editForm.modalidad" /> 5v5</label>
-    </div>
-    <div slot="footer">
-      <button type="button" (click)="close()">Cancelar</button>
-      <button type="submit">Guardar</button>
+
+    <!-- Footer -->
+    <div slot="footer" class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="close()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar Configuración</button>
     </div>
   </form>
 </app-modal-base>

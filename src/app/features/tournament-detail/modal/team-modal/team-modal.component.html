@@ -1,9 +1,95 @@
 <app-modal-base [isOpen]="isOpen" title="Gestión de Jugadores" size="large" (closeModal)="close()">
-  <form (ngSubmit)="agregarJugador()">
-    <input type="text" [(ngModel)]="nuevoJugador.curp" name="curp" placeholder="CURP" />
-    <input type="number" [(ngModel)]="nuevoJugador.dorsal" name="dorsal" placeholder="Dorsal" />
-    <button type="submit">Agregar</button>
-  </form>
-  <div *ngFor="let j of equipo?.jugadores">{{ j.persona.nombres }} - #{{ j.dorsal }}</div>
-  <div slot="footer"><button (click)="close()">Cerrar</button></div>
+  <ng-container *ngIf="equipoTemp">
+    <div class="modal-body">
+      <!-- Información del equipo -->
+      <div class="equipo-info-section">
+        <div class="equipo-logo-grande">
+          <div class="equipo-logo-placeholder">
+            {{ (equipoTemp?.nombre || '?').charAt(0).toUpperCase() }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Nombre del Equipo *</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="equipoTemp.nombre"
+            placeholder="Ej: Los Halcones"
+          />
+        </div>
+      </div>
+
+      <!-- Sección de Jugadores -->
+      <div class="jugadores-modal-section">
+        <h3 class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 
+              1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 
+              8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 
+              1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 
+              0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 
+              3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+            />
+          </svg>
+          Jugadores ({{ equipoTemp?.jugadores?.length || 0 }})
+        </h3>
+
+        <!-- Lista de jugadores -->
+        <div class="jugadores-lista-modal" *ngIf="equipoTemp?.jugadores?.length > 0">
+          <div class="jugador-item-modal" *ngFor="let j of equipoTemp.jugadores">
+            <div class="jugador-dorsal">#{{ j.dorsal }}</div>
+            <div class="jugador-info">
+              <div class="jugador-nombre">{{ j.persona?.nombres }}</div>
+              <div class="jugador-curp">{{ j.persona?.curp }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-state-small" *ngIf="!equipoTemp?.jugadores?.length">
+          <p>No hay jugadores en este equipo</p>
+        </div>
+
+        <!-- Formulario agregar jugador -->
+        <div class="agregar-jugador-modal-form">
+          <h4>Agregar Jugador</h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>CURP</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="nuevoJugador.curp"
+                name="curp"
+                placeholder="CURP del jugador"
+              />
+            </div>
+            <div class="form-group">
+              <label>Dorsal</label>
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="nuevoJugador.dorsal"
+                name="dorsal"
+                placeholder="Número"
+              />
+            </div>
+          </div>
+
+          <button class="btn btn-secondary btn-block" (click)="agregarJugador()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            Agregar Jugador
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div slot="footer" class="modal-footer">
+      <button class="btn btn-secondary" (click)="close()">Cerrar</button>
+      <button class="btn btn-primary" (click)="equipoUpdated.emit()">Guardar</button>
+    </div>
+  </ng-container>
 </app-modal-base>

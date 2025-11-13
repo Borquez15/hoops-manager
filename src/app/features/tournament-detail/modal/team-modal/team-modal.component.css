@@ -434,3 +434,101 @@
   margin-top: 8px;
   margin-bottom: 12px;
 }
+
+/* ESTRUCTURA MODAL */
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px;
+  border-top: 2px solid #e1e8ed;
+}
+
+/* SECCIÓN DE EQUIPO */
+.equipo-info-section {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  background: #f5f7fa;
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+
+.equipo-logo-grande {
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.equipo-logo-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ff8c42, #ff6b35);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 48px;
+}
+
+/* SECCIÓN DE JUGADORES */
+.jugadores-modal-section {
+  margin-top: 32px;
+}
+
+.jugadores-lista-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 12px;
+}
+
+.jugador-item-modal {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.jugador-dorsal {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff8c42, #ff6b35);
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agregar-jugador-modal-form {
+  padding: 24px;
+  background: #f5f7fa;
+  border-radius: 12px;
+  margin-top: 24px;
+}
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}

@@ -1,8 +1,110 @@
 <app-modal-base [isOpen]="isOpen" title="Calendario del Torneo" size="fullscreen" (closeModal)="close()">
-  <div *ngIf="loading">Cargando...</div>
-  <div *ngIf="!loading && calendario">
-    <h3>{{ calendario.nombre_mes }} {{ calendario.anio }}</h3>
-    <p>Total de partidos: {{ calendario.total_partidos }}</p>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando calendario...</p>
   </div>
-  <div slot="footer"><button (click)="close()">Cerrar</button></div>
+
+  <!-- Calendario -->
+  <div *ngIf="!loading && calendario" class="calendar-container">
+    <!-- Header con navegación -->
+    <div class="calendar-header">
+      <div class="calendar-nav">
+        <button class="btn-nav" (click)="mesAnterior()" [disabled]="loading">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+          </svg>
+        </button>
+        <h2 class="calendar-title">{{ calendario.nombre_mes }} {{ calendario.anio }}</h2>
+        <button class="btn-nav" (click)="mesSiguiente()" [disabled]="loading">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="calendar-stats">
+        <div class="stat-item">
+          <span class="stat-label">Total:</span>
+          <span class="stat-value">{{ calendario.total_partidos }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Programados:</span>
+          <span class="stat-value">{{ calendario.partidos_programados }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Jugados:</span>
+          <span class="stat-value">{{ calendario.partidos_jugados }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid del calendario -->
+    <div class="calendar-grid">
+      <!-- Días de la semana -->
+      <div class="weekday-header">
+        <div class="weekday">DOMINGO</div>
+        <div class="weekday">LUNES</div>
+        <div class="weekday">MARTES</div>
+        <div class="weekday">MIÉRCOLES</div>
+        <div class="weekday">JUEVES</div>
+        <div class="weekday">VIERNES</div>
+        <div class="weekday">SÁBADO</div>
+      </div>
+
+      <!-- Semanas del mes -->
+      <div *ngFor="let semana of calendario.semanas" class="calendar-week">
+        <div 
+          *ngFor="let dia of semana" 
+          class="calendar-day"
+          [class.other-month]="!dia.es_mes_actual"
+          [class.has-matches]="dia.tiene_partidos"
+          (click)="verDetallesDia(dia)"
+        >
+          <div class="day-number">{{ dia.dia }}</div>
+          
+          <!-- Partidos del día -->
+          <div *ngIf="dia.tiene_partidos" class="day-matches">
+            <div *ngFor="let partido of dia.partidos" class="match-mini">
+              <div class="match-time">{{ formatTime(partido.hora) }}</div>
+              <div class="match-teams">
+                <span class="team-short">{{ getTeamShort(partido.equipo_local.nombre) }}</span>
+                <span class="vs">vs</span>
+                <span class="team-short">{{ getTeamShort(partido.equipo_visitante.nombre) }}</span>
+              </div>
+              <div class="match-status" [ngClass]="'status-' + partido.estado.toLowerCase()">
+                <span class="status-dot"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leyenda -->
+    <div class="calendar-legend">
+      <h4>Leyenda:</h4>
+      <div class="legend-items">
+        <div class="legend-item">
+          <div class="legend-color programado"></div>
+          <span>Programado</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color jugado"></div>
+          <span>Jugado</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color suspendido"></div>
+          <span>Suspendido</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div slot="footer" class="calendar-footer">
+    <button class="btn btn-secondary" (click)="close()">Cerrar</button>
+    <button class="btn btn-primary" (click)="irAHoy()">Ir a Hoy</button>
+  </div>
 </app-modal-base>

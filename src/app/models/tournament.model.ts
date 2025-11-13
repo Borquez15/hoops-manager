@@ -19,6 +19,14 @@ export interface Tournament {
   creado_en?: string;
   usuario_id?: string;
   created_at?: string;
+
+  canchas?: Cancha[];
+}
+
+export interface Cancha {
+  id_cancha?: number;
+  nombre: string;
+  ubicacion: string;
 }
 
 export interface Equipo {

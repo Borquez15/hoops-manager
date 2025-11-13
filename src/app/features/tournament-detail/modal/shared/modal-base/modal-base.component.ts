@@ -14,7 +14,16 @@ export class ModalBaseComponent {
   @Input() size: 'small' | 'medium' | 'large' | 'fullscreen' = 'medium';
   @Input() showFooter = true;
   @Output() closeModal = new EventEmitter<void>();
-  onOverlayClick(): void { this.close(); }
-  onContentClick(event: Event): void { event.stopPropagation(); }
-  close(): void { this.closeModal.emit(); }
+
+  close(): void {
+    this.closeModal.emit();
+  }
+
+  onOverlayClick(): void {
+    this.close();
+  }
+
+  onContentClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
 }
