@@ -1,4 +1,4 @@
-<!-- tournament-detail.component.html -->
+<!-- tournament-detail.component.html - COMPLETO CON BARRA DE PROGRESO -->
 <div class="crear-torneo-container">
   <!-- HEADER -->
   <header class="header">
@@ -16,8 +16,28 @@
     </div>
   </header>
 
+  <!-- ✨ BARRA DE PROGRESO (SOLO CUANDO GENERA CALENDARIO) -->
+  <div *ngIf="generatingCalendar" class="progress-overlay">
+    <div class="progress-modal">
+      <div class="progress-header">
+        <h3>🔄 Generando Calendario</h3>
+        <p>{{ calendarProgressMessage }}</p>
+      </div>
+      
+      <div class="progress-bar-container">
+        <div class="progress-bar" [style.width.%]="calendarProgress">
+          <span class="progress-text">{{ calendarProgress }}%</span>
+        </div>
+      </div>
+      
+      <div class="progress-info">
+        <small>Por favor espera, esto puede tardar unos segundos...</small>
+      </div>
+    </div>
+  </div>
+
   <!-- LOADING -->
-  <div *ngIf="loading" class="loading-container">
+  <div *ngIf="loading && !generatingCalendar" class="loading-container">
     <div class="spinner"></div>
     <p>Cargando torneo...</p>
   </div>
@@ -75,7 +95,6 @@
             </div>
           </div>
           
-          <!-- Botón de Canchas -->
           <button class="btn btn-secondary mt-3" (click)="abrirModalCanchas()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
@@ -98,7 +117,7 @@
 
         <div class="card-body">
           <div class="list">
-            <div class="list-item" *ngFor="let arbitro of arbitros; let i = index">
+            <div class="list-item" *ngFor="let arbitro of arbitros">
               <svg class="list-item-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
@@ -151,7 +170,7 @@
 
             <div class="empty-state" *ngIf="equipos.length === 0">
               <p>No hay equipos agregados</p>
-              <small>Agrega al menos {{ getMinimumTeams() }} equipos para poder generar el calendario</small>
+              <small>Agrega al menos {{ getMinimumTeams() }} equipos para generar el calendario</small>
             </div>
           </div>
         </div>
@@ -174,7 +193,7 @@
 
         <div class="card-body">
           <!-- No hay suficientes equipos -->
-          <div *ngIf="equipos.length < getMinimumTeams()" class="empty-state">
+          <div *ngIf="equipos.length < getMinimumTeams() && !generatingCalendar" class="empty-state">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.3;">
               <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
             </svg>
@@ -183,7 +202,7 @@
           </div>
 
           <!-- Listo para generar -->
-          <div *ngIf="equipos.length >= getMinimumTeams() && !calendarGenerated" class="empty-state">
+          <div *ngIf="equipos.length >= getMinimumTeams() && !calendarGenerated && !generatingCalendar" class="empty-state">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: #FF7F00;">
               <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
             </svg>
@@ -197,7 +216,7 @@
           </div>
 
           <!-- Calendario generado -->
-          <div *ngIf="calendarGenerated" class="calendar-status">
+          <div *ngIf="calendarGenerated && !generatingCalendar" class="calendar-status">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: #2ecc71;">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
             </svg>
@@ -226,11 +245,7 @@
   </main>
 </div>
 
-<!-- ========================================
-     MODALES
-     ======================================== -->
-
-<!-- Modal de Configuración -->
+<!-- MODALES -->
 <app-config-modal
   [isOpen]="modalConfigAbierto"
   [tournament]="tournament"
@@ -238,7 +253,6 @@
   (saveTournament)="actualizarConfiguracion($event)"
 ></app-config-modal>
 
-<!-- Modal de Canchas -->
 <app-court-modal
   [isOpen]="modalCanchaAbierto"
   [tournamentId]="tournamentId"
@@ -247,7 +261,6 @@
   (canchasUpdated)="onCanchasUpdated()"
 ></app-court-modal>
 
-<!-- Modal de Equipos -->
 <app-team-modal
   [isOpen]="modalEquipoAbierto"
   [tournamentId]="tournamentId"
@@ -256,7 +269,6 @@
   (equipoUpdated)="onEquipoUpdated()"
 ></app-team-modal>
 
-<!-- Modal de Árbitros -->
 <app-referee-modal
   [isOpen]="modalArbitroAbierto"
   [tournamentId]="tournamentId"
@@ -264,7 +276,6 @@
   (refereesUpdated)="onArbitrosUpdated()"
 ></app-referee-modal>
 
-<!-- Modal de Calendario -->
 <app-calendar-modal
   [isOpen]="modalCalendarioAbierto"
   [tournamentId]="tournamentId"

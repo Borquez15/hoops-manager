@@ -1,22 +1,19 @@
-// tournament-detail.component.ts
+// tournament-detail.component.ts - FIX DEFINITIVO DEL LOADING
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
-// Servicios y Modelos
 import { TournamentService } from '../../services/tournament.service';
 import { Tournament } from '../../models/tournament.model';
 
-// Modales
 import { ConfigModalComponent } from './modal/config-modal/config-modal.component';
 import { CourtModalComponent } from './modal/court-modal/court-modal.component';
 import { TeamModalComponent } from './modal/team-modal/team-modal.component';
 import { RefereeModalComponent } from './modal/referee-modal/referee-modal.component';
 import { CalendarModalComponent } from './modal/calendar-modal/calendar-modal.component';
 
-// Interfaces
 interface Arbitro {
   id_arbitro?: number;
   nombre: string;
@@ -76,20 +73,22 @@ export class TournamentDetailComponent implements OnInit {
   arbitros: Arbitro[] = [];
   canchas: Cancha[] = [];
   
-  // Estados
   loading = false;
   error: string | null = null;
   tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
   calendarGenerated = false;
   
-  // Control de modales
+  // ✨ PROPIEDADES PARA BARRA DE PROGRESO
+  generatingCalendar = false;
+  calendarProgress = 0;
+  calendarProgressMessage = '';
+  
   modalConfigAbierto = false;
   modalCanchaAbierto = false;
   modalEquipoAbierto = false;
   modalArbitroAbierto = false;
   modalCalendarioAbierto = false;
   
-  // Equipo en edición (para modal de equipo)
   equipoEditando: EquipoConJugadores | null = null;
   indiceEquipoEditando: number = -1;
 
@@ -109,15 +108,17 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   // ========================================
-  // CARGA DE DATOS
+  // ✅ FIX: CARGA DE DATOS MEJORADA
   // ========================================
 
   async loadTournamentData(): Promise<void> {
+    console.log('🔵 Iniciando carga del torneo:', this.tournamentId);
     this.loading = true;
     this.error = null;
     
     try {
-      // Cargar torneo
+      // 1. Cargar datos del torneo
+      console.log('📥 Cargando datos del torneo...');
       const tournamentData = await this.tournamentService
         .getTournament(this.tournamentId)
         .toPromise();
@@ -128,11 +129,14 @@ export class TournamentDetailComponent implements OnInit {
         throw new Error('No se encontró el torneo');
       }
       
+      console.log('✅ Torneo cargado:', this.tournament.nombre);
+      
       if (this.tournament.estado) {
         this.tournamentStatus = this.tournament.estado as any;
       }
       
-      // Cargar todos los datos en paralelo
+      // 2. Cargar todos los datos en paralelo
+      console.log('📥 Cargando equipos, árbitros, canchas y calendario...');
       await Promise.all([
         this.loadEquipos(),
         this.loadArbitros(),
@@ -140,11 +144,20 @@ export class TournamentDetailComponent implements OnInit {
         this.checkCalendarStatus()
       ]);
       
+      console.log('✅ Todos los datos cargados exitosamente');
+      console.log('📊 Resumen:');
+      console.log('   - Equipos:', this.equipos.length);
+      console.log('   - Árbitros:', this.arbitros.length);
+      console.log('   - Canchas:', this.canchas.length);
+      console.log('   - Calendario generado:', this.calendarGenerated);
+      
     } catch (error: any) {
       console.error('❌ Error en carga:', error);
-      this.error = error?.message || 'Error al cargar el torneo';
+      this.error = error?.message || 'Error al cargar';
     } finally {
+      // ✅ CRÍTICO: Siempre poner loading en false
       this.loading = false;
+      console.log('🏁 Loading completado. Estado loading:', this.loading);
       this.cdr.detectChanges();
     }
   }
@@ -160,12 +173,14 @@ export class TournamentDetailComponent implements OnInit {
         jugadores: []
       }));
 
-      // Cargar jugadores para cada equipo
+      // Cargar jugadores
       for (const equipo of this.equipos) {
         if (equipo.id_equipo) {
           await this.loadJugadoresEquipo(equipo.id_equipo);
         }
       }
+      
+      console.log('✅ Equipos cargados:', this.equipos.length);
     } catch (error) {
       console.error('❌ Error al cargar equipos:', error);
       this.equipos = [];
@@ -188,7 +203,7 @@ export class TournamentDetailComponent implements OnInit {
         }));
       }
     } catch (error) {
-      console.error(`❌ Error al cargar jugadores del equipo ${equipoId}:`, error);
+      // Silenciar error de jugadores
     }
   }
 
@@ -199,6 +214,7 @@ export class TournamentDetailComponent implements OnInit {
       ).toPromise();
       
       this.arbitros = response || [];
+      console.log('✅ Árbitros cargados:', this.arbitros.length);
     } catch (error) {
       console.error('❌ Error al cargar árbitros:', error);
       this.arbitros = [];
@@ -212,6 +228,7 @@ export class TournamentDetailComponent implements OnInit {
       ).toPromise();
       
       this.canchas = response || [];
+      console.log('✅ Canchas cargadas:', this.canchas.length);
     } catch (error) {
       console.error('❌ Error al cargar canchas:', error);
       this.canchas = [];
@@ -224,7 +241,11 @@ export class TournamentDetailComponent implements OnInit {
         `${this.apiUrl}/tournaments/${this.tournamentId}/matches`
       ).toPromise();
       
-      this.calendarGenerated = (response || []).length > 0;
+      const hasMatches = (response || []).length > 0;
+      this.calendarGenerated = hasMatches;
+      
+      console.log('📅 Estado del calendario:', hasMatches ? 'GENERADO' : 'NO GENERADO');
+      console.log('📊 Partidos encontrados:', (response || []).length);
     } catch (error) {
       console.error('❌ Error al verificar calendario:', error);
       this.calendarGenerated = false;
@@ -232,7 +253,7 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   // ========================================
-  // MODAL DE CONFIGURACIÓN
+  // MODALES
   // ========================================
 
   abrirModalConfig(): void {
@@ -258,10 +279,6 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
-  // ========================================
-  // MODAL DE CANCHAS
-  // ========================================
-
   abrirModalCanchas(): void {
     this.modalCanchaAbierto = true;
   }
@@ -273,10 +290,6 @@ export class TournamentDetailComponent implements OnInit {
   async onCanchasUpdated(): Promise<void> {
     await this.loadCanchas();
   }
-
-  // ========================================
-  // MODAL DE EQUIPOS
-  // ========================================
 
   abrirModalEquipo(): void {
     this.equipoEditando = {
@@ -306,25 +319,18 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   async eliminarEquipo(index: number, id?: number): Promise<void> {
-    if (!id) return;
-    
-    if (!confirm('¿Eliminar este equipo?')) return;
+    if (!id || !confirm('¿Eliminar este equipo?')) return;
 
     try {
       await this.http.delete(
         `${this.apiUrl}/tournaments/${this.tournamentId}/teams/${id}`
       ).toPromise();
-
       await this.loadEquipos();
     } catch (error) {
       console.error('❌ Error al eliminar equipo:', error);
       alert('❌ Error al eliminar equipo');
     }
   }
-
-  // ========================================
-  // MODAL DE ÁRBITROS
-  // ========================================
 
   abrirModalArbitro(): void {
     this.modalArbitroAbierto = true;
@@ -338,10 +344,6 @@ export class TournamentDetailComponent implements OnInit {
     await this.loadArbitros();
   }
 
-  // ========================================
-  // MODAL DE CALENDARIO
-  // ========================================
-
   abrirModalCalendario(): void {
     this.modalCalendarioAbierto = true;
   }
@@ -351,7 +353,7 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   // ========================================
-  // CALENDARIO
+  // ✨ GENERAR CALENDARIO CON BARRA DE PROGRESO
   // ========================================
 
   async generateCalendar(): Promise<void> {
@@ -362,26 +364,84 @@ export class TournamentDetailComponent implements OnInit {
       return;
     }
     
-    if (!confirm('¿Generar calendario automático?')) {
+    if (!confirm('¿Generar calendario? Esto puede tardar unos segundos.')) {
       return;
     }
     
+    let progressInterval: any = null;
+    
     try {
-      this.loading = true;
+      console.log('🚀 Iniciando generación de calendario...');
       
+      // Iniciar barra de progreso
+      this.generatingCalendar = true;
+      this.calendarProgress = 0;
+      this.calendarProgressMessage = 'Iniciando generación...';
+      this.cdr.detectChanges();
+      
+      // Simular progreso
+      progressInterval = setInterval(() => {
+        if (this.calendarProgress < 90) {
+          this.calendarProgress += 10;
+          
+          if (this.calendarProgress <= 30) {
+            this.calendarProgressMessage = '🔍 Analizando equipos...';
+          } else if (this.calendarProgress <= 60) {
+            this.calendarProgressMessage = '⚙️ Generando partidos...';
+          } else if (this.calendarProgress <= 90) {
+            this.calendarProgressMessage = '📅 Asignando fechas...';
+          }
+          
+          this.cdr.detectChanges();
+        }
+      }, 300);
+      
+      // Llamada al backend
       await this.tournamentService
         .autoSchedule(this.tournamentId, undefined, true)
         .toPromise();
       
-      this.calendarGenerated = true;
-      this.loading = false;
+      console.log('✅ Calendario generado en el backend');
       
-      alert('✅ Calendario generado');
+      // Detener simulación
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+      
+      // Completar progreso
+      this.calendarProgress = 100;
+      this.calendarProgressMessage = '✅ ¡Calendario generado!';
+      this.cdr.detectChanges();
+      
+      // Esperar para mostrar mensaje
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // ✅ CRÍTICO: Actualizar estado del calendario
+      await this.checkCalendarStatus();
+      
+      alert('✅ Calendario generado exitosamente');
       
     } catch (error) {
       console.error('❌ Error al generar calendario:', error);
-      this.loading = false;
+      
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+      
+      this.calendarProgress = 100;
+      this.calendarProgressMessage = '❌ Error al generar';
+      this.cdr.detectChanges();
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
       alert('❌ Error al generar calendario');
+    } finally {
+      // Ocultar barra después de 2 segundos
+      setTimeout(() => {
+        this.generatingCalendar = false;
+        this.calendarProgress = 0;
+        this.calendarProgressMessage = '';
+        this.cdr.detectChanges();
+      }, 2000);
     }
   }
 
@@ -459,7 +519,6 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
-  // Helper para obtener cantidad de jugadores
   getJugadoresCount(equipo: EquipoConJugadores): number {
     return equipo.jugadores ? equipo.jugadores.length : 0;
   }
