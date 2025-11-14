@@ -1,0 +1,143 @@
+<div class="proximos-juegos-container">
+  <div class="header">
+    <h2>📅 Próximos Juegos</h2>
+    <div class="stats">
+      <span class="stat">Total: {{ partidos.length }}</span>
+      <span class="stat stat-pending">Programados: {{ getCountByStatus('PROGRAMADO') }}</span>
+      <span class="stat stat-played">Jugados: {{ getCountByStatus('JUGADO') }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando partidos...</p>
+  </div>
+
+  <div *ngIf="!loading && partidos.length > 0" class="partidos-lista">
+    <div *ngFor="let partido of partidos" class="partido-card" [class.editando]="editandoId === partido.id_partido">
+      <div *ngIf="editandoId !== partido.id_partido" class="partido-normal">
+        <div class="partido-fecha">
+          <div class="fecha-grande">{{ formatFecha(partido.fecha) }}</div>
+          <div class="hora">{{ partido.hora }}</div>
+        </div>
+        
+        <div class="partido-equipos">
+          <!-- Equipo Local -->
+          <div class="equipo equipo-local">
+            <div class="equipo-logo" *ngIf="!tieneLogoEquipo(partido.local)">
+              {{ getInicialEquipo(partido.local) }}
+            </div>
+            <img 
+              *ngIf="tieneLogoEquipo(partido.local)"
+              [src]="getLogoEquipo(partido.local)" 
+              [alt]="getNombreEquipo(partido.local)"
+              class="equipo-logo-img"
+            />
+            <span class="equipo-nombre">{{ getNombreEquipo(partido.local) }}</span>
+          </div>
+          
+          <div class="vs">VS</div>
+          
+          <!-- Equipo Visitante -->
+          <div class="equipo equipo-visitante">
+            <span class="equipo-nombre">{{ getNombreEquipo(partido.visitante) }}</span>
+            <img 
+              *ngIf="tieneLogoEquipo(partido.visitante)"
+              [src]="getLogoEquipo(partido.visitante)" 
+              [alt]="getNombreEquipo(partido.visitante)"
+              class="equipo-logo-img"
+            />
+            <div class="equipo-logo" *ngIf="!tieneLogoEquipo(partido.visitante)">
+              {{ getInicialEquipo(partido.visitante) }}
+            </div>
+          </div>
+        </div>
+        
+        <div class="partido-info">
+          <span class="cancha" *ngIf="partido.cancha">
+            📍 {{ partido.cancha.nombre }}
+          </span>
+          <span class="cancha sin-cancha" *ngIf="!partido.cancha">
+            📍 Sin cancha asignada
+          </span>
+          <span class="estado" [ngClass]="'estado-' + partido.estado.toLowerCase()">
+            {{ partido.estado }}
+          </span>
+        </div>
+        
+        <div class="partido-acciones">
+          <button class="btn-icon" (click)="editarPartido(partido)" title="Editar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="editandoId === partido.id_partido" class="partido-edit">
+        <h4>Editar Partido</h4>
+        
+        <div class="partido-equipos-edit">
+          <div class="equipo-edit">
+            <div class="equipo-logo-small" *ngIf="!tieneLogoEquipo(partido.local)">
+              {{ getInicialEquipo(partido.local) }}
+            </div>
+            <img 
+              *ngIf="tieneLogoEquipo(partido.local)"
+              [src]="getLogoEquipo(partido.local)" 
+              class="equipo-logo-small-img"
+            />
+            <span>{{ getNombreEquipo(partido.local) }}</span>
+          </div>
+          <span class="vs-small">VS</span>
+          <div class="equipo-edit">
+            <div class="equipo-logo-small" *ngIf="!tieneLogoEquipo(partido.visitante)">
+              {{ getInicialEquipo(partido.visitante) }}
+            </div>
+            <img 
+              *ngIf="tieneLogoEquipo(partido.visitante)"
+              [src]="getLogoEquipo(partido.visitante)" 
+              class="equipo-logo-small-img"
+            />
+            <span>{{ getNombreEquipo(partido.visitante) }}</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="editForm.fecha" class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label>Hora</label>
+            <input type="time" [(ngModel)]="editForm.hora" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Cancha</label>
+          <select [(ngModel)]="editForm.id_cancha" class="form-control">
+            <option [ngValue]="null">Sin cancha</option>
+            <option *ngFor="let cancha of canchasDisponibles" [ngValue]="cancha.id_cancha">
+              📍 {{ cancha.nombre }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-actions">
+          <button class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+          <button class="btn btn-primary" (click)="guardarCambios(partido.id_partido)">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && partidos.length === 0" class="empty-state">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.3;">
+      <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+    </svg>
+    <p>No hay partidos programados</p>
+    <small>Genera el calendario para ver los próximos juegos</small>
+  </div>
+</div>

@@ -1,8 +1,16 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Tournament } from '../../../../models/tournament.model';
 import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
+
+interface Cancha {
+  id_cancha?: number;
+  nombre: string;
+  ubicacion: string;
+  activa: boolean;
+}
 
 @Component({
   selector: 'app-config-modal',
@@ -14,9 +22,13 @@ import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
 export class ConfigModalComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() tournament: Tournament | null = null;
+  @Input() canchas: Cancha[] = [];
   @Output() closeModal = new EventEmitter<void>();
   @Output() saveTournament = new EventEmitter<Partial<Tournament>>();
+  @Output() canchasUpdated = new EventEmitter<void>();
 
+  private apiUrl = 'http://localhost:8000';
+  
   editForm: Partial<Tournament> = {
     nombre: '',
     vueltas: 1,
@@ -26,16 +38,14 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     partidos_por_dia: 2,
     hora_ini: '18:00',
     hora_fin: '22:00',
-    slot_min: 60,
-    canchas: []
+    slot_min: 60
   };
 
-  canchas: { nombre: string; ubicacion: string }[] = [];
   nuevaCancha = { nombre: '', ubicacion: '' };
   error: string | null = null;
-
-  // 👇 Añadimos Math para que Angular lo reconozca en el template
   Math = Math;
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.resetForm();
@@ -50,7 +60,6 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   resetForm(): void {
     if (this.tournament) {
       this.editForm = { ...this.tournament };
-      this.canchas = this.tournament.canchas ?? [];
     }
     this.error = null;
   }
@@ -67,13 +76,40 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     }
   }
 
-  agregarCancha(): void {
-    if (!this.nuevaCancha.nombre.trim() || !this.nuevaCancha.ubicacion.trim()) {
-      alert('Completa todos los campos de la cancha.');
+  async agregarCancha(): Promise<void> {
+    if (!this.nuevaCancha.nombre.trim()) {
+      alert('El nombre es requerido');
       return;
     }
-    this.canchas.push({ ...this.nuevaCancha });
-    this.nuevaCancha = { nombre: '', ubicacion: '' };
+    
+    if (!this.tournament?.id_torneo) return;
+
+    try {
+      await this.http.post(
+        `${this.apiUrl}/tournaments/${this.tournament.id_torneo}/courts`,
+        { ...this.nuevaCancha, activa: true }
+      ).toPromise();
+      
+      this.nuevaCancha = { nombre: '', ubicacion: '' };
+      this.canchasUpdated.emit();
+    } catch (err: any) {
+      this.error = err.error?.detail || 'Error al crear cancha';
+    }
+  }
+
+  async eliminarCancha(cancha: Cancha): Promise<void> {
+    if (!cancha.id_cancha || !this.tournament?.id_torneo) return;
+    if (!confirm('¿Eliminar esta cancha?')) return;
+
+    try {
+      await this.http.delete(
+        `${this.apiUrl}/tournaments/${this.tournament.id_torneo}/courts/${cancha.id_cancha}`
+      ).toPromise();
+      
+      this.canchasUpdated.emit();
+    } catch (err) {
+      alert('Error al eliminar cancha');
+    }
   }
 
   close(): void {
@@ -91,9 +127,6 @@ export class ConfigModalComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.saveTournament.emit({
-      ...this.editForm,
-      canchas: this.canchas
-    });
+    this.saveTournament.emit(this.editForm);
   }
 }

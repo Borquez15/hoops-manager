@@ -1,0 +1,415 @@
+.proximos-juegos-container {
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.header h2 {
+  margin: 0;
+  color: #1e2946;
+  font-size: 1.5rem;
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat {
+  padding: 6px 14px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.stat-pending {
+  background: rgba(255, 127, 0, 0.1);
+  color: #FF7F00;
+}
+
+.stat-played {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 127, 0, 0.2);
+  border-top-color: #FF7F00;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.partidos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.partido-card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 4px solid #FF7F00;
+  transition: all 0.3s;
+}
+
+.partido-card:hover {
+  background: #f5f5f5;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.partido-card.editando {
+  background: white;
+  border-left-color: #2196F3;
+  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.2);
+}
+
+.partido-normal {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.partido-fecha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.fecha-grande {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.hora {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FF7F00;
+  margin-top: 4px;
+}
+
+.partido-equipos {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.equipo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.equipo-local {
+  justify-content: flex-end;
+}
+
+.equipo-visitante {
+  justify-content: flex-start;
+}
+
+.equipo-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FF7F00, #e67300);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.equipo-logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.equipo-nombre {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.vs {
+  font-weight: 700;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.partido-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.cancha {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.sin-cancha {
+  color: #f44336;
+  font-style: italic;
+}
+
+.estado {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.estado-programado {
+  background: rgba(255, 127, 0, 0.1);
+  color: #FF7F00;
+}
+
+.estado-jugado {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.partido-acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: transparent;
+  border: 2px solid #e0e0e0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  border-color: #FF7F00;
+  background: rgba(255, 127, 0, 0.1);
+}
+
+.partido-edit {
+  padding: 20px;
+}
+
+.partido-edit h4 {
+  margin: 0 0 20px 0;
+  color: #2196F3;
+  font-size: 1.1rem;
+}
+
+.partido-equipos-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.equipo-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.equipo-logo-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #FF7F00, #e67300);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.equipo-logo-small-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.vs-small {
+  font-weight: 700;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #2196F3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+select.form-control {
+  background: white;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+}
+
+.btn-primary {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1976D2;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.empty-state p {
+  margin: 16px 0 4px 0;
+  font-weight: 600;
+  color: #666;
+}
+
+.empty-state small {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .partido-normal {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .partido-fecha {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .partido-equipos {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .equipo {
+    width: 100%;
+    justify-content: center !important;
+  }
+
+  .partido-info {
+    align-items: center;
+    width: 100%;
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+}
