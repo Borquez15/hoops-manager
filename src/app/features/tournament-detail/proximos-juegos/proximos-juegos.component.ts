@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges, ChangeDetectorRef } from '@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 interface Equipo {
   id: number;
@@ -25,6 +26,9 @@ interface Match {
   estado: string;
 }
 
+type FiltroTiempo = 'todos' | 'semana' | 'mes';
+type FiltroEstado = 'todos' | 'PROGRAMADO' | 'EN_CURSO' | 'JUGADO';
+
 @Component({
   selector: 'app-proximos-juegos',
   standalone: true,
@@ -37,13 +41,19 @@ export class ProximosJuegosComponent implements OnChanges {
 
   private apiUrl = 'http://localhost:8000';
   partidos: Match[] = [];
+  partidosFiltrados: Match[] = [];
   loading = false;
   editandoId: number | null = null;
   editForm = { fecha: '', hora: '', id_cancha: null as number | null };
   canchasDisponibles: Cancha[] = [];
 
+  // Filtros
+  filtroTiempo: FiltroTiempo = 'todos';
+  filtroEstado: FiltroEstado = 'todos';
+
   constructor(
     private http: HttpClient,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -67,17 +77,62 @@ export class ProximosJuegosComponent implements OnChanges {
       this.partidos = partidosResponse || [];
       this.canchasDisponibles = canchasResponse || [];
       
+      this.aplicarFiltros();
+      
       console.log('✅ Partidos cargados:', this.partidos.length);
-      console.log('📊 Primer partido:', this.partidos[0]);
-      console.log('🏟️ Canchas disponibles:', this.canchasDisponibles.length);
     } catch (error) {
       console.error('❌ Error al cargar datos:', error);
       this.partidos = [];
       this.canchasDisponibles = [];
+      this.partidosFiltrados = [];
     } finally {
       this.loading = false;
       this.cdr.detectChanges();
     }
+  }
+
+  aplicarFiltros(): void {
+    let filtrados = [...this.partidos];
+
+    // Filtro por tiempo
+    if (this.filtroTiempo !== 'todos') {
+      const hoy = new Date();
+      filtrados = filtrados.filter(p => {
+        const fechaPartido = new Date(p.fecha);
+        
+        if (this.filtroTiempo === 'semana') {
+          const unaSemana = new Date(hoy);
+          unaSemana.setDate(hoy.getDate() + 7);
+          return fechaPartido >= hoy && fechaPartido <= unaSemana;
+        } else if (this.filtroTiempo === 'mes') {
+          const unMes = new Date(hoy);
+          unMes.setMonth(hoy.getMonth() + 1);
+          return fechaPartido >= hoy && fechaPartido <= unMes;
+        }
+        return true;
+      });
+    }
+
+    // Filtro por estado
+    if (this.filtroEstado !== 'todos') {
+      filtrados = filtrados.filter(p => p.estado === this.filtroEstado);
+    }
+
+    this.partidosFiltrados = filtrados;
+  }
+
+  cambiarFiltroTiempo(filtro: FiltroTiempo): void {
+    this.filtroTiempo = filtro;
+    this.aplicarFiltros();
+  }
+
+  cambiarFiltroEstado(filtro: FiltroEstado): void {
+    this.filtroEstado = filtro;
+    this.aplicarFiltros();
+  }
+
+  iniciarPartido(partidoId: number): void {
+    this.router.navigate(['/partido', partidoId]);
   }
 
   editarPartido(partido: Match): void {
@@ -151,5 +206,18 @@ export class ProximosJuegosComponent implements OnChanges {
 
   getLogoEquipo(equipo?: Equipo): string {
     return equipo?.logo_url || '';
+  }
+
+  getEstadoBadgeClass(estado: string): string {
+    switch (estado) {
+      case 'PROGRAMADO': return 'estado-programado';
+      case 'EN_CURSO': return 'estado-en-curso';
+      case 'JUGADO': return 'estado-jugado';
+      default: return '';
+    }
+  }
+
+  puedeIniciar(partido: Match): boolean {
+    return partido.estado === 'PROGRAMADO' && !!partido.cancha;
   }
 }

@@ -43,9 +43,10 @@ export class TournamentService {
     );
   }
 
+  // ✅ CORREGIDO: Cambiado de PUT a PATCH
   updateTournament(id: number, data: Partial<Tournament>): Observable<Tournament> {
     console.log('🔵 Actualizando torneo ID:', id, 'con data:', data);
-    return this.http.put<Tournament>(`${this.apiUrl}/tournaments/${id}`, data).pipe(
+    return this.http.patch<Tournament>(`${this.apiUrl}/tournaments/${id}`, data).pipe(
       tap(tournament => console.log('✅ Torneo actualizado:', tournament)),
       catchError(error => {
         console.error('❌ Error al actualizar torneo:', error);

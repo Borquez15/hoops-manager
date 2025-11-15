@@ -22,7 +22,7 @@ export const routes: Routes = [
   // RUTAS PROTEGIDAS (requieren autenticación)
   // ============================================
   
-  // Dashboard (crea este componente después)
+  // Dashboard
   {
     path: 'dashboard',
     loadComponent: () => 
@@ -55,6 +55,15 @@ export const routes: Routes = [
     loadComponent: () => 
       import('./features/tournament-detail/tournament-detail.component')
         .then(m => m.TournamentDetailComponent),
+    canActivate: [authGuard]
+  },
+
+  // 🆕 PARTIDO EN VIVO (gestión de partido)
+  {
+    path: 'partido/:id',
+    loadComponent: () => 
+      import('./features/match-live/match-live.component')
+        .then(m => m.MatchLiveComponent),
     canActivate: [authGuard]
   },
 

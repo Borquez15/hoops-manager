@@ -1,0 +1,231 @@
+<div class="match-live-container" *ngIf="!loading && partido">
+  <!-- HEADER -->
+  <div class="match-header">
+    <button class="btn-back" (click)="volver()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+      </svg>
+      Volver
+    </button>
+
+    <div class="match-status">
+      <span class="estado-badge" [class.en-curso]="partido.estado === 'EN_CURSO'">
+        {{ partido.estado === 'EN_CURSO' ? '🔴 EN VIVO' : partido.estado }}
+      </span>
+      <span class="periodo">Período {{ partido.periodo_actual }}</span>
+    </div>
+
+    <div class="match-controls">
+      <button 
+        *ngIf="partido.estado === 'PROGRAMADO'" 
+        class="btn-control btn-start" 
+        (click)="iniciarPartido()"
+      >
+        ▶️ Iniciar Partido
+      </button>
+      
+      <button 
+        *ngIf="partido.estado === 'EN_CURSO'" 
+        class="btn-control btn-timer" 
+        (click)="timerRunning ? stopTimer() : startTimer()"
+      >
+        {{ timerRunning ? '⏸️ Pausar' : '▶️ Reanudar' }}
+      </button>
+      
+      <button 
+        *ngIf="partido.estado === 'EN_CURSO'" 
+        class="btn-control btn-finish" 
+        (click)="finalizarPartido()"
+      >
+        🏁 Finalizar
+      </button>
+    </div>
+  </div>
+
+  <!-- MARCADOR PRINCIPAL -->
+  <div class="scoreboard">
+    <div class="team team-left">
+      <div class="team-logo" *ngIf="!partido.local.logo_url">
+        {{ partido.local.nombre.charAt(0) }}
+      </div>
+      <img 
+        *ngIf="partido.local.logo_url" 
+        [src]="partido.local.logo_url" 
+        [alt]="partido.local.nombre"
+        class="team-logo-img"
+      />
+      <div class="team-info">
+        <h2 class="team-name">{{ partido.local.nombre }}</h2>
+        <div class="team-stats">
+          <span class="fouls">Faltas: {{ partido.local.faltas }}</span>
+        </div>
+      </div>
+      <div class="team-score">{{ partido.local.puntos }}</div>
+    </div>
+
+    <div class="scoreboard-center">
+      <div class="timer" [class.running]="timerRunning">
+        {{ formatTime(tiempoActual) }}
+      </div>
+      <div class="vs-text">VS</div>
+    </div>
+
+    <div class="team team-right">
+      <div class="team-score">{{ partido.visitante.puntos }}</div>
+      <div class="team-info">
+        <h2 class="team-name">{{ partido.visitante.nombre }}</h2>
+        <div class="team-stats">
+          <span class="fouls">Faltas: {{ partido.visitante.faltas }}</span>
+        </div>
+      </div>
+      <img 
+        *ngIf="partido.visitante.logo_url" 
+        [src]="partido.visitante.logo_url" 
+        [alt]="partido.visitante.nombre"
+        class="team-logo-img"
+      />
+      <div class="team-logo" *ngIf="!partido.visitante.logo_url">
+        {{ partido.visitante.nombre.charAt(0) }}
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DE CONTROL -->
+  <div class="control-panel">
+    <!-- EQUIPO LOCAL -->
+    <div class="team-panel">
+      <div class="team-panel-header">
+        <h3>{{ partido.local.nombre }}</h3>
+      </div>
+      
+      <div class="players-grid">
+        <div 
+          *ngFor="let jugador of partido.local.jugadores" 
+          class="player-card"
+        >
+          <div class="player-info">
+            <span class="player-number">#{{ jugador.dorsal }}</span>
+            <span class="player-name">{{ jugador.nombre_completo }}</span>
+          </div>
+          
+          <div class="player-actions">
+            <button 
+              class="btn-action btn-point-1" 
+              (click)="registrarPuntos(partido.local.id_equipo, jugador.id_jugador, 1)"
+              title="Tiro libre"
+            >
+              +1
+            </button>
+            <button 
+              class="btn-action btn-point-2" 
+              (click)="registrarPuntos(partido.local.id_equipo, jugador.id_jugador, 2)"
+              title="Canasta de 2"
+            >
+              +2
+            </button>
+            <button 
+              class="btn-action btn-point-3" 
+              (click)="registrarPuntos(partido.local.id_equipo, jugador.id_jugador, 3)"
+              title="Canasta de 3"
+            >
+              +3
+            </button>
+            <button 
+              class="btn-action btn-foul" 
+              (click)="registrarFalta(partido.local.id_equipo, jugador.id_jugador)"
+              title="Falta"
+            >
+              ⚠️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EQUIPO VISITANTE -->
+    <div class="team-panel">
+      <div class="team-panel-header">
+        <h3>{{ partido.visitante.nombre }}</h3>
+      </div>
+      
+      <div class="players-grid">
+        <div 
+          *ngFor="let jugador of partido.visitante.jugadores" 
+          class="player-card"
+        >
+          <div class="player-info">
+            <span class="player-number">#{{ jugador.dorsal }}</span>
+            <span class="player-name">{{ jugador.nombre_completo }}</span>
+          </div>
+          
+          <div class="player-actions">
+            <button 
+              class="btn-action btn-point-1" 
+              (click)="registrarPuntos(partido.visitante.id_equipo, jugador.id_jugador, 1)"
+              title="Tiro libre"
+            >
+              +1
+            </button>
+            <button 
+              class="btn-action btn-point-2" 
+              (click)="registrarPuntos(partido.visitante.id_equipo, jugador.id_jugador, 2)"
+              title="Canasta de 2"
+            >
+              +2
+            </button>
+            <button 
+              class="btn-action btn-point-3" 
+              (click)="registrarPuntos(partido.visitante.id_equipo, jugador.id_jugador, 3)"
+              title="Canasta de 3"
+            >
+              +3
+            </button>
+            <button 
+              class="btn-action btn-foul" 
+              (click)="registrarFalta(partido.visitante.id_equipo, jugador.id_jugador)"
+              title="Falta"
+            >
+              ⚠️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTRO DE ACCIONES -->
+  <div class="actions-log">
+    <div class="actions-header">
+      <h3>📋 Registro de Jugadas</h3>
+      <span class="actions-count">{{ acciones.length }} acciones</span>
+    </div>
+    
+    <div class="actions-list">
+      <div 
+        *ngFor="let accion of acciones.slice().reverse()" 
+        class="action-item"
+        [class.points]="accion.puntos > 0"
+        [class.foul]="accion.tipo === 'FALTA'"
+      >
+        <span class="action-icon">{{ getAccionIcon(accion.tipo) }}</span>
+        <span class="action-time">{{ accion.minuto }}:{{ accion.segundo.toString().padStart(2, '0') }}</span>
+        <span class="action-player">{{ getJugadorNombre(accion.id_jugador, accion.id_equipo) }}</span>
+        <span class="action-type">{{ accion.tipo.replace('_', ' ') }}</span>
+        <span class="action-points" *ngIf="accion.puntos > 0">+{{ accion.puntos }}</span>
+      </div>
+      
+      <div *ngIf="acciones.length === 0" class="no-actions">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.3;">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+        </svg>
+        <p>No hay acciones registradas</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading" class="loading-screen">
+  <div class="spinner-large"></div>
+  <p>Cargando partido...</p>
+</div>

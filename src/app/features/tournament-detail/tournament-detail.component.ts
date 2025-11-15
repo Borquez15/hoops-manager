@@ -205,8 +205,16 @@ export class TournamentDetailComponent implements OnInit {
       this.canchas = response || [];
       console.log('✅ Canchas cargadas:', this.canchas.length);
     } catch (error) {
+      console.error('❌ Error al cargar canchas:', error);
       this.canchas = [];
     }
+  }
+
+  // 🆕 MÉTODO NUEVO PARA RECARGAR CANCHAS
+  async onCanchasUpdated(): Promise<void> {
+    console.log('🔄 Recargando canchas desde el modal...');
+    await this.loadCanchas();
+    this.cdr.detectChanges();
   }
 
   async checkCalendarStatus(): Promise<void> {
