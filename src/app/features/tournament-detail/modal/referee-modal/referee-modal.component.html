@@ -1,9 +1,211 @@
-<app-modal-base [isOpen]="isOpen" title="Invitar Árbitro" size="small" (closeModal)="close()">
-  <form (ngSubmit)="enviarInvitacion()">
-    <input type="email" [(ngModel)]="nuevoArbitroEmail" name="email" placeholder="Email del árbitro" required />
-    <div slot="footer">
-      <button type="button" (click)="close()">Cancelar</button>
-      <button type="submit" [disabled]="enviando">Enviar</button>
+<!-- referee-modal.component.html -->
+<div class="modal-overlay" *ngIf="isOpen" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>🏀 Gestión de Árbitros</h2>
+      <button class="btn-close" (click)="close()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
     </div>
-  </form>
-</app-modal-base>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        class="tab"
+        [class.active]="vistaActual === 'invitar'"
+        (click)="cambiarVista('invitar')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Enviar Invitación
+      </button>
+      <button 
+        class="tab"
+        [class.active]="vistaActual === 'lista'"
+        (click)="cambiarVista('lista')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+        </svg>
+        Ver Invitaciones ({{ invitaciones.length }})
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- VISTA: ENVIAR INVITACIÓN -->
+      <div *ngIf="vistaActual === 'invitar'" class="vista-invitar">
+        <div class="info-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: #2196F3;">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          <div>
+            <p><strong>¿Cómo funciona?</strong></p>
+            <small>Se enviará un correo al email ingresado con un link único para que el árbitro acepte o rechace la invitación. La invitación expira en 7 días.</small>
+          </div>
+        </div>
+
+        <form (ngSubmit)="enviarInvitacion()" class="form-invitar">
+          <div class="form-group">
+            <label for="email">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+              Email del Árbitro
+            </label>
+            <input 
+              type="email" 
+              id="email"
+              [(ngModel)]="nuevoArbitroEmail" 
+              name="email" 
+              placeholder="ejemplo@correo.com" 
+              required 
+              [disabled]="enviando"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="close()" [disabled]="enviando">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="enviando || !nuevoArbitroEmail">
+              <span *ngIf="!enviando">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+                Enviar Invitación
+              </span>
+              <span *ngIf="enviando" class="loading-text">
+                <div class="spinner-small"></div>
+                Enviando...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- VISTA: LISTA DE INVITACIONES -->
+      <div *ngIf="vistaActual === 'lista'" class="vista-lista">
+        <!-- Loading -->
+        <div *ngIf="cargandoInvitaciones" class="loading">
+          <div class="spinner"></div>
+          <p>Cargando invitaciones...</p>
+        </div>
+
+        <!-- Sin invitaciones -->
+        <div *ngIf="!cargandoInvitaciones && invitaciones.length === 0" class="empty-state">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.3;">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+          <p>No hay invitaciones enviadas</p>
+          <small>Envía tu primera invitación para empezar</small>
+        </div>
+
+        <!-- Lista de invitaciones -->
+        <div *ngIf="!cargandoInvitaciones && invitaciones.length > 0" class="invitaciones-container">
+          <!-- Invitaciones Pendientes -->
+          <div *ngIf="invitacionesPendientes.length > 0" class="seccion">
+            <h3 class="seccion-titulo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: #ff9800;">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+              </svg>
+              Pendientes ({{ invitacionesPendientes.length }})
+            </h3>
+            
+            <div class="invitaciones-lista">
+              <div *ngFor="let inv of invitacionesPendientes" class="inv-card">
+                <div class="inv-info">
+                  <div class="inv-email">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                    {{ inv.email }}
+                  </div>
+                  <div class="inv-meta">
+                    <span class="badge" [ngClass]="getEstadoBadgeClass(inv.estado)">
+                      {{ getEstadoTexto(inv.estado) }}
+                    </span>
+                    <span class="inv-fecha">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                      </svg>
+                      Expira: {{ formatearFecha(inv.expira_en) }}
+                    </span>
+                  </div>
+                </div>
+                <button class="btn-icon btn-delete" (click)="eliminarInvitacion(inv.id_inv)" title="Cancelar invitación">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Invitaciones Aceptadas -->
+          <div *ngIf="invitacionesAceptadas.length > 0" class="seccion">
+            <h3 class="seccion-titulo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: #4caf50;">
+                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+              </svg>
+              Aceptadas ({{ invitacionesAceptadas.length }})
+            </h3>
+            
+            <div class="invitaciones-lista">
+              <div *ngFor="let inv of invitacionesAceptadas" class="inv-card inv-aceptada">
+                <div class="inv-info">
+                  <div class="inv-email">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    {{ inv.nombre_arbitro || inv.email }}
+                  </div>
+                  <div class="inv-meta">
+                    <span class="badge" [ngClass]="getEstadoBadgeClass(inv.estado)">
+                      {{ getEstadoTexto(inv.estado) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Invitaciones Rechazadas/Expiradas -->
+          <div *ngIf="invitacionesRechazadas.length > 0" class="seccion">
+            <h3 class="seccion-titulo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: #999;">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+              Rechazadas/Expiradas ({{ invitacionesRechazadas.length }})
+            </h3>
+            
+            <div class="invitaciones-lista">
+              <div *ngFor="let inv of invitacionesRechazadas" class="inv-card inv-rechazada">
+                <div class="inv-info">
+                  <div class="inv-email">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
+                    </svg>
+                    {{ inv.email }}
+                  </div>
+                  <div class="inv-meta">
+                    <span class="badge" [ngClass]="getEstadoBadgeClass(inv.estado)">
+                      {{ getEstadoTexto(inv.estado) }}
+                    </span>
+                  </div>
+                </div>
+                <button class="btn-icon btn-delete" (click)="eliminarInvitacion(inv.id_inv)" title="Eliminar">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

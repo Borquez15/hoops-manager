@@ -1,3 +1,4 @@
+// tournament-detail.component.ts - COMPATIBLE CON TU ESTRUCTURA
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -208,13 +209,6 @@ export class TournamentDetailComponent implements OnInit {
       console.error('❌ Error al cargar canchas:', error);
       this.canchas = [];
     }
-  }
-
-  // 🆕 MÉTODO NUEVO PARA RECARGAR CANCHAS
-  async onCanchasUpdated(): Promise<void> {
-    console.log('🔄 Recargando canchas desde el modal...');
-    await this.loadCanchas();
-    this.cdr.detectChanges();
   }
 
   async checkCalendarStatus(): Promise<void> {

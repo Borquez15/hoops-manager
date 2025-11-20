@@ -73,8 +73,19 @@
     </div>
   </div>
 
-  <div class="resultados-info">
-    <span>Mostrando {{ partidosFiltrados.length }} de {{ partidos.length }} partidos</span>
+  <div class="resultados-header">
+    <span class="resultados-info">Mostrando {{ partidosFiltrados.length }} de {{ partidos.length }} partidos</span>
+    <button 
+      class="btn-expandir" 
+      [class.expandido]="expandido"
+      (click)="toggleExpandir()"
+      *ngIf="partidosFiltrados.length > 0"
+    >
+      <span>{{ expandido ? 'Contraer' : 'Expandir' }}</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+      </svg>
+    </button>
   </div>
 
   <div *ngIf="loading" class="loading">
@@ -82,144 +93,150 @@
     <p>Cargando partidos...</p>
   </div>
 
-  <div *ngIf="!loading && partidosFiltrados.length > 0" class="partidos-lista">
-    <div *ngFor="let partido of partidosFiltrados" class="partido-card" [class.editando]="editandoId === partido.id_partido">
-      <div *ngIf="editandoId !== partido.id_partido" class="partido-normal">
-        <div class="partido-fecha">
-          <div class="fecha-grande">{{ formatFecha(partido.fecha) }}</div>
-          <div class="hora">{{ partido.hora }}</div>
-        </div>
-        
-        <div class="partido-equipos">
-          <div class="equipo equipo-local">
-            <div class="equipo-logo" *ngIf="!tieneLogoEquipo(partido.local)">
-              {{ getInicialEquipo(partido.local) }}
-            </div>
-            <img 
-              *ngIf="tieneLogoEquipo(partido.local)"
-              [src]="getLogoEquipo(partido.local)" 
-              [alt]="getNombreEquipo(partido.local)"
-              class="equipo-logo-img"
-            />
-            <span class="equipo-nombre">{{ getNombreEquipo(partido.local) }}</span>
+  <div 
+    *ngIf="!loading && partidosFiltrados.length > 0" 
+    class="partidos-wrapper" 
+    [class.expandido]="expandido"
+  >
+    <div class="partidos-lista">
+      <div *ngFor="let partido of partidosFiltrados" class="partido-card" [class.editando]="editandoId === partido.id_partido">
+        <div *ngIf="editandoId !== partido.id_partido" class="partido-normal">
+          <div class="partido-fecha">
+            <div class="fecha-grande">{{ formatFecha(partido.fecha) }}</div>
+            <div class="hora">{{ partido.hora }}</div>
           </div>
           
-          <div class="vs">VS</div>
+          <div class="partido-equipos">
+            <div class="equipo equipo-local">
+              <div class="equipo-logo" *ngIf="!tieneLogoEquipo(partido.local)">
+                {{ getInicialEquipo(partido.local) }}
+              </div>
+              <img 
+                *ngIf="tieneLogoEquipo(partido.local)"
+                [src]="getLogoEquipo(partido.local)" 
+                [alt]="getNombreEquipo(partido.local)"
+                class="equipo-logo-img"
+              />
+              <span class="equipo-nombre">{{ getNombreEquipo(partido.local) }}</span>
+            </div>
+            
+            <div class="vs">VS</div>
+            
+            <div class="equipo equipo-visitante">
+              <span class="equipo-nombre">{{ getNombreEquipo(partido.visitante) }}</span>
+              <img 
+                *ngIf="tieneLogoEquipo(partido.visitante)"
+                [src]="getLogoEquipo(partido.visitante)" 
+                [alt]="getNombreEquipo(partido.visitante)"
+                class="equipo-logo-img"
+              />
+              <div class="equipo-logo" *ngIf="!tieneLogoEquipo(partido.visitante)">
+                {{ getInicialEquipo(partido.visitante) }}
+              </div>
+            </div>
+          </div>
           
-          <div class="equipo equipo-visitante">
-            <span class="equipo-nombre">{{ getNombreEquipo(partido.visitante) }}</span>
-            <img 
-              *ngIf="tieneLogoEquipo(partido.visitante)"
-              [src]="getLogoEquipo(partido.visitante)" 
-              [alt]="getNombreEquipo(partido.visitante)"
-              class="equipo-logo-img"
-            />
-            <div class="equipo-logo" *ngIf="!tieneLogoEquipo(partido.visitante)">
-              {{ getInicialEquipo(partido.visitante) }}
-            </div>
+          <div class="partido-info">
+            <span class="cancha" *ngIf="partido.cancha">
+              📍 {{ partido.cancha.nombre }}
+            </span>
+            <span class="cancha sin-cancha" *ngIf="!partido.cancha">
+              📍 Sin cancha asignada
+            </span>
+            <span class="estado" [ngClass]="getEstadoBadgeClass(partido.estado)">
+              {{ partido.estado === 'EN_CURSO' ? 'EN CURSO' : partido.estado }}
+            </span>
           </div>
-        </div>
-        
-        <div class="partido-info">
-          <span class="cancha" *ngIf="partido.cancha">
-            📍 {{ partido.cancha.nombre }}
-          </span>
-          <span class="cancha sin-cancha" *ngIf="!partido.cancha">
-            📍 Sin cancha asignada
-          </span>
-          <span class="estado" [ngClass]="getEstadoBadgeClass(partido.estado)">
-            {{ partido.estado === 'EN_CURSO' ? 'EN CURSO' : partido.estado }}
-          </span>
-        </div>
-        
-        <div class="partido-acciones">
-          <!-- Botón INICIAR PARTIDO -->
-          <button 
-            *ngIf="puedeIniciar(partido)"
-            class="btn-icon btn-play" 
-            (click)="iniciarPartido(partido.id_partido)" 
-            title="Iniciar Partido"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </button>
+          
+          <div class="partido-acciones">
+            <!-- Botón INICIAR PARTIDO -->
+            <button 
+              *ngIf="puedeIniciar(partido)"
+              class="btn-icon btn-play" 
+              (click)="iniciarPartido(partido.id_partido)" 
+              title="Iniciar Partido"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
 
-          <!-- Botón VER (si está en curso o jugado) -->
-          <button 
-            *ngIf="partido.estado === 'EN_CURSO' || partido.estado === 'JUGADO'"
-            class="btn-icon btn-view" 
-            (click)="iniciarPartido(partido.id_partido)" 
-            title="Ver Partido"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-            </svg>
-          </button>
+            <!-- Botón VER (si está en curso o jugado) -->
+            <button 
+              *ngIf="partido.estado === 'EN_CURSO' || partido.estado === 'JUGADO'"
+              class="btn-icon btn-view" 
+              (click)="iniciarPartido(partido.id_partido)" 
+              title="Ver Partido"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
+            </button>
 
-          <button class="btn-icon" (click)="editarPartido(partido)" title="Editar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Vista de edición (sin cambios) -->
-      <div *ngIf="editandoId === partido.id_partido" class="partido-edit">
-        <h4>Editar Partido</h4>
-        
-        <div class="partido-equipos-edit">
-          <div class="equipo-edit">
-            <div class="equipo-logo-small" *ngIf="!tieneLogoEquipo(partido.local)">
-              {{ getInicialEquipo(partido.local) }}
-            </div>
-            <img 
-              *ngIf="tieneLogoEquipo(partido.local)"
-              [src]="getLogoEquipo(partido.local)" 
-              class="equipo-logo-small-img"
-            />
-            <span>{{ getNombreEquipo(partido.local) }}</span>
-          </div>
-          <span class="vs-small">VS</span>
-          <div class="equipo-edit">
-            <div class="equipo-logo-small" *ngIf="!tieneLogoEquipo(partido.visitante)">
-              {{ getInicialEquipo(partido.visitante) }}
-            </div>
-            <img 
-              *ngIf="tieneLogoEquipo(partido.visitante)"
-              [src]="getLogoEquipo(partido.visitante)" 
-              class="equipo-logo-small-img"
-            />
-            <span>{{ getNombreEquipo(partido.visitante) }}</span>
+            <button class="btn-icon" (click)="editarPartido(partido)" title="Editar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+            </button>
           </div>
         </div>
 
-        <div class="form-row">
+        <!-- Vista de edición -->
+        <div *ngIf="editandoId === partido.id_partido" class="partido-edit">
+          <h4>Editar Partido</h4>
+          
+          <div class="partido-equipos-edit">
+            <div class="equipo-edit">
+              <div class="equipo-logo-small" *ngIf="!tieneLogoEquipo(partido.local)">
+                {{ getInicialEquipo(partido.local) }}
+              </div>
+              <img 
+                *ngIf="tieneLogoEquipo(partido.local)"
+                [src]="getLogoEquipo(partido.local)" 
+                class="equipo-logo-small-img"
+              />
+              <span>{{ getNombreEquipo(partido.local) }}</span>
+            </div>
+            <span class="vs-small">VS</span>
+            <div class="equipo-edit">
+              <div class="equipo-logo-small" *ngIf="!tieneLogoEquipo(partido.visitante)">
+                {{ getInicialEquipo(partido.visitante) }}
+              </div>
+              <img 
+                *ngIf="tieneLogoEquipo(partido.visitante)"
+                [src]="getLogoEquipo(partido.visitante)" 
+                class="equipo-logo-small-img"
+              />
+              <span>{{ getNombreEquipo(partido.visitante) }}</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Fecha</label>
+              <input type="date" [(ngModel)]="editForm.fecha" class="form-control">
+            </div>
+            
+            <div class="form-group">
+              <label>Hora</label>
+              <input type="time" [(ngModel)]="editForm.hora" class="form-control">
+            </div>
+          </div>
+
           <div class="form-group">
-            <label>Fecha</label>
-            <input type="date" [(ngModel)]="editForm.fecha" class="form-control">
+            <label>Cancha</label>
+            <select [(ngModel)]="editForm.id_cancha" class="form-control">
+              <option [ngValue]="null">Sin cancha</option>
+              <option *ngFor="let cancha of canchasDisponibles" [ngValue]="cancha.id_cancha">
+                📍 {{ cancha.nombre }}
+              </option>
+            </select>
           </div>
           
-          <div class="form-group">
-            <label>Hora</label>
-            <input type="time" [(ngModel)]="editForm.hora" class="form-control">
+          <div class="form-actions">
+            <button class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+            <button class="btn btn-primary" (click)="guardarCambios(partido.id_partido)">Guardar</button>
           </div>
-        </div>
-
-        <div class="form-group">
-          <label>Cancha</label>
-          <select [(ngModel)]="editForm.id_cancha" class="form-control">
-            <option [ngValue]="null">Sin cancha</option>
-            <option *ngFor="let cancha of canchasDisponibles" [ngValue]="cancha.id_cancha">
-              📍 {{ cancha.nombre }}
-            </option>
-          </select>
-        </div>
-        
-        <div class="form-actions">
-          <button class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
-          <button class="btn btn-primary" (click)="guardarCambios(partido.id_partido)">Guardar</button>
         </div>
       </div>
     </div>

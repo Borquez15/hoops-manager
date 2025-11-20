@@ -122,12 +122,45 @@
   border-color: #9e9e9e;
 }
 
+.resultados-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .resultados-info {
-  padding: 8px 0;
   color: #b4b8c5;
   font-size: 13px;
-  text-align: right;
-  margin-bottom: 16px;
+}
+
+.btn-expandir {
+  padding: 8px 16px;
+  background: #2a2d3a;
+  border: 2px solid #3a3d4a;
+  border-radius: 8px;
+  color: #b4b8c5;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-expandir:hover {
+  background: #3a3d4a;
+  border-color: #ff6b35;
+  color: #ff6b35;
+}
+
+.btn-expandir svg {
+  transition: transform 0.3s ease;
+}
+
+.btn-expandir.expandido svg {
+  transform: rotate(180deg);
 }
 
 /* ============================================
@@ -157,8 +190,39 @@
 }
 
 /* ============================================
-   LISTA DE PARTIDOS
+   LISTA DE PARTIDOS - CON SCROLL
 ============================================ */
+.partidos-wrapper {
+  max-height: 600px; /* Altura fija por defecto */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  transition: max-height 0.3s ease;
+}
+
+.partidos-wrapper.expandido {
+  max-height: none; /* Sin límite cuando está expandido */
+}
+
+/* Estilos del scrollbar */
+.partidos-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.partidos-wrapper::-webkit-scrollbar-track {
+  background: #1a1d29;
+  border-radius: 4px;
+}
+
+.partidos-wrapper::-webkit-scrollbar-thumb {
+  background: #3a3d4a;
+  border-radius: 4px;
+}
+
+.partidos-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #ff6b35;
+}
+
 .partidos-lista {
   display: flex;
   flex-direction: column;
@@ -570,6 +634,21 @@
     min-width: auto;
   }
 
+  .resultados-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .btn-expandir {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .partidos-wrapper {
+    max-height: 500px;
+  }
+
   .partido-normal {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -626,6 +705,10 @@
     flex: 1;
     font-size: 13px;
     padding: 8px 12px;
+  }
+
+  .partidos-wrapper {
+    max-height: 400px;
   }
 
   .equipo-nombre {

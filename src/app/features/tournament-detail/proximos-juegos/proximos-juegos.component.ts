@@ -51,6 +51,9 @@ export class ProximosJuegosComponent implements OnChanges {
   filtroTiempo: FiltroTiempo = 'todos';
   filtroEstado: FiltroEstado = 'todos';
 
+  // Control de expansión
+  expandido = false;
+
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -129,6 +132,10 @@ export class ProximosJuegosComponent implements OnChanges {
   cambiarFiltroEstado(filtro: FiltroEstado): void {
     this.filtroEstado = filtro;
     this.aplicarFiltros();
+  }
+
+  toggleExpandir(): void {
+    this.expandido = !this.expandido;
   }
 
   iniciarPartido(partidoId: number): void {
