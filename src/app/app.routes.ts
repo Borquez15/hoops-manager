@@ -58,7 +58,28 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // 🆕 PARTIDO EN VIVO (gestión de partido)
+   {
+    path: 'arbitro',
+    canActivate: [authGuard],
+    loadComponent: () => 
+      import('./features/referee/referee-dashboard/referee-dashboard.component')
+        .then(m => m.RefereeDashboardComponent)
+  },
+  {
+    path: 'arbitro/partido/:id',
+    canActivate: [authGuard],
+    loadComponent: () => 
+      import('./features/referee/match-live/match-live.component')
+        .then(m => m.MatchLiveComponent)
+  },
+  {
+    path: 'arbitro/reporte/:id',
+    canActivate: [authGuard],
+    loadComponent: () => 
+      import('./features/referee/match-report/match-report.component')
+        .then(m => m.MatchReportComponent)
+  },
+
   {
     path: 'partido/:id',
     loadComponent: () => 
@@ -66,6 +87,7 @@ export const routes: Routes = [
         .then(m => m.MatchLiveComponent),
     canActivate: [authGuard]
   },
+
 
   // Perfil
   {

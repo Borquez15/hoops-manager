@@ -1,0 +1,202 @@
+<div class="report-container">
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando partido...</p>
+  </div>
+
+  <div class="error" *ngIf="error && !loading">
+    <h2>⚠️ Error</h2>
+    <p>{{ error }}</p>
+    <button class="btn btn-back" (click)="goBack()">Volver</button>
+  </div>
+
+  <div class="report-content" *ngIf="!loading && !error && partido">
+    <div class="report-header">
+      <button class="btn-back-small" (click)="goBack()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+      </button>
+      <h1>📋 REPORTE DEL PARTIDO</h1>
+    </div>
+
+    <div class="match-summary">
+      <h2>Reporte del juego {{ partido.equipo_local }} vs {{ partido.equipo_visitante }}</h2>
+      
+      <div class="match-result">
+        <div class="team-result">
+          <h3>{{ partido.equipo_local }}</h3>
+          <div class="final-score">{{ partido.puntos_local }}</div>
+        </div>
+        
+        <span class="vs">VS</span>
+        
+        <div class="team-result">
+          <h3>{{ partido.equipo_visitante }}</h3>
+          <div class="final-score">{{ partido.puntos_visitante }}</div>
+        </div>
+      </div>
+
+      <div class="match-date">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
+        </svg>
+        {{ partido.fecha }}
+      </div>
+    </div>
+
+    <div class="incidencias-section">
+      <div class="section-header">
+        <h2>⚠️ Incidencias y Observaciones</h2>
+        <button class="btn btn-add" (click)="abrirModalIncidencia()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          Agregar Incidencia
+        </button>
+      </div>
+
+      <div class="incidencias-list" *ngIf="incidencias.length > 0">
+        <div class="incidencia-card" *ngFor="let incidencia of incidencias; let i = index">
+          <div class="incidencia-header">
+            <span class="incidencia-tipo">{{ getTipoLabel(incidencia.tipo) }}</span>
+            <button class="btn-delete-small" (click)="eliminarIncidencia(i)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="incidencia-info">
+            <div class="info-row">
+              <span class="label">Equipo:</span>
+              <span class="value">{{ incidencia.equipo === 'LOCAL' ? partido.equipo_local : partido.equipo_visitante }}</span>
+            </div>
+            
+            <div class="info-row" *ngIf="incidencia.nombre_jugador">
+              <span class="label">Jugador:</span>
+              <span class="value">{{ incidencia.nombre_jugador }}</span>
+            </div>
+            
+            <div class="info-row">
+              <span class="label">Periodo:</span>
+              <span class="value">{{ incidencia.periodo }}</span>
+            </div>
+            
+            <div class="info-row">
+              <span class="label">Tiempo:</span>
+              <span class="value">{{ incidencia.tiempo }}</span>
+            </div>
+          </div>
+          
+          <div class="incidencia-descripcion">
+            <strong>Descripción:</strong>
+            <p>{{ incidencia.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="incidencias.length === 0">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9H9v-2h3V7h2v3h3v2h-3v3h-2v-3z"/>
+        </svg>
+        <p>No hay incidencias registradas</p>
+        <small>Agrega cualquier evento relevante del partido</small>
+      </div>
+    </div>
+
+    <div class="report-actions">
+      <button class="btn btn-secondary" (click)="goBack()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary btn-lg" 
+              [disabled]="enviandoReporte"
+              (click)="enviarReporte()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" *ngIf="!enviandoReporte">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+        <span *ngIf="!enviandoReporte">Enviar Reporte</span>
+        <span *ngIf="enviandoReporte">Enviando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="modalIncidenciaAbierto" (click)="cerrarModalIncidencia()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⚠️ Agregar Incidencia</h2>
+      <button class="btn-close" (click)="cerrarModalIncidencia()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Tipo de Incidencia</label>
+        <select [(ngModel)]="nuevaIncidencia.tipo" class="form-control">
+          <option value="FALTA_TECNICA">⚠️ Falta Técnica</option>
+          <option value="FALTA_ANTIDEPORTIVA">🚨 Falta Antideportiva (Flagrante)</option>
+          <option value="DESCALIFICACION">🚫 Descalificación/Expulsión</option>
+          <option value="LESION">🤕 Lesión</option>
+          <option value="PROTESTA">🗣️ Protesta Excesiva</option>
+          <option value="OTRO">📝 Otra Incidencia</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Equipo</label>
+        <select [(ngModel)]="nuevaIncidencia.equipo" class="form-control">
+          <option value="LOCAL">{{ partido?.equipo_local }}</option>
+          <option value="VISITANTE">{{ partido?.equipo_visitante }}</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Periodo</label>
+          <input type="number" 
+                 [(ngModel)]="nuevaIncidencia.periodo" 
+                 class="form-control"
+                 min="1"
+                 max="4">
+        </div>
+
+        <div class="form-group">
+          <label>Tiempo</label>
+          <input type="text" 
+                 [(ngModel)]="nuevaIncidencia.tiempo" 
+                 class="form-control"
+                 placeholder="00:00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Jugador Involucrado (Opcional)</label>
+        <input type="text" 
+               [(ngModel)]="nuevaIncidencia.nombre_jugador" 
+               class="form-control"
+               placeholder="Nombre del jugador">
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea [(ngModel)]="nuevaIncidencia.descripcion" 
+                  class="form-control"
+                  rows="4"
+                  placeholder="Describe lo ocurrido..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrarModalIncidencia()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="agregarIncidencia()">
+        Agregar Incidencia
+      </button>
+    </div>
+  </div>
+</div>
