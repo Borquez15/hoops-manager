@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { FeaturesSectionComponent } from '../../sections/features/features-section.component';
 import { TournamentsSectionComponent } from '../../sections/tournaments/tournaments-section.component';
@@ -8,6 +9,7 @@ import { ContactSectionComponent } from '../../sections/contact/contact-section.
 import { LoginModalComponent } from '../../../../auth/login-modal/login-modal.component';
 import { RegisterModalComponent } from '../../../../auth/register-modal/register-modal.component';
 import { AuthService } from '../../../../services/auth.service';
+import { TournamentSearchService, TorneoPublico, SearchResponse } from '../../../../services/tournament-search.service';
 
 const SECTION_IDS = ['inicio', 'caracteristicas', 'torneos', 'contacto'] as const;
 type SectionId = typeof SECTION_IDS[number];
@@ -18,6 +20,7 @@ type SectionId = typeof SECTION_IDS[number];
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule,
     FeaturesSectionComponent,
     TournamentsSectionComponent,
     ContactSectionComponent,
@@ -32,6 +35,7 @@ export class HomeComponent implements AfterViewInit {
 
   private auth = inject(AuthService);
   private router = inject(Router);
+  private searchService = inject(TournamentSearchService);
 
   active: SectionId = 'inicio';
   year = new Date().getFullYear();
@@ -44,6 +48,13 @@ export class HomeComponent implements AfterViewInit {
   user = this.auth.getCurrentUserNative();
   isAuthenticated = !!this.user;
   menuOpen = false;
+
+  // ✅ NUEVO: Estado de búsqueda de torneos
+  searchQuery = '';
+  searching = false;
+  hasSearched = false;
+  match: TorneoPublico | null = null;
+  suggestions: TorneoPublico[] = [];
 
   // Botones con lógica de autenticación
   iniciarSesion(ev?: Event) {
@@ -107,6 +118,61 @@ export class HomeComponent implements AfterViewInit {
     window.location.href = '/';
   }
 
+  // ✅ NUEVO: Método de búsqueda de torneos
+  onSearch(): void {
+    const query = this.searchQuery.trim();
+    
+    if (!query) {
+      this.clearResults();
+      return;
+    }
+
+    console.log('🔍 Buscando torneo:', query);
+    this.searching = true;
+    this.hasSearched = true;
+
+    this.searchService.search(query).subscribe({
+      next: (response: SearchResponse) => {
+        console.log('✅ Resultados de búsqueda:', response);
+        this.match = response.match;
+        this.suggestions = response.suggestions;
+        this.searching = false;
+      },
+      error: (error) => {
+        console.error('❌ Error en búsqueda:', error);
+        this.clearResults();
+        this.searching = false;
+      }
+    });
+  }
+
+  // ✅ NUEVO: Limpiar resultados
+  clearResults(): void {
+    this.match = null;
+    this.suggestions = [];
+    this.hasSearched = false;
+  }
+
+  // ✅ NUEVO: Ver torneo
+  viewTournament(torneo: TorneoPublico): void {
+    console.log('🏀 Navegando a torneo:', torneo.id_torneo);
+    this.router.navigate(['/torneos', torneo.id_torneo]);
+  }
+
+  // ✅ NUEVO: Badge de estado
+  getEstadoBadge(estado: string): string {
+    switch (estado?.toUpperCase()) {
+      case 'ACTIVO':
+        return '🟢 Activo';
+      case 'FINALIZADO':
+        return '⚫ Finalizado';
+      case 'DRAFT':
+        return '🔴 Borrador';
+      default:
+        return estado || 'Desconocido';
+    }
+  }
+
   // Navegación/scroll
   async go(id: SectionId, ev?: Event) {
     ev?.preventDefault();
@@ -132,7 +198,6 @@ export class HomeComponent implements AfterViewInit {
       .map(id => document.getElementById(id))
       .filter((e): e is HTMLElement => !!e);
 
-    // Configuración mejorada del IntersectionObserver
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -142,13 +207,12 @@ export class HomeComponent implements AfterViewInit {
         }
       });
     }, { 
-      threshold: [0, 0.25, 0.5, 0.75, 1],  // ← Múltiples puntos de detección
-      rootMargin: '-100px 0px -50% 0px'    // ← Detecta cuando está cerca del top
+      threshold: [0, 0.25, 0.5, 0.75, 1],
+      rootMargin: '-100px 0px -50% 0px'
     });
 
     els.forEach(el => observer.observe(el));
 
-    // Detección adicional de scroll para la sección de inicio
     window.addEventListener('scroll', () => {
       if (window.scrollY < 200) {
         this.active = 'inicio';

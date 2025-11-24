@@ -103,44 +103,58 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   async loadTournamentData(): Promise<void> {
-    console.log('🔵 Iniciando carga del torneo:', this.tournamentId);
-    this.loading = true;
-    this.error = null;
+  console.log('🔵 Iniciando carga del torneo:', this.tournamentId);
+  this.loading = true;
+  this.error = null;
+  
+  try {
+    const tournamentData = await this.tournamentService
+      .getTournament(this.tournamentId)
+      .toPromise();
     
-    try {
-      const tournamentData = await this.tournamentService
-        .getTournament(this.tournamentId)
-        .toPromise();
-      
-      this.tournament = tournamentData || null;
-      
-      if (!this.tournament) {
-        throw new Error('No se encontró el torneo');
-      }
-      
-      console.log('✅ Torneo cargado:', this.tournament.nombre);
-      
-      if (this.tournament.estado) {
-        this.tournamentStatus = this.tournament.estado as any;
-      }
-      
-      await Promise.all([
-        this.loadEquipos(),
-        this.loadArbitros(),
-        this.loadCanchas(),
-        this.checkCalendarStatus()
-      ]);
-      
-      console.log('✅ Todos los datos cargados');
-      
-    } catch (error: any) {
-      console.error('❌ Error en carga:', error);
-      this.error = error?.message || 'Error al cargar';
-    } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
+    this.tournament = tournamentData || null;
+    
+    if (!this.tournament) {
+      throw new Error('No se encontró el torneo');
     }
+    
+    console.log('✅ Torneo cargado:', this.tournament.nombre);
+    console.log('📊 Estado del torneo:', this.tournament.estado);
+    
+    // ✅ MAPEO CORRECTO DE ESTADOS
+    if (this.tournament.estado) {
+      const estado = this.tournament.estado.toUpperCase();
+      
+      if (estado === 'DRAFT' || estado === 'CONFIGURANDO') {
+        this.tournamentStatus = 'configurando';
+      } else if (estado === 'ACTIVO' || estado === 'INICIADO') {
+        this.tournamentStatus = 'iniciado';
+      } else if (estado === 'FINALIZADO') {
+        this.tournamentStatus = 'finalizado';
+      } else {
+        this.tournamentStatus = 'configurando'; // Por defecto
+      }
+    }
+    
+    console.log('🎯 Estado mapeado a:', this.tournamentStatus);
+    
+    await Promise.all([
+      this.loadEquipos(),
+      this.loadArbitros(),
+      this.loadCanchas(),
+      this.checkCalendarStatus()
+    ]);
+    
+    console.log('✅ Todos los datos cargados');
+    
+  } catch (error: any) {
+    console.error('❌ Error en carga:', error);
+    this.error = error?.message || 'Error al cargar';
+  } finally {
+    this.loading = false;
+    this.cdr.detectChanges();
   }
+}
 
   async loadEquipos(): Promise<void> {
     try {
@@ -398,43 +412,64 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   canStartTournament(): boolean {
-    if (!this.tournament) return false;
-    
-    return this.equipos.length >= this.getMinimumTeams() &&
-           this.calendarGenerated &&
-           this.tournamentStatus === 'configurando';
+  if (!this.tournament) {
+    console.log('❌ No tournament');
+    return false;
   }
+  
+  const hasMinTeams = this.equipos.length >= this.getMinimumTeams();
+  const hasCalendar = this.calendarGenerated;
+  const isConfiguring = this.tournamentStatus === 'configurando';
+  
+  console.log('🔍 canStartTournament check:', {
+    hasMinTeams,
+    hasCalendar,
+    isConfiguring,
+    tournamentStatus: this.tournamentStatus,
+    equipos: this.equipos.length,
+    minTeams: this.getMinimumTeams()
+  });
+  
+  return hasMinTeams && hasCalendar && isConfiguring;
+}
 
   getStatusBadge(): { text: string; class: string } {
-    switch (this.tournamentStatus) {
-      case 'iniciado':
-        return { text: '🟢 Iniciado', class: 'badge-success' };
-      case 'finalizado':
-        return { text: '⚫ Finalizado', class: 'badge-finished' };
-      default:
-        return { text: '🔴 Configurando', class: 'badge-warning' };
-    }
+  switch (this.tournamentStatus) {
+    case 'iniciado':
+      return { text: '🟢 Iniciado', class: 'badge-success' };
+    case 'finalizado':
+      return { text: '⚫ Finalizado', class: 'badge-finished' };
+    case 'configurando':
+    default:
+      return { text: '🔴 Configurando', class: 'badge-warning' };
   }
+}
 
   async startTournament(): Promise<void> {
-    if (!this.canStartTournament()) {
-      alert('⚠️ No se puede iniciar');
-      return;
-    }
-    
-    if (!confirm('¿Iniciar el torneo?')) return;
-    
-    try {
-      await this.tournamentService
-        .updateTournament(this.tournamentId, { estado: 'ACTIVO' })
-        .toPromise();
-      
-      alert('🚀 ¡Torneo iniciado!');
-      await this.loadTournamentData();
-    } catch (error) {
-      alert('❌ Error al iniciar');
-    }
+  if (!this.canStartTournament()) {
+    alert('⚠️ No se puede iniciar el torneo');
+    return;
   }
+
+  if (!confirm('¿Iniciar el torneo y hacerlo PÚBLICO? Esta acción no se puede deshacer.')) {
+    return;
+  }
+
+  try {
+    // Usar el nuevo endpoint /start
+    await this.http.post(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/start`,
+      {},
+      { withCredentials: true }
+    ).toPromise();
+
+    alert('🚀 ¡Torneo iniciado y ahora es PÚBLICO!');
+    await this.loadTournamentData();
+  } catch (error: any) {
+    const mensaje = error?.error?.detail || 'Error al iniciar torneo';
+    alert(`❌ ${mensaje}`);
+  }
+}
 
   getJugadoresCount(equipo: EquipoConJugadores): number {
     return equipo.jugadores ? equipo.jugadores.length : 0;
@@ -443,4 +478,6 @@ export class TournamentDetailComponent implements OnInit {
   goBack(): void {
     this.router.navigate(['/mis-torneos']);
   }
+
+  
 }

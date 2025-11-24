@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -19,7 +19,7 @@ interface Partido {
   equipo_visitante: string;
   logo_local?: string;
   logo_visitante?: string;
-  estado: 'PENDIENTE' | 'EN_CURSO' | 'FINALIZADO';
+  estado: 'PROGRAMADO' | 'EN_CURSO' | 'FINALIZADO';
   id_torneo: number;
 }
 
@@ -44,7 +44,8 @@ export class RefereeDashboardComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
+    private cdr: ChangeDetectorRef  // ✅ AGREGADO
   ) {}
 
   ngOnInit(): void {
@@ -53,25 +54,39 @@ export class RefereeDashboardComponent implements OnInit {
     this.loadTorneos();
   }
 
-  async loadTorneos(): Promise<void> {
+  loadTorneos(): void {
+    console.log('🔄 Cargando torneos del árbitro...');
     this.loading = true;
-    try {
-      const response = await this.http.get<any[]>(
-        `${this.apiUrl}/referee/my-tournaments`,
-        { withCredentials: true }
-      ).toPromise();
-      
-      this.torneos = response || [];
-      console.log('✅ Torneos cargados:', this.torneos.length);
-    } catch (error) {
-      console.error('❌ Error al cargar torneos:', error);
-      this.torneos = [];
-    } finally {
-      this.loading = false;
-    }
+    console.log('📊 Estado loading:', this.loading);
+    
+    this.http.get<Torneo[]>(
+      `${this.apiUrl}/referee/my-tournaments`,
+      { withCredentials: true }
+    ).subscribe({
+      next: (data) => {
+        console.log('✅ Respuesta recibida:', data);
+        this.torneos = data || [];
+        console.log('✅ Torneos asignados al array:', this.torneos.length);
+        console.log('✅ Contenido del array:', this.torneos);
+        
+        this.loading = false;
+        console.log('📊 Estado loading después de cargar:', this.loading);
+        
+        // ✅ FORZAR DETECCIÓN DE CAMBIOS
+        this.cdr.detectChanges();
+        console.log('🔄 Detección de cambios forzada');
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar torneos:', error);
+        this.torneos = [];
+        this.loading = false;
+        this.cdr.detectChanges();  // ✅ AGREGADO
+      }
+    });
   }
 
   selectTorneo(torneo: Torneo): void {
+    console.log('🏀 Seleccionando torneo:', torneo);
     this.torneoSeleccionado = torneo;
     this.loadPartidos(torneo.id_torneo);
   }
@@ -81,26 +96,31 @@ export class RefereeDashboardComponent implements OnInit {
     this.partidos = [];
   }
 
-  async loadPartidos(idTorneo: number): Promise<void> {
+  loadPartidos(idTorneo: number): void {
+    console.log('🔄 Cargando partidos del torneo:', idTorneo);
     this.loadingPartidos = true;
-    try {
-      const response = await this.http.get<Partido[]>(
-        `${this.apiUrl}/referee/tournaments/${idTorneo}/my-matches`,
-        { withCredentials: true }
-      ).toPromise();
-      
-      this.partidos = response || [];
-      console.log('✅ Partidos cargados:', this.partidos.length);
-    } catch (error) {
-      console.error('❌ Error al cargar partidos:', error);
-      this.partidos = [];
-    } finally {
-      this.loadingPartidos = false;
-    }
+    
+    this.http.get<Partido[]>(
+      `${this.apiUrl}/referee/tournaments/${idTorneo}/my-matches`,
+      { withCredentials: true }
+    ).subscribe({
+      next: (data) => {
+        console.log('✅ Partidos recibidos:', data);
+        this.partidos = data || [];
+        this.loadingPartidos = false;
+        this.cdr.detectChanges();  // ✅ AGREGADO
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar partidos:', error);
+        this.partidos = [];
+        this.loadingPartidos = false;
+        this.cdr.detectChanges();  // ✅ AGREGADO
+      }
+    });
   }
 
   get partidosPendientes(): Partido[] {
-    return this.partidos.filter(p => p.estado === 'PENDIENTE');
+    return this.partidos.filter(p => p.estado === 'PROGRAMADO');
   }
 
   get partidosEnCurso(): Partido[] {
@@ -131,6 +151,10 @@ export class RefereeDashboardComponent implements OnInit {
   }
 
   goHome(): void {
-    this.router.navigate(['/']);
+    if (this.torneoSeleccionado) {
+      this.deselectTorneo();
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }

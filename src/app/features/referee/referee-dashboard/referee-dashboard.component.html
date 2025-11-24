@@ -4,31 +4,31 @@
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
         <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
       </svg>
-      Volver
     </button>
-    <h1>🏀 MIS TORNEOS</h1>
+    <h1>ÁRBITRO - {{ torneoSeleccionado?.nombre || 'MIS TORNEOS' }}</h1>
     <div class="user-badge">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
       </svg>
       {{ userName }}
     </div>
   </header>
 
-  <div class="tournament-selector">
-    <h2>Elija su liga con la que trabajará</h2>
+  <!-- Selector de Torneos -->
+  <div class="tournament-selector" *ngIf="!torneoSeleccionado">
+    <h2>Seleccione su liga con la que trabajará</h2>
     
     <div class="loading" *ngIf="loading">
       <div class="spinner"></div>
       <p>Cargando torneos...</p>
     </div>
 
-    <div class="tournaments-list" *ngIf="!loading">
+    <div class="tournaments-grid" *ngIf="!loading">
       <div class="tournament-card" 
            *ngFor="let torneo of torneos"
            (click)="selectTorneo(torneo)">
         <div class="tournament-logo">
-          <img *ngIf="torneo.logo_url" [src]="torneo.logo_url" [alt]="torneo.nombre">
+          <img *ngIf="torneo.logo_url" [src]="torneo.logo_url">
           <span *ngIf="!torneo.logo_url">{{ torneo.nombre.charAt(0) }}</span>
         </div>
         <h3>{{ torneo.nombre }}</h3>
@@ -40,122 +40,96 @@
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
         </svg>
         <p>No tienes torneos asignados</p>
-        <small>Espera a que te inviten a un torneo</small>
       </div>
     </div>
   </div>
 
+  <!-- Próximos Juegos -->
   <div class="matches-section" *ngIf="torneoSeleccionado">
-    <div class="section-header">
-      <button class="btn-back-small" (click)="deselectTorneo()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-        </svg>
-      </button>
-      <h2>{{ torneoSeleccionado.nombre }}</h2>
-    </div>
+    <div class="proximos-juegos-card">
+      <div class="card-header-custom">
+        <h2>Próximos juegos</h2>
+      </div>
 
-    <div class="loading" *ngIf="loadingPartidos">
-      <div class="spinner"></div>
-      <p>Cargando partidos...</p>
-    </div>
+      <div class="loading" *ngIf="loadingPartidos">
+        <div class="spinner"></div>
+        <p>Cargando partidos...</p>
+      </div>
 
-    <div class="matches-grid" *ngIf="!loadingPartidos">
-      <div class="matches-group" *ngIf="partidosPendientes.length > 0">
-        <h3 class="group-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-          </svg>
-          Próximos Partidos
-        </h3>
-        
-        <div class="match-card" *ngFor="let partido of partidosPendientes" (click)="startMatch(partido)">
-          <div class="match-date">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
-            </svg>
-            {{ formatDate(partido.fecha) }} - {{ partido.hora }}
+      <div class="matches-list" *ngIf="!loadingPartidos">
+        <!-- Partidos Pendientes -->
+        <div class="match-item" *ngFor="let partido of partidosPendientes" (click)="startMatch(partido)">
+          <div class="match-date-time">
+            <div class="match-date-label">{{ formatDate(partido.fecha) }}</div>
+            <div class="match-time">{{ partido.hora }}</div>
           </div>
-          
-          <div class="match-teams">
-            <div class="team">
-              <div class="team-logo">
+
+          <div class="match-teams-horizontal">
+            <div class="team-info">
+              <div class="team-logo-small">
                 <img *ngIf="partido.logo_local" [src]="partido.logo_local">
                 <span *ngIf="!partido.logo_local">{{ partido.equipo_local.charAt(0) }}</span>
               </div>
-              <span class="team-name">{{ partido.equipo_local }}</span>
+              <span class="team-name-small">{{ partido.equipo_local }}</span>
             </div>
-            
-            <span class="vs">VS</span>
-            
-            <div class="team">
-              <div class="team-logo">
+
+            <span class="vs-text">VS</span>
+
+            <div class="team-info">
+              <div class="team-logo-small">
                 <img *ngIf="partido.logo_visitante" [src]="partido.logo_visitante">
                 <span *ngIf="!partido.logo_visitante">{{ partido.equipo_visitante.charAt(0) }}</span>
               </div>
-              <span class="team-name">{{ partido.equipo_visitante }}</span>
+              <span class="team-name-small">{{ partido.equipo_visitante }}</span>
             </div>
           </div>
-          
-          <div class="match-location">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            {{ partido.cancha }}
-          </div>
-          
-          <button class="btn-start">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+
+          <button class="btn-play">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z"/>
             </svg>
-            Iniciar Partido
           </button>
         </div>
-      </div>
 
-      <div class="matches-group" *ngIf="partidosEnCurso.length > 0">
-        <h3 class="group-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
-          En Curso
-        </h3>
-        
-        <div class="match-card match-live" *ngFor="let partido of partidosEnCurso" (click)="continueMatch(partido)">
-          <div class="live-badge">🔴 EN VIVO</div>
-          
-          <div class="match-teams">
-            <div class="team">
-              <div class="team-logo">
+        <!-- Partidos en Curso -->
+        <div class="match-item match-live" *ngFor="let partido of partidosEnCurso" (click)="continueMatch(partido)">
+          <div class="match-date-time">
+            <div class="live-badge-small">🔴 EN VIVO</div>
+          </div>
+
+          <div class="match-teams-horizontal">
+            <div class="team-info">
+              <div class="team-logo-small">
                 <img *ngIf="partido.logo_local" [src]="partido.logo_local">
                 <span *ngIf="!partido.logo_local">{{ partido.equipo_local.charAt(0) }}</span>
               </div>
-              <span class="team-name">{{ partido.equipo_local }}</span>
+              <span class="team-name-small">{{ partido.equipo_local }}</span>
             </div>
-            
-            <span class="vs">VS</span>
-            
-            <div class="team">
-              <div class="team-logo">
+
+            <span class="vs-text">VS</span>
+
+            <div class="team-info">
+              <div class="team-logo-small">
                 <img *ngIf="partido.logo_visitante" [src]="partido.logo_visitante">
                 <span *ngIf="!partido.logo_visitante">{{ partido.equipo_visitante.charAt(0) }}</span>
               </div>
-              <span class="team-name">{{ partido.equipo_visitante }}</span>
+              <span class="team-name-small">{{ partido.equipo_visitante }}</span>
             </div>
           </div>
-          
-          <button class="btn-continue">
-            Continuar Partido
+
+          <button class="btn-play btn-continue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
           </button>
         </div>
-      </div>
 
-      <div class="empty-state" *ngIf="partidos.length === 0 && !loadingPartidos">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
-        </svg>
-        <p>No tienes partidos asignados</p>
-        <small>Los partidos aparecerán cuando el organizador te los asigne</small>
+        <div class="empty-state" *ngIf="partidos.length === 0">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>
+          </svg>
+          <p>No tienes partidos asignados</p>
+        </div>
       </div>
     </div>
   </div>
