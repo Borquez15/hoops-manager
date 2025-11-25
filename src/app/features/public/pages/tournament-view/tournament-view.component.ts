@@ -1,68 +1,113 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TournamentsService, Torneo } from '../../../../services/tournaments.service';
+import { TournamentSearchService, TorneoPublico } from '../../../../services/tournament-search.service';
+import { HttpClient } from '@angular/common/http';
+
+interface StandingRow {
+  id_equipo: number;
+  equipo: string;
+  jj: number;
+  jg: number;
+  jp: number;
+  pf: number;
+  pc: number;
+  dif: number;
+  pts: number;
+}
+
+interface ScorerRow {
+  jugador: string;
+  equipo: string;
+  jj: number;
+  pts: number;
+}
 
 @Component({
   standalone: true,
   selector: 'app-tournament-view',
   imports: [CommonModule],
-  template: `
-  <section class="screen">
-    <div class="card-navy">
-      <button class="link" type="button" (click)="back()">← Regresar</button>
-
-      <ng-container *ngIf="loading">Cargando…</ng-container>
-      <ng-container *ngIf="!loading && error" class="err">{{ error }}</ng-container>
-
-      <ng-container *ngIf="!loading && !error && torneo">
-        <h2 style="margin-top:8px">{{ torneo.nombre }}</h2>
-        <div class="info">
-          <div><b>Modalidad:</b> {{ torneo.modalidad }}</div>
-          <div><b>Vueltas:</b> {{ torneo.vueltas }}</div>
-          <div><b>Cupos playoffs:</b> {{ torneo.cupos_playoffs }}</div>
-          <div><b>Máx/semana:</b> {{ torneo.max_partidos_semana }}</div>
-          <div><b>Máx/día:</b> {{ torneo.max_partidos_dia ?? '—' }}</div>
-          <div><b>Estado:</b> {{ torneo.estado }}</div>
-        </div>
-
-        <!-- Aquí luego podrás colgar tabs de Equipos, Calendario, Tabla, etc. -->
-      </ng-container>
-    </div>
-  </section>
-  `,
-  styles: [`
-  .screen{
-    background:#fff; min-height:100dvh; display:flex; justify-content:center; align-items:flex-start;
-    padding:72px 16px 96px;
-  }
-  .card-navy{
-    width:min(800px, 88vw); background:#1e2946; color:#eef2f8; border-radius:26px; padding:36px 28px;
-    box-shadow:0 18px 36px rgba(0,0,0,.30), 0 2px 0 0 #e57f3d inset;
-  }
-  .link{ background:transparent; border:none; color:#c6cfdf; cursor:pointer; font-weight:600; }
-  .err{ color:#ffb3b3; }
-  .info{ display:grid; gap:8px; margin-top:12px; }
-  `]
+  templateUrl: './tournament-view.component.html',
+  styleUrls: ['./tournament-view.component.css']
 })
-export class TournamentViewComponent {
+export class TournamentViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private svc = inject(TournamentsService);
+  private searchService = inject(TournamentSearchService);
+  private http = inject(HttpClient);
 
   loading = true;
   error = '';
-  torneo: Torneo | null = null;
+  torneo: TorneoPublico | null = null;
 
-  constructor() {
+  // Datos de estadísticas
+  loadingStandings = false;
+  loadingScorers = false;
+  standings: StandingRow[] = [];
+  scorers: ScorerRow[] = [];
+
+  ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.svc.getById(id).subscribe({
-      next: (t) => { this.torneo = t; this.loading = false; },
-      error: (e) => { this.error = e?.error?.detail || 'No se pudo cargar el torneo.'; this.loading = false; }
+    console.log('📍 Cargando torneo ID:', id);
+    
+    if (!id || isNaN(id)) {
+      this.error = 'ID de torneo inválido';
+      this.loading = false;
+      return;
+    }
+
+    // Cargar información del torneo
+    this.searchService.getPublicTournament(id).subscribe({
+      next: (t) => {
+        console.log('✅ Torneo cargado:', t);
+        this.torneo = t;
+        this.loading = false;
+        
+        // Cargar estadísticas
+        this.loadStandings(id);
+        this.loadScorers(id);
+      },
+      error: (e) => {
+        console.error('❌ Error al cargar torneo:', e);
+        this.error = e?.error?.detail || 'No se pudo cargar el torneo.';
+        this.loading = false;
+      }
     });
   }
 
-  back() {
-    this.router.navigate(['']); // vuelve al home (donde está tu buscador)
+  loadStandings(id: number) {
+    this.loadingStandings = true;
+    this.http.get<{torneo: number, rows: StandingRow[]}>(`http://localhost:8000/tournaments/${id}/standings`)
+      .subscribe({
+        next: (response) => {
+          this.standings = response.rows || [];
+          this.loadingStandings = false;
+          console.log('✅ Tabla cargada:', this.standings);
+        },
+        error: (e) => {
+          console.error('❌ Error al cargar tabla:', e);
+          this.loadingStandings = false;
+        }
+      });
+  }
+
+  loadScorers(id: number) {
+    this.loadingScorers = true;
+    this.http.get<{torneo: number, rows: ScorerRow[]}>(`http://localhost:8000/tournaments/${id}/leaders/scorers?limit=10`)
+      .subscribe({
+        next: (response) => {
+          this.scorers = response.rows || [];
+          this.loadingScorers = false;
+          console.log('✅ Anotadores cargados:', this.scorers);
+        },
+        error: (e) => {
+          console.error('❌ Error al cargar anotadores:', e);
+          this.loadingScorers = false;
+        }
+      });
+  }
+
+  volver() {
+    this.router.navigate(['/']);
   }
 }

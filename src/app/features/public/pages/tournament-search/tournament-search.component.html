@@ -10,6 +10,7 @@
         class="search-input"
         [(ngModel)]="searchQuery"
         (input)="onSearch()"
+        (keyup.enter)="onSearch()"
         placeholder="Escribe el nombre del torneo o su ID..."
         autocomplete="off"
       />
@@ -32,7 +33,7 @@
 
     <!-- Resultado exacto (Match) -->
     <div *ngIf="match" class="results-section">
-      <h3 class="section-title">✅ Resultado Exacto</h3>
+      <h3 class="section-title">Resultado Exacto</h3>
       <div class="tournament-card match-card" (click)="viewTournament(match)">
         <div class="tournament-logo">
           <span>{{ match.nombre.charAt(0) }}</span>
@@ -42,16 +43,16 @@
           <div class="tournament-details">
             <span class="detail-badge">{{ match.modalidad }}</span>
             <span class="detail-badge">{{ match.vueltas }} {{ match.vueltas === 1 ? 'vuelta' : 'vueltas' }}</span>
-            <span class="detail-badge estado">{{ getEstadoBadge(match.estado) }}</span>
+            <span class="detail-badge estado">{{ match.estado }}</span>
           </div>
         </div>
-        <button class="btn-enter">ENTRAR</button>
+        <button class="btn-enter" (click)="viewTournament(match); $event.stopPropagation()">ENTRAR</button>
       </div>
     </div>
 
     <!-- Sugerencias -->
     <div *ngIf="suggestions.length > 0" class="results-section">
-      <h3 class="section-title">💡 Sugerencias</h3>
+      <h3 class="section-title">Sugerencias</h3>
       <div class="tournaments-grid">
         <div 
           *ngFor="let torneo of suggestions" 
@@ -65,10 +66,10 @@
             <div class="tournament-details">
               <span class="detail-badge">{{ torneo.modalidad }}</span>
               <span class="detail-badge">{{ torneo.vueltas }} {{ torneo.vueltas === 1 ? 'vuelta' : 'vueltas' }}</span>
-              <span class="detail-badge estado">{{ getEstadoBadge(torneo.estado) }}</span>
+              <span class="detail-badge estado">{{ torneo.estado }}</span>
             </div>
           </div>
-          <button class="btn-enter">ENTRAR</button>
+          <button class="btn-enter" (click)="viewTournament(torneo); $event.stopPropagation()">ENTRAR</button>
         </div>
       </div>
     </div>

@@ -25,7 +25,9 @@ export class TournamentSearchComponent {
   ) {}
 
   onSearch(): void {
-    if (!this.searchQuery.trim()) {
+    const query = this.searchQuery.trim();
+    
+    if (!query) {
       this.clearResults();
       return;
     }
@@ -33,17 +35,23 @@ export class TournamentSearchComponent {
     this.searching = true;
     this.hasSearched = true;
 
-    this.searchService.search(this.searchQuery.trim()).subscribe({
+    console.log('🔍 Buscando:', query);
+
+    this.searchService.search(query).subscribe({
       next: (response: SearchResponse) => {
-        console.log('✅ Resultados:', response);
+        console.log('✅ Respuesta recibida:', response);
         this.match = response.match;
         this.suggestions = response.suggestions;
         this.searching = false;
+        
+        console.log('Match:', this.match);
+        console.log('Suggestions:', this.suggestions);
       },
       error: (error) => {
         console.error('❌ Error en búsqueda:', error);
         this.clearResults();
         this.searching = false;
+        alert('Error al buscar torneos. Por favor intenta de nuevo.');
       }
     });
   }
@@ -55,20 +63,8 @@ export class TournamentSearchComponent {
   }
 
   viewTournament(torneo: TorneoPublico): void {
-    // Navegar a la vista pública del torneo
+    console.log('📍 Navegando a torneo:', torneo.id_torneo);
+    // Navegar usando la ruta correcta: /torneos/:id
     this.router.navigate(['/torneos', torneo.id_torneo]);
-  }
-
-  getEstadoBadge(estado: string): string {
-    switch (estado?.toUpperCase()) {
-      case 'ACTIVO':
-        return '🟢 Activo';
-      case 'FINALIZADO':
-        return '⚫ Finalizado';
-      case 'DRAFT':
-        return '🔴 Borrador';
-      default:
-        return estado || 'Desconocido';
-    }
   }
 }

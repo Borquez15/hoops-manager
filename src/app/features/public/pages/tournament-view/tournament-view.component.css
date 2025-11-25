@@ -1,6 +1,5 @@
 :host { display: block; }
 
-/* Reutiliza el layout del buscador */
 .screen{
   background:#ffffff;
   min-height: calc(100dvh - 80px);
@@ -35,6 +34,7 @@
   border-radius:10px;
   padding:6px 10px;
   cursor:pointer;
+  font-size: 14px;
 }
 .back:hover{ background:rgba(255,255,255,.06); }
 
@@ -57,7 +57,7 @@ h2{ margin:0; font-weight:800; letter-spacing:1px; }
   padding:14px;
 }
 .label{ opacity:.8; font-size:.85rem; }
-.value{ font-weight:800; font-size:1.05rem; }
+.value{ font-weight:800; font-size:1.05rem; margin-top: 4px; }
 .tag{
   background:#e57f3d; color:#fff;
   display:inline-block; padding:2px 8px; border-radius:8px;
@@ -75,18 +75,137 @@ h2{ margin:0; font-weight:800; letter-spacing:1px; }
   border-radius:16px;
   padding:16px;
 }
-.panel h3{ margin:0 0 10px; }
+.panel h3{ margin:0 0 10px; font-size: 1.1rem; }
 .placeholder{
   opacity:.8;
   background:rgba(255,255,255,.05);
   border:1px dashed rgba(255,255,255,.18);
   border-radius:12px;
   padding:14px;
+  text-align: center;
 }
 .span-2{ grid-column: span 2; }
+
+/* Tabla de posiciones */
+.table-container {
+  overflow-x: auto;
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.standings-table thead {
+  background: rgba(255,255,255,.08);
+}
+
+.standings-table th {
+  padding: 8px 6px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-bottom: 2px solid rgba(255,255,255,.15);
+}
+
+.standings-table td {
+  padding: 10px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.standings-table .team-name {
+  text-align: left;
+  font-weight: 600;
+}
+
+.standings-table .pts {
+  font-weight: 800;
+  color: #e57f3d;
+}
+
+.standings-table .positive {
+  color: #4CAF50;
+}
+
+.standings-table .negative {
+  color: #ff6b6b;
+}
+
+/* Lista de anotadores */
+.scorers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scorer-item {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,.04);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.scorer-item:hover {
+  background: rgba(255,255,255,.08);
+}
+
+.rank {
+  font-weight: 800;
+  color: #e57f3d;
+  font-size: 1rem;
+}
+
+.scorer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scorer-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.scorer-team {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.scorer-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.pts-label {
+  font-weight: 800;
+  color: #e57f3d;
+  font-size: 1rem;
+}
+
+.games-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
 
 @media (max-width: 780px){
   .info-grid{ grid-template-columns: 1fr 1fr; }
   .panels{ grid-template-columns: 1fr; }
   .span-2{ grid-column: auto; }
+  
+  .standings-table {
+    font-size: 0.8rem;
+  }
+  
+  .standings-table th,
+  .standings-table td {
+    padding: 6px 4px;
+  }
 }

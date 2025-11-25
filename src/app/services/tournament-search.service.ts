@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 export interface TorneoPublico {
   id_torneo: number;
@@ -27,8 +28,11 @@ export class TournamentSearchService {
   constructor(private http: HttpClient) {}
 
   search(query: string): Observable<SearchResponse> {
-    return this.http.get<SearchResponse>(
-      `${this.apiUrl}/tournaments/search?q=${encodeURIComponent(query)}`
+    const url = `${this.apiUrl}/tournaments/search?q=${encodeURIComponent(query)}`;
+    console.log('🌐 Llamando a:', url);
+    
+    return this.http.get<SearchResponse>(url).pipe(
+      tap(response => console.log('📦 Respuesta del servidor:', response))
     );
   }
 

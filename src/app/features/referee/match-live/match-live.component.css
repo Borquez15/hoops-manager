@@ -1,9 +1,19 @@
-.match-live-container {
-  min-height: 100vh;
-  background: #0f1419;
-  color: white;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+.match-live-container {
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ============================================
+   LOADING Y ERROR
+   ============================================ */
 .loading, .error {
   display: flex;
   flex-direction: column;
@@ -28,10 +38,27 @@
   to { transform: rotate(360deg); }
 }
 
-/* SELECCIÓN DE QUINTETO */
+.error h2 {
+  margin-bottom: 15px;
+}
+
+.btn-back {
+  padding: 12px 24px;
+  background: #FF7F00;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* ============================================
+   SELECCIÓN DE QUINTETO (MANTENER IGUAL)
+   ============================================ */
 .quinteto-selector {
   min-height: 100vh;
-  background: #0f1419;
+  background: #1a1a1a;
 }
 
 .quinteto-header {
@@ -39,7 +66,7 @@
   align-items: center;
   gap: 20px;
   padding: 20px 30px;
-  background: linear-gradient(135deg, #1a1f2e, #2d3748);
+  background: #2a2a2a;
   border-bottom: 2px solid #FF7F00;
 }
 
@@ -72,7 +99,7 @@
 }
 
 .equipo-quinteto-card {
-  background: #1a1f2e;
+  background: #2a2a2a;
   border-radius: 16px;
   padding: 40px;
 }
@@ -151,7 +178,7 @@
   align-items: center;
   gap: 12px;
   padding: 15px;
-  background: #2d3748;
+  background: #3a3a3a;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -205,12 +232,8 @@
 }
 
 @keyframes checkIn {
-  from {
-    transform: scale(0);
-  }
-  to {
-    transform: scale(1);
-  }
+  from { transform: scale(0); }
+  to { transform: scale(1); }
 }
 
 .quinteto-actions {
@@ -247,36 +270,74 @@
   cursor: not-allowed;
 }
 
-/* TABLERO EN VIVO */
+/* ============================================
+   TABLERO EN VIVO - DISEÑO IDÉNTICO A REFERENCIA
+   ============================================ */
 .live-board {
   min-height: 100vh;
+  background: #1a1a1a;
+  padding: 0;
+  overflow: hidden;
 }
 
-.match-header {
+/* Header Superior */
+.match-header-compact {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 20px 30px;
-  background: linear-gradient(135deg, #1a1f2e, #2d3748);
-  border-bottom: 2px solid #FF7F00;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #2a2a2a;
+  border-bottom: 1px solid #3a3a3a;
 }
 
-.match-info {
-  flex: 1;
+.btn-back-icon {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.live-indicator {
-  display: inline-flex;
+.btn-back-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.match-title {
+  flex: 1;
+  text-align: center;
+}
+
+.match-title h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.match-title .vs {
+  color: #FF7F00;
+  margin: 0 10px;
+  font-weight: 700;
+}
+
+.match-indicators {
+  display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+.live-badge {
+  padding: 5px 12px;
   background: #ff3333;
-  border-radius: 12px;
-  font-size: 14px;
+  border-radius: 20px;
+  font-size: 11px;
   font-weight: 700;
   animation: blink 1.5s infinite;
 }
@@ -286,262 +347,402 @@
   50% { opacity: 0.7; }
 }
 
-.periodo {
-  font-weight: 700;
-  font-size: 16px;
+.periodo-badge {
+  padding: 5px 12px;
+  background: rgba(255, 127, 0, 0.2);
+  border: 1px solid #FF7F00;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #FF7F00;
 }
 
-.scoreboard {
+/* Layout Principal - 3 Columnas */
+.main-board {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 40px;
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 40px;
-  background: linear-gradient(135deg, #1a1f2e, #2d3748);
-  border-radius: 16px;
+  grid-template-columns: 280px 1fr 280px;
+  height: calc(100vh - 60px);
+  gap: 0;
 }
 
-.team-score {
+/* ============================================
+   PANELES LATERALES - ESTILO REFERENCIA
+   ============================================ */
+.team-panel {
+  background: #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #3a3a3a;
+  overflow-y: auto;
+}
+
+.team-panel.team-visitante {
+  border-right: none;
+  border-left: 1px solid #3a3a3a;
+}
+
+.team-panel-header {
+  padding: 20px;
+  background: #252525;
+  border-bottom: 2px solid #FF7F00;
   text-align: center;
 }
 
-.team-logo {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 15px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FF7F00, #FFA500);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: bold;
+.team-panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.team-logo img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.team-name {
-  margin: 0 0 20px 0;
-  font-size: 20px;
-}
-
-.score {
-  font-size: 72px;
-  font-weight: 900;
-  color: #FF7F00;
-  margin-bottom: 10px;
-}
-
-.team-faltas {
-  color: #a0aec0;
-  font-size: 14px;
-}
-
-.timer-section {
+/* Lista de Jugadores - Estilo Idéntico */
+.jugadores-list {
+  flex: 1;
+  padding: 10px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.jugador-item {
+  background: #333;
+  border-radius: 8px;
+  padding: 12px 10px;
+  display: grid;
+  grid-template-columns: 50px 1fr auto 45px;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-.timer {
-  font-size: 64px;
-  font-weight: 900;
-  font-family: 'Courier New', monospace;
-  background: linear-gradient(135deg, #FF7F00, #FFA500);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.timer-controls {
-  display: flex;
   gap: 10px;
-}
-
-.btn-timer {
-  width: 60px;
-  height: 60px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 127, 0, 0.2);
-  color: #FF7F00;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: all 0.2s ease;
 }
 
-.btn-timer:hover {
-  background: rgba(255, 127, 0, 0.3);
-  transform: scale(1.1);
+.team-visitante .jugador-item {
+  grid-template-columns: 45px auto 1fr 50px;
 }
 
-.quintetos-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  max-width: 1400px;
-  margin: 40px auto;
-  padding: 0 20px;
+.jugador-item:hover {
+  background: #3a3a3a;
 }
 
-.quinteto-section {
-  background: #1a1f2e;
-  border-radius: 16px;
-  padding: 20px;
+.jugador-item.encancha {
+  background: rgba(255, 127, 0, 0.15);
+  border: 1px solid rgba(255, 127, 0, 0.4);
 }
 
-.quinteto-header-live {
+/* Número del Jugador */
+.jugador-numero-mini {
+  width: 50px;
+  height: 50px;
+  background: #FF7F00;
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid rgba(255, 127, 0, 0.2);
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+  color: white;
+  flex-shrink: 0;
 }
 
-.quinteto-header-live h3 {
-  margin: 0;
-  font-size: 18px;
+/* Nombre del Jugador */
+.jugador-nombre-mini {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.btn-cambio {
+/* Indicadores de Faltas - 5 círculos */
+.jugador-faltas-mini {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.falta-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4a4a4a;
+  border: 1px solid #5a5a5a;
+  transition: all 0.2s ease;
+}
+
+.falta-dot.active {
+  background: #FFC107;
+  border-color: #FFA000;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+}
+
+/* Puntos del Jugador */
+.jugador-puntos-mini {
+  width: 45px;
+  height: 45px;
+  background: #1a1a1a;
+  border: 2px solid #3a3a3a;
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #4CAF50;
+  flex-shrink: 0;
+}
+
+/* Botón de Cambio */
+.btn-cambio-compact {
+  margin: 10px;
+  padding: 12px;
   background: rgba(255, 127, 0, 0.2);
   border: 1px solid #FF7F00;
   border-radius: 8px;
   color: #FF7F00;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-cambio:hover {
+.btn-cambio-compact:hover {
   background: rgba(255, 127, 0, 0.3);
-  transform: translateY(-2px);
 }
 
-.jugadores-en-cancha {
+/* ============================================
+   PANEL CENTRAL - MARCADOR Y TIMER
+   ============================================ */
+.center-panel {
+  background: #1a1a1a;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.jugador-en-cancha {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-  background: #2d3748;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.jugador-en-cancha:hover {
-  background: #3d4758;
-}
-
-.jugador-numero-grande {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #FF7F00, #FFA500);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 28px;
+  align-items: center;
+  padding: 40px 20px;
+  gap: 30px;
+}
+
+/* Marcador Principal - GIGANTE como la referencia */
+.scoreboard-large {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 40px;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+.score-team {
+  text-align: center;
+}
+
+.score-value {
+  font-size: 140px;
   font-weight: 900;
-  flex-shrink: 0;
+  line-height: 1;
+  color: white;
+  font-family: 'Arial Black', sans-serif;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-.jugador-detalles {
-  flex: 1;
+.score-label {
+  font-size: 14px;
+  color: #888;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
 }
 
-.jugador-detalles h4 {
-  margin: 0 0 4px 0;
-  font-size: 16px;
-}
-
-.jugador-detalles small {
-  color: #a0aec0;
-  font-size: 13px;
-}
-
-.jugador-acciones {
+/* Divisor Central con Faltas y Período */
+.score-divider {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 25px;
+  align-items: center;
+  padding: 0 20px;
 }
 
-.btn-icon-action {
-  width: 40px;
-  height: 40px;
+.faltas-equipo {
+  text-align: center;
+}
+
+.falta-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.falta-count {
+  font-size: 32px;
+  font-weight: 900;
+  color: #FFC107;
+  font-family: 'Arial Black', sans-serif;
+}
+
+.periodo-central {
+  background: #2a2a2a;
+  border: 2px solid #FF7F00;
+  border-radius: 12px;
+  padding: 20px 30px;
+  text-align: center;
+}
+
+.periodo-number {
+  font-size: 48px;
+  font-weight: 900;
+  color: #FF7F00;
+  font-family: 'Arial Black', sans-serif;
+  line-height: 1;
+}
+
+.periodo-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* Temporizador - Grande y prominente */
+.timer-section-large {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.timer-display {
+  font-size: 96px;
+  font-weight: 900;
+  font-family: 'Courier New', 'DS-Digital', monospace;
+  color: white;
+  letter-spacing: 10px;
+  text-shadow: 0 0 30px rgba(255, 127, 0, 0.5);
+  line-height: 1;
+  margin-bottom: 25px;
+}
+
+/* Controles del Timer - Estilo Referencia */
+.timer-controls-large {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-timer-ctrl {
+  width: 70px;
+  height: 70px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
+  background: #2a2a2a;
+  border: 2px solid #3a3a3a;
+  color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-}
-
-.btn-punto {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
-}
-
-.btn-punto:hover {
-  background: rgba(76, 175, 80, 0.3);
-  transform: scale(1.1);
-}
-
-.btn-falta {
-  background: rgba(255, 193, 7, 0.2);
-  color: #FFC107;
-}
-
-.btn-falta:hover {
-  background: rgba(255, 193, 7, 0.3);
-  transform: scale(1.1);
-}
-
-.match-actions {
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #f44336, #e53935);
-  color: white;
-  padding: 16px 32px;
   font-size: 16px;
+  font-weight: 700;
 }
 
-.btn-danger:hover {
+.btn-timer-ctrl:hover {
+  background: #3a3a3a;
+  border-color: #FF7F00;
+  transform: scale(1.05);
+}
+
+.btn-timer-ctrl.btn-play {
+  background: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.btn-timer-ctrl.btn-play:hover {
+  background: #45a049;
+}
+
+.btn-timer-ctrl.btn-pause {
+  background: #FFC107;
+  border-color: #FFC107;
+  color: #1a1a1a;
+}
+
+.btn-timer-ctrl.btn-pause:hover {
+  background: #FFB300;
+}
+
+/* Acciones Rápidas */
+.quick-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.btn-quick {
+  padding: 12px 24px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.btn-quick:hover {
+  background: #3a3a3a;
+  border-color: #FF7F00;
+}
+
+.btn-next-period {
+  background: rgba(255, 127, 0, 0.2);
+  border-color: #FF7F00;
+  color: #FF7F00;
+}
+
+.btn-finalizar-large {
+  margin-top: 30px;
+  padding: 16px 40px;
+  background: linear-gradient(135deg, #f44336, #e53935);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-finalizar-large:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
 }
 
-/* MODALES */
+/* Barra de Acciones (oculta en diseño referencia) */
+.player-actions-bar {
+  display: none;
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
@@ -556,7 +757,7 @@
 }
 
 .modal-content {
-  background: #1a1f2e;
+  background: #2a2a2a;
   border-radius: 16px;
   width: 700px;
   max-width: 95vw;
@@ -568,7 +769,7 @@
 }
 
 .modal-content-small {
-  background: #1a1f2e;
+  background: #2a2a2a;
   border-radius: 16px;
   width: 500px;
   max-width: 95vw;
@@ -643,7 +844,7 @@
   align-items: center;
   gap: 8px;
   padding: 15px;
-  background: #2d3748;
+  background: #333;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -699,6 +900,11 @@
 .btn-secondary {
   background: #4a5568;
   color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .btn-secondary:hover {
@@ -715,6 +921,19 @@
   font-size: 18px;
 }
 
+.jugador-numero-grande {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #FF7F00, #FFA500);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 900;
+  margin: 0 auto 15px;
+}
+
 .puntos-opciones {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -727,7 +946,7 @@
   align-items: center;
   gap: 8px;
   padding: 30px 20px;
-  background: #2d3748;
+  background: #333;
   border: 2px solid transparent;
   border-radius: 12px;
   color: white;
@@ -753,7 +972,12 @@
 
 .btn-warning {
   background: linear-gradient(135deg, #FFC107, #FFB300);
-  color: #1a1f2e;
+  color: #1a1a1a;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .btn-warning:hover {
@@ -761,36 +985,90 @@
   box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .quintetos-grid {
-    grid-template-columns: 1fr;
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1200px) {
+  .main-board {
+    grid-template-columns: 250px 1fr 250px;
   }
 
-  .scoreboard {
+  .score-value {
+    font-size: 100px;
+  }
+
+  .timer-display {
+    font-size: 72px;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-board {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .team-panel {
+    border-right: none;
+    border-bottom: 1px solid #3a3a3a;
+  }
+
+  .team-panel.team-visitante {
+    border-left: none;
+  }
+
+  .scoreboard-large {
     grid-template-columns: 1fr;
     gap: 20px;
   }
 
-  .timer {
-    font-size: 48px;
+  .score-divider {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
   }
 
-  .score {
+  .score-value {
+    font-size: 80px;
+  }
+
+  .timer-display {
     font-size: 56px;
+  }
+
+  .jugadores-list {
+    max-height: 300px;
+    overflow-y: auto;
   }
 }
 
-@media (max-width: 768px) {
-  .jugadores-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 600px) {
+  .jugador-item {
+    grid-template-columns: 40px 1fr 40px;
+    gap: 8px;
   }
 
-  .jugadores-cambio {
-    grid-template-columns: repeat(2, 1fr);
+  .jugador-faltas-mini {
+    display: none;
   }
 
-  .puntos-opciones {
-    grid-template-columns: 1fr;
+  .jugador-numero-mini {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .jugador-puntos-mini {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .score-value {
+    font-size: 60px;
+  }
+
+  .timer-display {
+    font-size: 48px;
   }
 }

@@ -2,12 +2,12 @@
   <div class="card-navy">
     <div class="header">
       <button class="back" type="button" (click)="volver()">← Volver</button>
-      <h2 *ngIf="torneo; else titulo">Torneo: {{ torneo?.nombre }}</h2>
+      <h2 *ngIf="torneo; else titulo">Torneo: {{ torneo.nombre }}</h2>
       <ng-template #titulo><h2>Detalle del torneo</h2></ng-template>
     </div>
 
     <!-- Estados de carga / error -->
-    <div *ngIf="loading" class="state">Cargando…</div>
+    <div *ngIf="loading" class="state">Cargando...</div>
     <div *ngIf="!loading && error" class="state err">{{ error }}</div>
 
     <!-- Info principal del torneo -->
@@ -30,16 +30,67 @@
       </div>
     </div>
 
-    <!-- Panels secundarios (maquetados; conecta cuando tengas endpoints) -->
+    <!-- Panels secundarios -->
     <div *ngIf="!loading && torneo" class="panels">
       <div class="panel">
         <h3>Tabla general</h3>
-        <div class="placeholder">Próximamente: tabla de posiciones.</div>
+        <div *ngIf="loadingStandings" class="placeholder">Cargando tabla...</div>
+        <div *ngIf="!loadingStandings && standings.length === 0" class="placeholder">
+          No hay partidos jugados aún.
+        </div>
+        <div *ngIf="!loadingStandings && standings.length > 0" class="table-container">
+          <table class="standings-table">
+            <thead>
+              <tr>
+                <th>Pos</th>
+                <th>Equipo</th>
+                <th>JJ</th>
+                <th>JG</th>
+                <th>JP</th>
+                <th>PF</th>
+                <th>PC</th>
+                <th>DIF</th>
+                <th>PTS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of standings; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td class="team-name">{{ row.equipo }}</td>
+                <td>{{ row.jj }}</td>
+                <td>{{ row.jg }}</td>
+                <td>{{ row.jp }}</td>
+                <td>{{ row.pf }}</td>
+                <td>{{ row.pc }}</td>
+                <td [class.positive]="row.dif > 0" [class.negative]="row.dif < 0">
+                  {{ row.dif > 0 ? '+' : '' }}{{ row.dif }}
+                </td>
+                <td class="pts">{{ row.pts }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="panel">
         <h3>Campeones canasteros</h3>
-        <div class="placeholder">Próximamente: líderes anotadores.</div>
+        <div *ngIf="loadingScorers" class="placeholder">Cargando anotadores...</div>
+        <div *ngIf="!loadingScorers && scorers.length === 0" class="placeholder">
+          No hay estadísticas disponibles.
+        </div>
+        <div *ngIf="!loadingScorers && scorers.length > 0" class="scorers-list">
+          <div *ngFor="let scorer of scorers; let i = index" class="scorer-item">
+            <span class="rank">{{ i + 1 }}.</span>
+            <div class="scorer-info">
+              <div class="scorer-name">{{ scorer.jugador }}</div>
+              <div class="scorer-team">{{ scorer.equipo }}</div>
+            </div>
+            <div class="scorer-stats">
+              <span class="pts-label">{{ scorer.pts }} pts</span>
+              <span class="games-label">{{ scorer.jj }} JJ</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="panel span-2">

@@ -29,7 +29,7 @@
           <div class="equipo-logo-large">
             <img *ngIf="equipoSeleccionandoData?.logo_url" [src]="equipoSeleccionandoData?.logo_url">
             <span *ngIf="!equipoSeleccionandoData?.logo_url">
-            {{ equipoSeleccionandoData?.nombre?.charAt(0) }}
+              {{ equipoSeleccionandoData?.nombre?.charAt(0) }}
             </span>
           </div>
           <h2>{{ equipoSeleccionandoData?.nombre }}</h2>
@@ -82,148 +82,262 @@
 
   <!-- TABLERO EN VIVO -->
   <div class="live-board" *ngIf="!seleccionandoQuinteto && !loading && partido">
-    <!-- Header del Partido -->
-    <div class="match-header">
-      <button class="btn-back-small" (click)="goBack()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    
+    <!-- Header Superior -->
+    <div class="match-header-compact">
+      <button class="btn-back-icon" (click)="goBack()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
         </svg>
       </button>
-      <div class="match-info">
-        <span class="live-indicator">🔴 EN VIVO</span>
-        <span class="periodo">Período {{ partido.periodo_actual }}</span>
+      
+      <div class="match-title">
+        <h2>{{ partido.equipo_local.nombre }} <span class="vs">VS</span> {{ partido.equipo_visitante.nombre }}</h2>
+      </div>
+
+      <div class="match-indicators">
+        <span class="live-badge">🔴 EN VIVO</span>
+        <span class="periodo-badge">{{ getNombrePeriodo() }}</span>
       </div>
     </div>
 
-    <!-- Marcador Principal -->
-    <div class="scoreboard">
-      <!-- Equipo Local -->
-      <div class="team-score">
-        <div class="team-logo">
-          <img *ngIf="partido.equipo_local.logo_url" [src]="partido.equipo_local.logo_url">
-          <span *ngIf="!partido.equipo_local.logo_url">
-            {{ partido.equipo_local.nombre.charAt(0) }}
-          </span>
-        </div>
-        <h3 class="team-name">{{ partido.equipo_local.nombre }}</h3>
-        <div class="score">{{ partido.equipo_local.puntos }}</div>
-        <div class="team-faltas">Faltas: {{ partido.equipo_local.faltas }}</div>
-      </div>
-
-      <!-- Timer -->
-      <div class="timer-section">
-        <div class="timer">{{ formatearTiempo(tiempoTranscurrido) }}</div>
-        <div class="timer-controls">
-          <button class="btn-timer" (click)="startTimer()" *ngIf="!timerActivo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </button>
-          <button class="btn-timer" (click)="pauseTimer()" *ngIf="timerActivo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Equipo Visitante -->
-      <div class="team-score">
-        <div class="team-logo">
-          <img *ngIf="partido.equipo_visitante.logo_url" [src]="partido.equipo_visitante.logo_url">
-          <span *ngIf="!partido.equipo_visitante.logo_url">
-            {{ partido.equipo_visitante.nombre.charAt(0) }}
-          </span>
-        </div>
-        <h3 class="team-name">{{ partido.equipo_visitante.nombre }}</h3>
-        <div class="score">{{ partido.equipo_visitante.puntos }}</div>
-        <div class="team-faltas">Faltas: {{ partido.equipo_visitante.faltas }}</div>
-      </div>
-    </div>
-
-    <!-- Quintetos en Cancha -->
-    <div class="quintetos-grid">
-      <!-- Local -->
-      <div class="quinteto-section">
-        <div class="quinteto-header-live">
-          <h3>🏠 {{ partido.equipo_local.nombre }}</h3>
-          <button class="btn-cambio" (click)="abrirModalCambio('LOCAL')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
-            </svg>
-            Cambio
-          </button>
-        </div>
-
-        <div class="jugadores-en-cancha">
-          <div class="jugador-en-cancha"
-               *ngFor="let jugador of partido.equipo_local.quinteto">
-            <div class="jugador-numero-grande">{{ jugador.dorsal }}</div>
-            <div class="jugador-detalles">
-              <h4>{{ jugador.nombres }} {{ jugador.ap_p }}</h4>
-              <small>{{ jugador.ap_m || '' }}</small>
-            </div>
-            <div class="jugador-acciones">
-              <button class="btn-icon-action btn-punto" (click)="abrirModalPuntos('LOCAL', jugador)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                </svg>
-              </button>
-              <button class="btn-icon-action btn-falta" (click)="abrirModalFaltas('LOCAL', jugador)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                </svg>
-              </button>
-            </div>
+    <!-- Layout Principal: 3 Columnas -->
+    <div class="main-board">
+      
+      <!-- ========================================
+           PANEL IZQUIERDO: EQUIPO LOCAL
+           ======================================== -->
+      <div class="team-panel team-local">
+        <div class="team-panel-header">
+          <h3>{{ partido.equipo_local.nombre }}</h3>
+          
+          <!-- Botones de Puntos -->
+          <div class="team-actions">
+            <button class="btn-team-action btn-add" (click)="abrirModalPuntosSumar('LOCAL')" title="Sumar puntos">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+            </button>
+            <button class="btn-team-action btn-subtract" (click)="abrirModalPuntosRestar('LOCAL')" title="Restar puntos">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13H5v-2h14v2z"/>
+              </svg>
+            </button>
           </div>
         </div>
+
+        <!-- Timeouts -->
+        <div class="timeouts-section">
+          <span class="timeouts-label">Timeouts:</span>
+          <div class="timeouts-dots">
+            <div class="timeout-dot" [class.active]="i < partido.equipo_local.timeouts" 
+                 *ngFor="let i of [0,1,2]"
+                 (click)="usarTimeout('LOCAL')"></div>
+          </div>
+        </div>
+
+        <div class="jugadores-list">
+          <div class="jugador-item"
+               *ngFor="let jugador of partido.equipo_local.quinteto"
+               [class.encancha]="jugador.enCancha"
+               [class.expulsado]="jugador.faltas >= 5">
+            
+            <!-- # Número -->
+            <div class="jugador-numero-mini">{{ jugador.dorsal }}</div>
+            
+            <!-- Nombre -->
+            <div class="jugador-nombre-mini">
+              <span>{{ jugador.nombres }} {{ jugador.ap_p }}</span>
+            </div>
+            
+            <!-- 5 Círculos de Faltas -->
+            <div class="jugador-faltas-mini" (click)="abrirModalFaltas('LOCAL', jugador)">
+              <div class="falta-dot" 
+                   [class.active]="i < jugador.faltas"
+                   [class.expulsion]="i === 4 && jugador.faltas >= 5"
+                   *ngFor="let i of [0,1,2,3,4]"></div>
+            </div>
+            
+            <!-- Puntos -->
+            <div class="jugador-puntos-mini">{{ jugador.puntos }}</div>
+          </div>
+        </div>
+
+        <button class="btn-cambio-compact" (click)="abrirModalCambio('LOCAL')">
+          🔄 Cambio
+        </button>
       </div>
 
-      <!-- Visitante -->
-      <div class="quinteto-section">
-        <div class="quinteto-header-live">
-          <h3>✈️ {{ partido.equipo_visitante.nombre }}</h3>
-          <button class="btn-cambio" (click)="abrirModalCambio('VISITANTE')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+      <!-- ========================================
+           PANEL CENTRAL: MARCADOR Y TIMER
+           ======================================== -->
+      <div class="center-panel">
+        
+        <!-- Marcador Principal -->
+        <div class="scoreboard-large">
+          <!-- Score Local -->
+          <div class="score-team">
+            <div class="score-value">{{ partido.equipo_local.puntos }}</div>
+            <div class="score-label">LOCAL</div>
+          </div>
+
+          <!-- Divisor Central -->
+          <div class="score-divider">
+            <!-- Faltas Local -->
+            <div class="faltas-equipo">
+              <div class="falta-label">Faltas</div>
+              <div class="falta-count">{{ partido.equipo_local.faltas }}</div>
+            </div>
+            
+            <!-- Período -->
+            <div class="periodo-central">
+              <div class="periodo-number">{{ partido.periodo_actual }}</div>
+              <div class="periodo-label">{{ partido.en_overtime ? 'OT' : 'Período' }}</div>
+            </div>
+
+            <!-- Faltas Visitante -->
+            <div class="faltas-equipo">
+              <div class="falta-label">Faltas</div>
+              <div class="falta-count">{{ partido.equipo_visitante.faltas }}</div>
+            </div>
+          </div>
+
+          <!-- Score Visitante -->
+          <div class="score-team">
+            <div class="score-value">{{ partido.equipo_visitante.puntos }}</div>
+            <div class="score-label">VISITANTE</div>
+          </div>
+        </div>
+
+        <!-- Temporizador -->
+        <div class="timer-section-large">
+          <div class="timer-display" (click)="abrirModalEditarTiempo()">
+            {{ formatearTiempo(tiempoTranscurrido) }}
+          </div>
+          
+          <!-- Controles: - | PAUSE/PLAY | + -->
+          <div class="timer-controls-large">
+            <!-- Botón - -->
+            <button class="btn-timer-ctrl" (click)="restarTiempo()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13H5v-2h14v2z"/>
+              </svg>
+            </button>
+
+            <!-- Botón PLAY -->
+            <button class="btn-timer-ctrl btn-play" (click)="startTimer()" *ngIf="!timerActivo">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+
+            <!-- Botón PAUSE -->
+            <button class="btn-timer-ctrl btn-pause" (click)="pauseTimer()" *ngIf="timerActivo">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+              </svg>
+            </button>
+
+            <!-- Botón + -->
+            <button class="btn-timer-ctrl" (click)="agregarTiempo()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="quick-actions">
+          <button class="btn-quick" (click)="resetTimer()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
             </svg>
-            Cambio
+            Reiniciar
+          </button>
+          
+          <button class="btn-quick btn-next-period" (click)="siguientePeriodo()">
+            Siguiente Período ➔
           </button>
         </div>
 
-        <div class="jugadores-en-cancha">
-          <div class="jugador-en-cancha"
-               *ngFor="let jugador of partido.equipo_visitante.quinteto">
-            <div class="jugador-numero-grande">{{ jugador.dorsal }}</div>
-            <div class="jugador-detalles">
-              <h4>{{ jugador.nombres }} {{ jugador.ap_p }}</h4>
-              <small>{{ jugador.ap_m || '' }}</small>
-            </div>
-            <div class="jugador-acciones">
-              <button class="btn-icon-action btn-punto" (click)="abrirModalPuntos('VISITANTE', jugador)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                </svg>
-              </button>
-              <button class="btn-icon-action btn-falta" (click)="abrirModalFaltas('VISITANTE', jugador)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                </svg>
-              </button>
-            </div>
+        <!-- Botón Finalizar -->
+        <button class="btn-finalizar-large" (click)="finalizarPartido()">
+          🏁 Finalizar Partido
+        </button>
+      </div>
+
+      <!-- ========================================
+           PANEL DERECHO: EQUIPO VISITANTE
+           ======================================== -->
+      <div class="team-panel team-visitante">
+        <div class="team-panel-header">
+          <h3>{{ partido.equipo_visitante.nombre }}</h3>
+          
+          <!-- Botones de Puntos -->
+          <div class="team-actions">
+            <button class="btn-team-action btn-add" (click)="abrirModalPuntosSumar('VISITANTE')" title="Sumar puntos">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+            </button>
+            <button class="btn-team-action btn-subtract" (click)="abrirModalPuntosRestar('VISITANTE')" title="Restar puntos">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13H5v-2h14v2z"/>
+              </svg>
+            </button>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Acciones del Partido -->
-    <div class="match-actions">
-      <button class="btn btn-danger" (click)="finalizarPartido()">
-        Finalizar Partido
-      </button>
+        <!-- Timeouts -->
+        <div class="timeouts-section">
+          <span class="timeouts-label">Timeouts:</span>
+          <div class="timeouts-dots">
+            <div class="timeout-dot" [class.active]="i < partido.equipo_visitante.timeouts" 
+                 *ngFor="let i of [0,1,2]"
+                 (click)="usarTimeout('VISITANTE')"></div>
+          </div>
+        </div>
+
+        <div class="jugadores-list">
+          <div class="jugador-item"
+               *ngFor="let jugador of partido.equipo_visitante.quinteto"
+               [class.encancha]="jugador.enCancha"
+               [class.expulsado]="jugador.faltas >= 5">
+            
+            <!-- Puntos -->
+            <div class="jugador-puntos-mini">{{ jugador.puntos }}</div>
+            
+            <!-- 5 Círculos de Faltas -->
+            <div class="jugador-faltas-mini" (click)="abrirModalFaltas('VISITANTE', jugador)">
+              <div class="falta-dot" 
+                   [class.active]="i < jugador.faltas"
+                   [class.expulsion]="i === 4 && jugador.faltas >= 5"
+                   *ngFor="let i of [0,1,2,3,4]"></div>
+            </div>
+            
+            <!-- Nombre -->
+            <div class="jugador-nombre-mini">
+              <span>{{ jugador.nombres }} {{ jugador.ap_p }}</span>
+            </div>
+            
+            <!-- # Número -->
+            <div class="jugador-numero-mini">{{ jugador.dorsal }}</div>
+          </div>
+        </div>
+
+        <button class="btn-cambio-compact" (click)="abrirModalCambio('VISITANTE')">
+          🔄 Cambio
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
+
+<!-- ========================================
+     MODALES
+     ======================================== -->
 
 <!-- MODAL DE CAMBIO -->
 <div class="modal-overlay" *ngIf="modalCambioAbierto" (click)="cerrarModalCambio()">
@@ -261,10 +375,12 @@
           <div class="jugador-cambio-card"
                *ngFor="let jugador of equipoCambio === 'LOCAL' ? (partido?.equipo_local?.banco || []) : (partido?.equipo_visitante?.banco || [])"
                [class.selected]="jugadorEntrante?.id_jugador === jugador.id_jugador"
-               (click)="seleccionarJugadorEntrante(jugador)">
+               [class.disabled]="jugador.faltas >= 5"
+               (click)="jugador.faltas < 5 && seleccionarJugadorEntrante(jugador)">
             <div class="jugador-numero-cambio">{{ jugador.dorsal }}</div>
             <div class="jugador-nombre-cambio">
               {{ jugador.nombres }} {{ jugador.ap_p }}
+              <span *ngIf="jugador.faltas >= 5" class="expulsado-label">EXPULSADO</span>
             </div>
           </div>
         </div>
@@ -282,11 +398,11 @@
   </div>
 </div>
 
-<!-- MODAL DE PUNTOS -->
+<!-- MODAL DE PUNTOS - NUEVO DISEÑO -->
 <div class="modal-overlay" *ngIf="modalPuntosAbierto" (click)="cerrarModalPuntos()">
-  <div class="modal-content-small" (click)="$event.stopPropagation()">
+  <div class="modal-content-large" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>🏀 Registrar Puntos</h2>
+      <h2>{{ accionPuntos === 'SUMAR' ? '➕ Sumar Puntos' : '➖ Restar Puntos' }}</h2>
       <button class="btn-close" (click)="cerrarModalPuntos()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -295,24 +411,38 @@
     </div>
 
     <div class="modal-body">
-      <div class="jugador-puntos-info">
-        <div class="jugador-numero-grande">{{ jugadorPuntos?.dorsal }}</div>
-        <h3>{{ getNombreCompleto(jugadorPuntos!) }}</h3>
+      <!-- Selección de Jugador -->
+      <div class="puntos-jugador-section">
+        <h3>Selecciona el jugador:</h3>
+        <div class="jugadores-puntos-grid">
+          <div class="jugador-punto-card"
+               *ngFor="let jugador of equipoPuntos === 'LOCAL' ? (partido?.equipo_local?.quinteto || []) : (partido?.equipo_visitante?.quinteto || [])"
+               [class.selected]="jugadorPuntos?.id_jugador === jugador.id_jugador"
+               (click)="seleccionarJugadorParaPuntos(jugador)">
+            <div class="jugador-numero-punto">{{ jugador.dorsal }}</div>
+            <div class="jugador-nombre-punto">{{ jugador.nombres }} {{ jugador.ap_p }}</div>
+            <div class="jugador-stats-punto">{{ jugador.puntos }} pts</div>
+          </div>
+        </div>
       </div>
 
-      <div class="puntos-opciones">
-        <button class="btn-punto-valor" (click)="registrarPuntos(1)">
-          <span class="valor">1</span>
-          <small>Tiro Libre</small>
-        </button>
-        <button class="btn-punto-valor" (click)="registrarPuntos(2)">
-          <span class="valor">2</span>
-          <small>Canasta</small>
-        </button>
-        <button class="btn-punto-valor" (click)="registrarPuntos(3)">
-          <span class="valor">3</span>
-          <small>Triple</small>
-        </button>
+      <!-- Selección de Valor -->
+      <div class="puntos-valor-section" *ngIf="jugadorPuntos">
+        <h3>Selecciona el valor:</h3>
+        <div class="puntos-opciones">
+          <button class="btn-punto-valor" (click)="registrarPuntos(1)">
+            <span class="valor">{{ accionPuntos === 'SUMAR' ? '+1' : '-1' }}</span>
+            <small>Tiro Libre</small>
+          </button>
+          <button class="btn-punto-valor" (click)="registrarPuntos(2)">
+            <span class="valor">{{ accionPuntos === 'SUMAR' ? '+2' : '-2' }}</span>
+            <small>Canasta</small>
+          </button>
+          <button class="btn-punto-valor" (click)="registrarPuntos(3)">
+            <span class="valor">{{ accionPuntos === 'SUMAR' ? '+3' : '-3' }}</span>
+            <small>Triple</small>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -331,17 +461,66 @@
     </div>
 
     <div class="modal-body">
-      <div class="jugador-puntos-info">
-        <div class="jugador-numero-grande">{{ jugadorFaltas?.dorsal }}</div>
-        <h3>{{ getNombreCompleto(jugadorFaltas!) }}</h3>
+      <div class="jugador-puntos-info" *ngIf="jugadorFaltas">
+        <div class="jugador-numero-grande">{{ jugadorFaltas.dorsal }}</div>
+        <h3>{{ getNombreCompleto(jugadorFaltas) }}</h3>
+        <p class="faltas-actuales">Faltas actuales: {{ jugadorFaltas.faltas }}/5</p>
       </div>
 
-      <p style="text-align: center; margin: 20px 0;">¿Confirmar falta personal?</p>
+      <p style="text-align: center; margin: 20px 0; color: #ddd;">
+        ¿Confirmar falta personal?
+        <span *ngIf="jugadorFaltas && jugadorFaltas.faltas === 4" style="display: block; color: #ff3333; font-weight: 700; margin-top: 10px;">
+          ⚠️ Esta será su QUINTA falta - Será EXPULSADO
+        </span>
+      </p>
 
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="cerrarModalFaltas()">Cancelar</button>
         <button class="btn btn-warning" (click)="registrarFalta()">Confirmar Falta</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR TIEMPO -->
+<div class="modal-overlay" *ngIf="modalEditarTiempoAbierto" (click)="cerrarModalEditarTiempo()">
+  <div class="modal-content-small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⏱️ Editar Tiempo</h2>
+      <button class="btn-close" (click)="cerrarModalEditarTiempo()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="editar-tiempo-form">
+        <div class="tiempo-input-group">
+          <label>Minutos</label>
+          <input type="number" 
+                 [(ngModel)]="minutosEditar" 
+                 min="0" 
+                 max="99"
+                 class="tiempo-input">
+        </div>
+        
+        <div class="tiempo-separator">:</div>
+        
+        <div class="tiempo-input-group">
+          <label>Segundos</label>
+          <input type="number" 
+                 [(ngModel)]="segundosEditar" 
+                 min="0" 
+                 max="59"
+                 class="tiempo-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrarModalEditarTiempo()">Cancelar</button>
+      <button class="btn btn-primary" (click)="confirmarEditarTiempo()">Confirmar</button>
     </div>
   </div>
 </div>
