@@ -2,7 +2,7 @@
   <div class="card-navy">
     <div class="header">
       <button class="back" type="button" (click)="volver()">← Volver</button>
-      <h2 *ngIf="torneo; else titulo">Torneo: {{ torneo.nombre }}</h2>
+      <h2 *ngIf="torneo; else titulo">{{ torneo.nombre }}</h2>
       <ng-template #titulo><h2>Detalle del torneo</h2></ng-template>
     </div>
 
@@ -32,8 +32,25 @@
 
     <!-- Panels secundarios -->
     <div *ngIf="!loading && torneo" class="panels">
+      
+      <!-- TABLA GENERAL -->
       <div class="panel">
-        <h3>Tabla general</h3>
+        <div class="panel-header">
+          <h3>📊 Tabla general</h3>
+          <button 
+            *ngIf="standings.length > 0"
+            class="btn-download" 
+            (click)="downloadStandingsPDF()"
+            [disabled]="downloadingPDF"
+            title="Descargar tabla en PDF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            </svg>
+            <span *ngIf="!downloadingPDF">PDF</span>
+            <span *ngIf="downloadingPDF">...</span>
+          </button>
+        </div>
+        
         <div *ngIf="loadingStandings" class="placeholder">Cargando tabla...</div>
         <div *ngIf="!loadingStandings && standings.length === 0" class="placeholder">
           No hay partidos jugados aún.
@@ -72,8 +89,24 @@
         </div>
       </div>
 
+      <!-- CAMPEONES CANASTEROS -->
       <div class="panel">
-        <h3>Campeones canasteros</h3>
+        <div class="panel-header">
+          <h3>🏀 Campeones canasteros</h3>
+          <button 
+            *ngIf="scorers.length > 0"
+            class="btn-download" 
+            (click)="downloadScorersPDF()"
+            [disabled]="downloadingPDF"
+            title="Descargar anotadores en PDF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            </svg>
+            <span *ngIf="!downloadingPDF">PDF</span>
+            <span *ngIf="downloadingPDF">...</span>
+          </button>
+        </div>
+
         <div *ngIf="loadingScorers" class="placeholder">Cargando anotadores...</div>
         <div *ngIf="!loadingScorers && scorers.length === 0" class="placeholder">
           No hay estadísticas disponibles.
@@ -93,10 +126,61 @@
         </div>
       </div>
 
+      <!-- PRÓXIMOS JUEGOS -->
       <div class="panel span-2">
-        <h3>Próximos juegos</h3>
-        <div class="placeholder">Próximamente: lista de partidos.</div>
+        <div class="panel-header">
+          <h3>📅 Próximos juegos</h3>
+          <button 
+            class="btn-download" 
+            (click)="downloadSchedulePDF()"
+            [disabled]="downloadingPDF"
+            title="Descargar calendario en PDF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            </svg>
+            <span *ngIf="!downloadingPDF">PDF</span>
+            <span *ngIf="downloadingPDF">...</span>
+          </button>
+        </div>
+
+        <div *ngIf="loadingGames" class="placeholder">Cargando partidos...</div>
+        <div *ngIf="!loadingGames && upcomingGames.length === 0" class="placeholder">
+          No hay partidos programados.
+        </div>
+        
+        <!-- Lista de próximos partidos -->
+        <div *ngIf="!loadingGames && upcomingGames.length > 0" class="games-list">
+          <div *ngFor="let game of upcomingGames" class="game-card">
+            <div class="game-date">
+              <div class="date-day">{{ formatDate(game.fecha) }}</div>
+              <div class="date-time">{{ game.hora || 'Por definir' }}</div>
+            </div>
+            <div class="game-teams">
+              <div class="team team-local">
+                <span class="team-badge">🏠</span>
+                <span class="team-name">{{ game.equipo_local_nombre }}</span>
+              </div>
+              <div class="game-vs">VS</div>
+              <div class="team team-visitor">
+                <span class="team-name">{{ game.equipo_visitante_nombre }}</span>
+                <span class="team-badge">✈️</span>
+              </div>
+            </div>
+            <div class="game-venue">
+              <span class="venue-icon">📍</span>
+              <span>{{ game.cancha || 'Cancha principal' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+
+    <!-- Notificación de descarga -->
+    <div *ngIf="downloadMessage" class="download-notification">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </svg>
+      <span>{{ downloadMessage }}</span>
     </div>
   </div>
 </section>

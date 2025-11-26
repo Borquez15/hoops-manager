@@ -35,8 +35,12 @@
   padding:6px 10px;
   cursor:pointer;
   font-size: 14px;
+  transition: all 0.2s;
 }
-.back:hover{ background:rgba(255,255,255,.06); }
+.back:hover{ 
+  background:rgba(255,255,255,.06); 
+  transform: translateX(-2px);
+}
 
 h2{ margin:0; font-weight:800; letter-spacing:1px; }
 
@@ -55,12 +59,20 @@ h2{ margin:0; font-weight:800; letter-spacing:1px; }
   border:1px solid rgba(255,255,255,.09);
   border-radius:14px;
   padding:14px;
+  transition: all 0.2s;
+}
+.info:hover{
+  background:rgba(255,255,255,.08);
+  transform: translateY(-2px);
 }
 .label{ opacity:.8; font-size:.85rem; }
 .value{ font-weight:800; font-size:1.05rem; margin-top: 4px; }
 .tag{
-  background:#e57f3d; color:#fff;
-  display:inline-block; padding:2px 8px; border-radius:8px;
+  background:#e57f3d; 
+  color:#fff;
+  display:inline-block; 
+  padding:2px 8px; 
+  border-radius:8px;
 }
 
 .panels{
@@ -74,8 +86,54 @@ h2{ margin:0; font-weight:800; letter-spacing:1px; }
   border:1px solid rgba(255,255,255,.08);
   border-radius:16px;
   padding:16px;
+  transition: all 0.3s;
 }
-.panel h3{ margin:0 0 10px; font-size: 1.1rem; }
+.panel:hover{
+  border-color:rgba(255,255,255,.15);
+}
+
+/* Header del panel con botón de descarga */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.panel h3{ margin:0; font-size: 1.1rem; }
+
+/* Botón de descarga PDF */
+.btn-download {
+  background: #e57f3d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-download:hover:not(:disabled) {
+  background: #ff8c42;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(229, 127, 61, 0.4);
+}
+
+.btn-download:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-download svg {
+  width: 18px;
+  height: 18px;
+}
+
 .placeholder{
   opacity:.8;
   background:rgba(255,255,255,.05);
@@ -195,6 +253,154 @@ h2{ margin:0; font-weight:800; letter-spacing:1px; }
   opacity: 0.7;
 }
 
+/* Lista de próximos juegos */
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Scrollbar personalizado */
+.games-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.games-list::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.05);
+  border-radius: 3px;
+}
+
+.games-list::-webkit-scrollbar-thumb {
+  background: #e57f3d;
+  border-radius: 3px;
+}
+
+.game-card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.game-card:hover {
+  background: rgba(255,255,255,.08);
+  border-color: #e57f3d;
+  transform: translateX(4px);
+}
+
+.game-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(229, 127, 61, 0.15);
+  border: 1px solid rgba(229, 127, 61, 0.3);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.date-day {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #e57f3d;
+}
+
+.date-time {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.game-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.team-local {
+  justify-content: flex-start;
+}
+
+.team-visitor {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+
+.team-badge {
+  font-size: 1.2rem;
+}
+
+.team-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.game-vs {
+  font-weight: 800;
+  color: #e57f3d;
+  font-size: 0.85rem;
+  padding: 0 8px;
+}
+
+.game-venue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  grid-column: 1 / -1;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.venue-icon {
+  font-size: 1rem;
+}
+
+/* Notificación de descarga */
+.download-notification {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  animation: slideInUp 0.3s ease;
+  z-index: 1000;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 780px){
   .info-grid{ grid-template-columns: 1fr 1fr; }
   .panels{ grid-template-columns: 1fr; }
@@ -207,5 +413,20 @@ h2{ margin:0; font-weight:800; letter-spacing:1px; }
   .standings-table th,
   .standings-table td {
     padding: 6px 4px;
+  }
+
+  .game-card {
+    grid-template-columns: 70px 1fr;
+  }
+
+  .team-name {
+    font-size: 0.85rem;
+  }
+
+  .download-notification {
+    bottom: 20px;
+    right: 20px;
+    left: 20px;
+    font-size: 0.9rem;
   }
 }
