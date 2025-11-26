@@ -126,10 +126,10 @@
         </div>
       </div>
 
-      <!-- PRÓXIMOS JUEGOS -->
+      <!-- PRÓXIMOS JUEGOS CON FILTROS -->
       <div class="panel span-2">
         <div class="panel-header">
-          <h3>📅 Próximos juegos</h3>
+          <h3>📅 Calendario de partidos</h3>
           <button 
             class="btn-download" 
             (click)="downloadSchedulePDF()"
@@ -143,14 +143,82 @@
           </button>
         </div>
 
+        <!-- ✅ FILTROS CON BOTONES (ESTILO PRÓXIMOS JUEGOS) -->
+        <div class="filters-container">
+          <div class="filter-row">
+            <label class="filter-label">Período:</label>
+            <div class="filter-buttons">
+              <button 
+                class="filter-btn" 
+                [class.active]="scheduleFilters.periodo === 'todos'"
+                (click)="cambiarFiltroPeriodo('todos')"
+              >
+                Todos
+              </button>
+              <button 
+                class="filter-btn" 
+                [class.active]="scheduleFilters.periodo === 'semana'"
+                (click)="cambiarFiltroPeriodo('semana')"
+              >
+                Esta Semana
+              </button>
+              <button 
+                class="filter-btn" 
+                [class.active]="scheduleFilters.periodo === 'mes'"
+                (click)="cambiarFiltroPeriodo('mes')"
+              >
+                Este Mes
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <label class="filter-label">Estado:</label>
+            <div class="filter-buttons">
+              <button 
+                class="filter-btn" 
+                [class.active]="scheduleFilters.estado === 'todos'"
+                (click)="cambiarFiltroEstado('todos')"
+              >
+                Todos
+              </button>
+              <button 
+                class="filter-btn filter-programado" 
+                [class.active]="scheduleFilters.estado === 'PROGRAMADO'"
+                (click)="cambiarFiltroEstado('PROGRAMADO')"
+              >
+                Programados
+              </button>
+              <button 
+                class="filter-btn filter-en-curso" 
+                [class.active]="scheduleFilters.estado === 'JUGADO'"
+                (click)="cambiarFiltroEstado('JUGADO')"
+              >
+                Jugados
+              </button>
+              <button 
+                class="filter-btn filter-finalizado" 
+                [class.active]="scheduleFilters.estado === 'FINALIZADO'"
+                (click)="cambiarFiltroEstado('FINALIZADO')"
+              >
+                Finalizados
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-info">
+            <span class="resultados-info">Mostrando {{ filteredGames.length }} de {{ upcomingGames.length }} partidos</span>
+          </div>
+        </div>
+
         <div *ngIf="loadingGames" class="placeholder">Cargando partidos...</div>
-        <div *ngIf="!loadingGames && upcomingGames.length === 0" class="placeholder">
-          No hay partidos programados.
+        <div *ngIf="!loadingGames && filteredGames.length === 0" class="placeholder">
+          No hay partidos que coincidan con los filtros.
         </div>
         
-        <!-- Lista de próximos partidos -->
-        <div *ngIf="!loadingGames && upcomingGames.length > 0" class="games-list">
-          <div *ngFor="let game of upcomingGames" class="game-card">
+        <!-- Lista de partidos filtrados -->
+        <div *ngIf="!loadingGames && filteredGames.length > 0" class="games-list">
+          <div *ngFor="let game of filteredGames" class="game-card">
             <div class="game-date">
               <div class="date-day">{{ formatDate(game.fecha) }}</div>
               <div class="date-time">{{ game.hora || 'Por definir' }}</div>
@@ -169,6 +237,9 @@
             <div class="game-venue">
               <span class="venue-icon">📍</span>
               <span>{{ game.cancha || 'Cancha principal' }}</span>
+              <span class="game-status" [class]="'status-' + game.estado.toLowerCase()">
+                {{ game.estado }}
+              </span>
             </div>
           </div>
         </div>
