@@ -646,3 +646,182 @@ h2{ margin:0; font-weight:800; letter-spacing:1px; }
     font-size: 13px;
   }
 }
+
+/* 🔴 INDICADOR WEBSOCKET */
+.ws-status {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  background: rgba(255, 23, 68, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.ws-status.connected {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.ws-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.ws-status.connected .ws-dot {
+  animation: none;
+  background: #fff;
+}
+
+/* Marcador en vivo animado */
+.live-score {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 22px;
+  font-weight: 900;
+  margin-left: 12px;
+  min-width: 55px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(255, 23, 68, 0.5);
+  animation: scoreUpdate 0.5s ease;
+}
+
+@keyframes scoreUpdate {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* ============================================
+   🔴 ESTILOS PARA LIVE UPDATES (FALTANTES)
+============================================ */
+
+/* Badge "EN VIVO" en el título de la sección */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 12px;
+  letter-spacing: 0.5px;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Tarjeta de partido EN VIVO */
+.game-card.game-live {
+  border: 2px solid #ff1744;
+  background: linear-gradient(135deg, rgba(255, 23, 68, 0.08), rgba(213, 0, 0, 0.05));
+  box-shadow: 0 0 20px rgba(255, 23, 68, 0.3);
+  position: relative;
+}
+
+/* Badge "EN VIVO" en la tarjeta del partido */
+.game-live-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.live-dot {
+  width: 5px;
+  height: 5px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Estado LIVE del partido */
+.status-live {
+  background: linear-gradient(135deg, #ff1744, #d50000) !important;
+  color: #fff !important;
+  animation: pulseGlow 2s ease-in-out infinite;
+  border: none !important;
+}
+
+/* ANIMACIONES */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 23, 68, 0.8);
+  }
+}
+
+/* Responsive para elementos live */
+@media (max-width: 780px) {
+  .ws-status {
+    top: 70px;
+    right: 10px;
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  .live-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .game-live-badge {
+    font-size: 9px;
+    padding: 4px 8px;
+  }
+
+  .live-score {
+    font-size: 18px;
+    padding: 4px 10px;
+    min-width: 45px;
+  }
+}

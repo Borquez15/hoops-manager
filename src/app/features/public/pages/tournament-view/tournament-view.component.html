@@ -6,6 +6,12 @@
       <ng-template #titulo><h2>Detalle del torneo</h2></ng-template>
     </div>
 
+    <!-- 🔴 INDICADOR DE CONEXIÓN WEBSOCKET -->
+    <div class="ws-status" [class.connected]="wsConnected">
+      <span class="ws-dot"></span>
+      <span class="ws-text">{{ wsConnected ? 'EN VIVO' : 'Conectando...' }}</span>
+    </div>
+
     <!-- Estados de carga / error -->
     <div *ngIf="loading" class="state">Cargando...</div>
     <div *ngIf="!loading && error" class="state err">{{ error }}</div>
@@ -126,10 +132,17 @@
         </div>
       </div>
 
-      <!-- PRÓXIMOS JUEGOS CON FILTROS -->
+      <!-- 📅 CALENDARIO DE PARTIDOS CON LIVE UPDATES -->
       <div class="panel span-2">
         <div class="panel-header">
-          <h3>📅 Calendario de partidos</h3>
+          <h3>
+            📅 Calendario de partidos
+            <!-- 🔴 BADGE DE PARTIDOS EN VIVO -->
+            <span class="live-badge" *ngIf="liveGamesCount > 0">
+              <span class="pulse-dot"></span>
+              {{ liveGamesCount }} EN VIVO
+            </span>
+          </h3>
           <button 
             class="btn-download" 
             (click)="downloadSchedulePDF()"
@@ -143,7 +156,7 @@
           </button>
         </div>
 
-        <!-- ✅ FILTROS CON BOTONES (ESTILO PRÓXIMOS JUEGOS) -->
+        <!-- ✅ FILTROS CON BOTONES -->
         <div class="filters-container">
           <div class="filter-row">
             <label class="filter-label">Período:</label>
@@ -151,22 +164,19 @@
               <button 
                 class="filter-btn" 
                 [class.active]="scheduleFilters.periodo === 'todos'"
-                (click)="cambiarFiltroPeriodo('todos')"
-              >
+                (click)="cambiarFiltroPeriodo('todos')">
                 Todos
               </button>
               <button 
                 class="filter-btn" 
                 [class.active]="scheduleFilters.periodo === 'semana'"
-                (click)="cambiarFiltroPeriodo('semana')"
-              >
+                (click)="cambiarFiltroPeriodo('semana')">
                 Esta Semana
               </button>
               <button 
                 class="filter-btn" 
                 [class.active]="scheduleFilters.periodo === 'mes'"
-                (click)="cambiarFiltroPeriodo('mes')"
-              >
+                (click)="cambiarFiltroPeriodo('mes')">
                 Este Mes
               </button>
             </div>
@@ -178,36 +188,34 @@
               <button 
                 class="filter-btn" 
                 [class.active]="scheduleFilters.estado === 'todos'"
-                (click)="cambiarFiltroEstado('todos')"
-              >
+                (click)="cambiarFiltroEstado('todos')">
                 Todos
               </button>
               <button 
                 class="filter-btn filter-programado" 
                 [class.active]="scheduleFilters.estado === 'PROGRAMADO'"
-                (click)="cambiarFiltroEstado('PROGRAMADO')"
-              >
+                (click)="cambiarFiltroEstado('PROGRAMADO')">
                 Programados
               </button>
               <button 
                 class="filter-btn filter-en-curso" 
                 [class.active]="scheduleFilters.estado === 'JUGADO'"
-                (click)="cambiarFiltroEstado('JUGADO')"
-              >
-                Jugados
+                (click)="cambiarFiltroEstado('JUGADO')">
+                En Curso
               </button>
               <button 
                 class="filter-btn filter-finalizado" 
                 [class.active]="scheduleFilters.estado === 'FINALIZADO'"
-                (click)="cambiarFiltroEstado('FINALIZADO')"
-              >
+                (click)="cambiarFiltroEstado('FINALIZADO')">
                 Finalizados
               </button>
             </div>
           </div>
 
           <div class="filter-info">
-            <span class="resultados-info">Mostrando {{ filteredGames.length }} de {{ upcomingGames.length }} partidos</span>
+            <span class="resultados-info">
+              Mostrando {{ filteredGames.length }} de {{ upcomingGames.length }} partidos
+            </span>
           </div>
         </div>
 
@@ -216,28 +224,58 @@
           No hay partidos que coincidan con los filtros.
         </div>
         
-        <!-- Lista de partidos filtrados -->
+        <!-- 🔴 LISTA DE PARTIDOS CON MARCADORES EN VIVO -->
         <div *ngIf="!loadingGames && filteredGames.length > 0" class="games-list">
-          <div *ngFor="let game of filteredGames" class="game-card">
+          <div *ngFor="let game of filteredGames" 
+               class="game-card"
+               [class.game-live]="game.en_vivo">
+            
+            <!-- 🔴 BADGE "EN VIVO" EN LA TARJETA -->
+            <div class="game-live-badge" *ngIf="game.en_vivo">
+              <span class="live-dot"></span>
+              EN VIVO
+            </div>
+
             <div class="game-date">
               <div class="date-day">{{ formatDate(game.fecha) }}</div>
               <div class="date-time">{{ game.hora || 'Por definir' }}</div>
             </div>
+
             <div class="game-teams">
+              <!-- EQUIPO LOCAL -->
               <div class="team team-local">
                 <span class="team-badge">🏠</span>
                 <span class="team-name">{{ game.equipo_local_nombre }}</span>
+                
+                <!-- 🔴 MARCADOR EN VIVO -->
+                <span class="live-score" *ngIf="game.en_vivo">
+                  {{ game.puntos_local || 0 }}
+                </span>
               </div>
+
               <div class="game-vs">VS</div>
+
+              <!-- EQUIPO VISITANTE -->
               <div class="team team-visitor">
                 <span class="team-name">{{ game.equipo_visitante_nombre }}</span>
                 <span class="team-badge">✈️</span>
+                
+                <!-- 🔴 MARCADOR EN VIVO -->
+                <span class="live-score" *ngIf="game.en_vivo">
+                  {{ game.puntos_visitante || 0 }}
+                </span>
               </div>
             </div>
+
             <div class="game-venue">
               <span class="venue-icon">📍</span>
               <span>{{ game.cancha || 'Cancha principal' }}</span>
-              <span class="game-status" [class]="'status-' + game.estado.toLowerCase()">
+              
+              <!-- 🔴 ESTADO DEL PARTIDO CON ESTILOS -->
+              <span class="game-status" 
+                    [class.status-live]="game.en_vivo"
+                    [class.status-programado]="game.estado === 'PROGRAMADO'"
+                    [class.status-finalizado]="game.estado === 'FINALIZADO'">
                 {{ game.estado }}
               </span>
             </div>

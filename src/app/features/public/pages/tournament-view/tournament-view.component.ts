@@ -1,9 +1,11 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TournamentSearchService, TorneoPublico } from '../../../../services/tournament-search.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { WebSocketService, WebSocketMessage } from '../../../../services/websocket.service';
+import { Subscription } from 'rxjs';
 
 interface StandingRow {
   id_equipo: number;
@@ -31,8 +33,10 @@ interface UpcomingGame {
   equipo_local_nombre: string;
   equipo_visitante_nombre: string;
   cancha: string | number;
-  jornada: number;
   estado: string;
+  en_vivo?: boolean;
+  puntos_local?: number;
+  puntos_visitante?: number;
 }
 
 type FiltroPeriodo = 'todos' | 'semana' | 'mes';
@@ -50,12 +54,13 @@ interface ScheduleFilters {
   templateUrl: './tournament-view.component.html',
   styleUrls: ['./tournament-view.component.css']
 })
-export class TournamentViewComponent implements OnInit {
+export class TournamentViewComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private searchService = inject(TournamentSearchService);
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
+  private wsService = inject(WebSocketService);
 
   loading = true;
   error = '';
@@ -72,7 +77,11 @@ export class TournamentViewComponent implements OnInit {
   downloadingPDF = false;
   downloadMessage = '';
 
-  // ✅ FILTROS ACTUALIZADOS CON BOTONES
+  // 🔴 WEBSOCKET
+  wsConnected = false;
+  wsSubscription?: Subscription;
+  liveGamesCount = 0;
+
   scheduleFilters: ScheduleFilters = {
     periodo: 'todos',
     estado: 'todos'
@@ -99,6 +108,9 @@ export class TournamentViewComponent implements OnInit {
         this.loadStandings(id);
         this.loadScorers(id);
         this.loadUpcomingGames(id);
+        
+        // 🔴 CONECTAR WEBSOCKET
+        this.connectWebSocket(id);
       },
       error: (e) => {
         console.error('❌ Error al cargar torneo:', e);
@@ -107,6 +119,95 @@ export class TournamentViewComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  ngOnDestroy() {
+    // 🔴 DESCONECTAR WEBSOCKET AL SALIR
+    this.disconnectWebSocket();
+  }
+
+  // 🔴 CONECTAR AL WEBSOCKET
+  private connectWebSocket(tournamentId: number) {
+    console.log('🔌 Iniciando conexión WebSocket...');
+    
+    this.wsSubscription = this.wsService.connect(tournamentId).subscribe({
+      next: (message: WebSocketMessage) => {
+        this.handleWebSocketMessage(message);
+      },
+      error: (error) => {
+        console.error('❌ Error en WebSocket:', error);
+        this.wsConnected = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // 🔴 MANEJAR MENSAJES WEBSOCKET
+  private handleWebSocketMessage(message: WebSocketMessage) {
+    console.log('📨 Mensaje recibido:', message.type, message);
+
+    switch (message.type) {
+      case 'connection_info':
+        this.wsConnected = true;
+        console.log(`✅ Conectado: ${message.mensaje}`);
+        this.cdr.detectChanges();
+        break;
+
+      case 'game_update':
+        // Actualizar partido en la lista
+        this.updateGameInList(message.data);
+        break;
+
+      case 'standings_update':
+        // Recargar tabla de posiciones
+        console.log('📊 Actualizando tabla de posiciones...');
+        if (this.torneo) {
+          this.loadStandings(this.torneo.id_torneo);
+        }
+        break;
+
+      case 'pong':
+        // Respuesta al ping (mantener viva la conexión)
+        break;
+    }
+  }
+
+  // 🔴 ACTUALIZAR PARTIDO EN LA LISTA
+  private updateGameInList(gameData: any) {
+    console.log('🔄 Actualizando partido:', gameData.id_partido);
+
+    // Actualizar en upcomingGames
+    const index = this.upcomingGames.findIndex(g => g.id_partido === gameData.id_partido);
+    
+    if (index !== -1) {
+      this.upcomingGames[index] = {
+        ...this.upcomingGames[index],
+        puntos_local: gameData.puntos_local,
+        puntos_visitante: gameData.puntos_visitante,
+        estado: gameData.estado,
+        en_vivo: gameData.estado === 'JUGADO' || gameData.estado === 'EN_VIVO'
+      };
+
+      // Recalcular partidos en vivo
+      this.liveGamesCount = this.upcomingGames.filter(g => g.en_vivo).length;
+
+      // Reaplicar filtros
+      this.aplicarFiltros();
+
+      this.cdr.detectChanges();
+      
+      console.log(`✅ Partido ${gameData.id_partido} actualizado: ${gameData.puntos_local} - ${gameData.puntos_visitante}`);
+    }
+  }
+
+  // 🔴 DESCONECTAR WEBSOCKET
+  private disconnectWebSocket() {
+    if (this.wsSubscription) {
+      this.wsSubscription.unsubscribe();
+    }
+    this.wsService.disconnect();
+    this.wsConnected = false;
+    console.log('🔌 WebSocket desconectado');
   }
 
   loadStandings(id: number) {
@@ -159,6 +260,7 @@ export class TournamentViewComponent implements OnInit {
       .subscribe({
         next: (games) => {
           this.upcomingGames = games || [];
+          this.liveGamesCount = games.filter(g => g.en_vivo).length;
           this.aplicarFiltros();
           this.loadingGames = false;
           this.cdr.detectChanges();
@@ -174,25 +276,21 @@ export class TournamentViewComponent implements OnInit {
       });
   }
 
-  // ✅ CAMBIAR FILTRO DE PERÍODO
   cambiarFiltroPeriodo(periodo: FiltroPeriodo) {
     this.scheduleFilters.periodo = periodo;
     this.aplicarFiltros();
   }
 
-  // ✅ CAMBIAR FILTRO DE ESTADO
   cambiarFiltroEstado(estado: FiltroEstado) {
     this.scheduleFilters.estado = estado;
     this.aplicarFiltros();
   }
 
-  // ✅ APLICAR FILTROS
   aplicarFiltros() {
     console.log('🔍 Aplicando filtros:', this.scheduleFilters);
     
     let filtrados = [...this.upcomingGames];
 
-    // Filtro por período
     if (this.scheduleFilters.periodo !== 'todos') {
       const hoy = new Date();
       filtrados = filtrados.filter(game => {
@@ -211,7 +309,6 @@ export class TournamentViewComponent implements OnInit {
       });
     }
 
-    // Filtro por estado
     if (this.scheduleFilters.estado !== 'todos') {
       filtrados = filtrados.filter(game => game.estado === this.scheduleFilters.estado);
     }
@@ -265,20 +362,17 @@ export class TournamentViewComponent implements OnInit {
     });
   }
 
-  // ✅ DESCARGAR CALENDARIO CON FILTROS
   downloadSchedulePDF() {
     if (!this.torneo || this.downloadingPDF) return;
     
     this.downloadingPDF = true;
     
-    // Construir URL con parámetros según filtros activos
     let params = new HttpParams();
     
     if (this.scheduleFilters.estado !== 'todos') {
       params = params.set('estado', this.scheduleFilters.estado);
     }
 
-    // Agregar filtro de fechas según período
     if (this.scheduleFilters.periodo === 'semana') {
       const hoy = new Date();
       const unaSemana = new Date(hoy);
@@ -296,8 +390,6 @@ export class TournamentViewComponent implements OnInit {
     }
 
     const url = `http://localhost:8000/tournaments/${this.torneo.id_torneo}/pdf/schedule`;
-    
-    console.log('📥 Descargando PDF con filtros:', params.toString());
     
     this.http.get(url, { responseType: 'blob', params }).subscribe({
       next: (blob) => {
