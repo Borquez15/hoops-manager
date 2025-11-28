@@ -19,6 +19,13 @@ export const routes: Routes = [
   },
 
   {
+    path: 'aceptar-arbitro',
+    loadComponent: () =>
+      import('./auth/accept-referee-invite/accept-referee-invite.component')
+        .then(m => m.AcceptRefereeInviteComponent)
+  },
+
+  {
     path: 'verificar-email',
     loadComponent: () =>
       import('./auth/verify-email/verify-email.component')

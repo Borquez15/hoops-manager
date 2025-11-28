@@ -1,0 +1,364 @@
+/* pages/accept-referee-invite/accept-referee-invite.component.css */
+
+/* ============================================
+   CONTAINER
+============================================ */
+.container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 20px;
+}
+
+/* ============================================
+   CARD
+============================================ */
+.card {
+  max-width: 600px;
+  width: 100%;
+  background: white;
+  padding: 50px 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   ICONS
+============================================ */
+.icon-large {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 60px;
+  background: linear-gradient(135deg, #FF7F00 0%, #FFA500 100%);
+  box-shadow: 0 10px 40px rgba(255, 127, 0, 0.3);
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.icon-large.success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+  color: white;
+}
+
+.icon-large.error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   LOADING STATE
+============================================ */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 20px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #f0f0f0;
+  border-top-color: #FF7F00;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state h2 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.loading-state p {
+  color: #64748b;
+  margin: 0;
+  font-size: 16px;
+}
+
+/* ============================================
+   TEXT
+============================================ */
+h1 {
+  color: #1e293b;
+  font-size: 32px;
+  margin: 0 0 20px;
+  font-weight: 800;
+}
+
+.message {
+  color: #475569;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0 0 30px;
+}
+
+.message.success {
+  color: #059669;
+  font-weight: 600;
+}
+
+.message.error {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.submessage {
+  color: #94a3b8;
+  font-size: 14px;
+  margin: 20px 0 0;
+}
+
+.message strong {
+  color: #FF7F00;
+  font-weight: 700;
+}
+
+/* ============================================
+   INFO BOX
+============================================ */
+.info-box {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-left: 4px solid #FF7F00;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0 0 30px;
+  text-align: left;
+}
+
+.info-box.warning {
+  background: #fef3c7;
+  border-color: #fbbf24;
+  border-left-color: #f59e0b;
+}
+
+.info-box p {
+  margin: 0 0 12px;
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.info-box strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* ============================================
+   ACTIONS
+============================================ */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+/* ============================================
+   BUTTONS
+============================================ */
+.btn {
+  padding: 16px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF7F00 0%, #FFA500 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(255, 127, 0, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.4);
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #cbd5e1;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spinner-small {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================
+   LOADING DOTS
+============================================ */
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.loading-dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #FF7F00;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 768px) {
+  .card {
+    padding: 40px 30px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .icon-large {
+    width: 80px;
+    height: 80px;
+    font-size: 48px;
+  }
+
+  .message {
+    font-size: 16px;
+  }
+
+  .btn {
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 30px 20px;
+    border-radius: 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .icon-large {
+    width: 70px;
+    height: 70px;
+    font-size: 40px;
+  }
+
+  .message {
+    font-size: 15px;
+  }
+
+  .info-box {
+    padding: 16px;
+  }
+}
