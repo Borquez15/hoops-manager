@@ -1,0 +1,85 @@
+<!-- pages/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="logo" routerLink="/">
+        <img src="/imagen/logo-hoops-manager.png" alt="Hoops Manager">
+        <span>Hoops Manager</span>
+      </div>
+
+      <div class="user-menu">
+        <div class="user-avatar">
+          {{ getUserInitial() }}
+        </div>
+        <button class="btn-logout" (click)="logout()">
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="welcome-section">
+      <div class="user-card">
+        <div class="user-avatar-large">
+          {{ getUserInitial() }}
+        </div>
+        <h1>¡Bienvenido, {{ getUserDisplayName() }}!</h1>
+        <p class="user-email">{{ user?.email }}</p>
+        <div class="auth-badge" [class.auth-badge-google]="authMethod === 'firebase'">
+          <span *ngIf="authMethod === 'native'">🔐 Cuenta Nativa</span>
+          <span *ngIf="authMethod === 'firebase'">🔑 Cuenta Google</span>
+        </div>
+      </div>
+
+      <div class="user-info-grid">
+        <div class="info-card">
+          <h3>Información Personal</h3>
+          <div class="info-item">
+            <span class="label">Nombre:</span>
+            <span class="value">{{ user?.nombre || 'No especificado' }}</span>
+          </div>
+          <div class="info-item" *ngIf="user?.ap_p">
+            <span class="label">Apellido Paterno:</span>
+            <span class="value">{{ user?.ap_p }}</span>
+          </div>
+          <div class="info-item" *ngIf="user?.ap_m">
+            <span class="label">Apellido Materno:</span>
+            <span class="value">{{ user?.ap_m }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Email:</span>
+            <span class="value">{{ user?.email }}</span>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <h3>Acciones Rápidas</h3>
+          <button class="action-btn" routerLink="/crear-torneo">
+            <span class="icon">🏆</span>
+            <span>Crear Torneo</span>
+          </button>
+          <button class="action-btn" routerLink="/mis-torneos">
+            <span class="icon">📋</span>
+            <span>Mis Torneos</span>
+          </button>
+          <button class="action-btn" routerLink="/arbitro">
+            <span class="icon">🔔</span>
+            <span>Modo Árbitro</span>
+          </button>
+          <button class="action-btn" (click)="goHome()">
+            <span class="icon">🏠</span>
+            <span>Volver al Inicio</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <p>© {{ new Date().getFullYear() }} Hoops Manager - Panel de Control</p>
+  </footer>
+</div>

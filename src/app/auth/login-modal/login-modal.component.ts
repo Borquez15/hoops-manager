@@ -1,6 +1,4 @@
-// ============================================
-// login-modal.component.ts - ACTUALIZADO
-// ============================================
+// login-modal.component.ts
 import {
   AfterViewInit, Component, EventEmitter, Input, OnChanges,
   Output, SimpleChanges, inject
@@ -24,6 +22,7 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<any>();
   @Output() goRegister = new EventEmitter<void>();
+  @Output() goForgotPassword = new EventEmitter<void>();  // ✅ NUEVO
 
   hide = true;
   loading = false;
@@ -43,7 +42,6 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
     try { document.body.style.overflow = lock ? 'hidden' : ''; } catch {}
   }
 
-  // ✅ MÉTODO ACTUALIZADO - USA loginNative
   async submit() {
     if (this.loading) return;
 
@@ -59,7 +57,6 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
     this.loading = true;
 
     try {
-      // ✅ Llama al método NATIVO (no Firebase)
       const usuario = await this.auth.loginNative(email, password);
       
       console.log('✅ Login exitoso:', usuario);
@@ -72,6 +69,8 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
       
       if (error.status === 401) {
         this.errorMsg = 'Credenciales inválidas';
+      } else if (error.status === 403) {
+        this.errorMsg = error.error?.detail || 'Debes verificar tu email antes de iniciar sesión';
       } else if (error.status === 0) {
         this.errorMsg = '⚠️ No se puede conectar al servidor';
       } else {
@@ -82,7 +81,6 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  // ✅ LOGIN CON GOOGLE (usa Firebase + backend)
   async loginWithGoogle() {
     if (this.loading) return;
     

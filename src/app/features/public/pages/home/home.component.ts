@@ -1,3 +1,4 @@
+// pages/public/pages/home/home.component.ts
 import { AfterViewInit, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -8,6 +9,7 @@ import { TournamentsSectionComponent } from '../../sections/tournaments/tourname
 import { ContactSectionComponent } from '../../sections/contact/contact-section.component';
 import { LoginModalComponent } from '../../../../auth/login-modal/login-modal.component';
 import { RegisterModalComponent } from '../../../../auth/register-modal/register-modal.component';
+import { ForgotPasswordModalComponent } from '../../../../auth/forgot-password/forgot-password-modal.component';
 import { AuthService } from '../../../../services/auth.service';
 import { TournamentSearchService, TorneoPublico, SearchResponse } from '../../../../services/tournament-search.service';
 
@@ -26,6 +28,7 @@ type SectionId = typeof SECTION_IDS[number];
     ContactSectionComponent,
     LoginModalComponent,
     RegisterModalComponent,
+    ForgotPasswordModalComponent,
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
@@ -43,20 +46,50 @@ export class HomeComponent implements AfterViewInit {
   // Estado de modales
   showLogin = false;
   showRegister = false;
+  showForgot = false;
 
   // Estado de autenticación
-  user = this.auth.getCurrentUserNative();
-  isAuthenticated = !!this.user;
+  user: any = null;
+  isAuthenticated = false;
   menuOpen = false;
 
-  // ✅ NUEVO: Estado de búsqueda de torneos
+  // Estado de búsqueda
   searchQuery = '';
   searching = false;
   hasSearched = false;
   match: TorneoPublico | null = null;
   suggestions: TorneoPublico[] = [];
 
-  // Botones con lógica de autenticación
+  constructor() {
+    this.loadUser();
+  }
+
+  // ============================================
+  // CARGAR USUARIO
+  // ============================================
+  private loadUser() {
+    console.log('🔵 Cargando usuario...');
+    
+    const token = localStorage.getItem('auth_token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      try {
+        this.user = JSON.parse(userData);
+        this.isAuthenticated = true;
+        console.log('✅ Usuario cargado desde localStorage:', this.user);
+      } catch (error) {
+        console.error('❌ Error parseando usuario:', error);
+        this.logout();
+      }
+    } else {
+      console.log('⚠️ No hay usuario en localStorage');
+    }
+  }
+
+  // ============================================
+  // INICIAR SESIÓN
+  // ============================================
   iniciarSesion(ev?: Event) {
     ev?.preventDefault();
     
@@ -67,6 +100,9 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
+  // ============================================
+  // CREAR TORNEO
+  // ============================================
   crearTorneo(ev?: Event) {
     ev?.preventDefault();
     
@@ -77,30 +113,31 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
-  // Callbacks de login/registro
+  // ============================================
+  // CALLBACKS DE LOGIN/REGISTRO
+  // ============================================
   onLoginSuccess(data: any) {
-    console.log('✅ Login exitoso:', data.user);
+    console.log('✅ Login exitoso:', data);
     this.showLogin = false;
     
+    // Actualizar estado
     this.user = data.user;
     this.isAuthenticated = true;
     
-    console.log('¡Bienvenido!', data.user.nombre);
+    console.log('¡Bienvenido!', this.user.nombre || this.user.email);
   }
 
   onRegisterSuccess(data: any) {
-    console.log('✅ Registro exitoso:', data.user);
+    console.log('✅ Registro exitoso:', data);
     this.showRegister = false;
     
-    this.user = data.user;
-    this.isAuthenticated = true;
-    
-    setTimeout(() => {
-      this.router.navigate(['/dashboard']);
-    }, 500);
+    // No guardamos usuario aquí porque el registro requiere verificación de email
+    console.log('📧 Revisa tu email para verificar tu cuenta');
   }
 
-  // Métodos del menú de usuario
+  // ============================================
+  // MENÚ DE USUARIO
+  // ============================================
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
@@ -118,7 +155,9 @@ export class HomeComponent implements AfterViewInit {
     window.location.href = '/';
   }
 
-  // ✅ NUEVO: Método de búsqueda de torneos
+  // ============================================
+  // BÚSQUEDA DE TORNEOS
+  // ============================================
   onSearch(): void {
     const query = this.searchQuery.trim();
     
@@ -133,47 +172,41 @@ export class HomeComponent implements AfterViewInit {
 
     this.searchService.search(query).subscribe({
       next: (response: SearchResponse) => {
-        console.log('✅ Resultados de búsqueda:', response);
+        console.log('✅ Resultados:', response);
         this.match = response.match;
         this.suggestions = response.suggestions;
         this.searching = false;
       },
       error: (error) => {
-        console.error('❌ Error en búsqueda:', error);
+        console.error('❌ Error:', error);
         this.clearResults();
         this.searching = false;
       }
     });
   }
 
-  // ✅ NUEVO: Limpiar resultados
   clearResults(): void {
     this.match = null;
     this.suggestions = [];
     this.hasSearched = false;
   }
 
-  // ✅ NUEVO: Ver torneo
   viewTournament(torneo: TorneoPublico): void {
-    console.log('🏀 Navegando a torneo:', torneo.id_torneo);
     this.router.navigate(['/torneos', torneo.id_torneo]);
   }
 
-  // ✅ NUEVO: Badge de estado
   getEstadoBadge(estado: string): string {
     switch (estado?.toUpperCase()) {
-      case 'ACTIVO':
-        return '🟢 Activo';
-      case 'FINALIZADO':
-        return '⚫ Finalizado';
-      case 'DRAFT':
-        return '🔴 Borrador';
-      default:
-        return estado || 'Desconocido';
+      case 'ACTIVO': return '🟢 Activo';
+      case 'FINALIZADO': return '⚫ Finalizado';
+      case 'DRAFT': return '🔴 Borrador';
+      default: return estado || 'Desconocido';
     }
   }
 
-  // Navegación/scroll
+  // ============================================
+  // NAVEGACIÓN
+  // ============================================
   async go(id: SectionId, ev?: Event) {
     ev?.preventDefault();
     if (this.router.url !== '/') {

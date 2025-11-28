@@ -1,23 +1,15 @@
-// ============================================
-// auth.service.ts - VERSIÓN HÍBRIDA (Firebase + Nativo) - ACTUALIZADO
-// ============================================
+// services/auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   Auth,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
-  User,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  sendEmailVerification,
   authState
 } from '@angular/fire/auth';
-import { firstValueFrom, from, of } from 'rxjs';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 
 export interface UsuarioNativo {
@@ -29,7 +21,6 @@ export interface UsuarioNativo {
   activo: boolean;
 }
 
-// ========== INTERFACES PARA RESPONSES ==========
 interface LoginResponse {
   user: UsuarioNativo;
   access_token: string;
@@ -40,37 +31,44 @@ interface FirebaseResponse {
   user: {
     id: number;
     nombre: string;
+    ap_p?: string;
+    ap_m?: string;
     email: string;
   };
   access_token: string;
   token_type: string;
 }
 
+interface RegisterData {
+  nombre: string;
+  ap_p: string;
+  ap_m?: string | null;
+  email: string;
+  password: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private af   = inject(Auth);
+  private af = inject(Auth);
   private http = inject(HttpClient);
 
-  // Observable del usuario Firebase (null si no hay sesión)
   user$ = authState(this.af).pipe(shareReplay({ bufferSize: 1, refCount: true }));
   isLoggedIn$ = this.user$.pipe(map(Boolean), shareReplay({ bufferSize: 1, refCount: true }));
-  idToken$ = this.user$.pipe(
-    switchMap(u => u ? from(u.getIdToken()) : of(null)),
-    shareReplay({ bufferSize: 1, refCount: true })
-  );
 
-  get currentUser() { return this.af.currentUser; }
+  get currentUser() { 
+    return this.af.currentUser; 
+  }
 
-  // ========================================
-  // ✅ LOGIN NATIVO (ACTUALIZADO - guarda token JWT)
-  // ========================================
+  // ============================================
+  // LOGIN NATIVO
+  // ============================================
   async loginNative(email: string, password: string): Promise<UsuarioNativo> {
     try {
       console.log('🔵 Iniciando login nativo...');
       
       const response = await firstValueFrom(
         this.http.post<LoginResponse>(
-          `${environment.apiBase}/auth/login`,
+          `${environment.apiBase}/api/auth/login`,
           { email, password },
           { withCredentials: true }
         )
@@ -78,31 +76,18 @@ export class AuthService {
       
       console.log('✅ Response del backend:', response);
       
-      // ========== GUARDAR TOKEN JWT (CRÍTICO) ==========
+      // Guardar token JWT
       if (response.access_token) {
         localStorage.setItem('auth_token', response.access_token);
-        console.log('✅ Token JWT guardado en localStorage');
-        console.log('✅ Token (primeros 50):', response.access_token.substring(0, 50));
-      } else {
-        console.error('❌ No se recibió access_token del backend');
-        throw new Error('No se recibió token del servidor');
+        console.log('✅ Token JWT guardado');
       }
       
-      // Guarda usuario en localStorage para persistencia
+      // Guardar usuario
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user));
         localStorage.setItem('auth_method', 'native');
-        console.log('✅ Usuario guardado:', response.user);
-        console.log('✅ auth_method guardado: native');
+        console.log('✅ Usuario nativo guardado');
       }
-      
-      // VERIFICACIÓN POST-LOGIN
-      console.log('==== VERIFICACIÓN POST-LOGIN ====');
-      console.log('auth_token existe:', !!localStorage.getItem('auth_token'));
-      console.log('user existe:', !!localStorage.getItem('user'));
-      console.log('auth_method:', localStorage.getItem('auth_method'));
-      console.log('isAuthenticated():', this.isAuthenticated());
-      console.log('================================');
       
       return response.user;
       
@@ -112,32 +97,22 @@ export class AuthService {
     }
   }
 
-  // ========================================
-  // ✅ REGISTRO NATIVO (mejorado)
-  // ========================================
-  async registerNative(data: {
-    nombre: string;
-    ap_p: string;
-    ap_m?: string | null;
-    email: string;
-    password: string;
-  }): Promise<UsuarioNativo> {
+  // ============================================
+  // REGISTRO NATIVO
+  // ============================================
+  async registerNative(data: RegisterData) {
     try {
       console.log('🔵 Registrando usuario nativo...');
       
-      const usuario = await firstValueFrom(
-        this.http.post<UsuarioNativo>(
-          `${environment.apiBase}/auth/register`,
+      const response = await firstValueFrom(
+        this.http.post<any>(
+          `${environment.apiBase}/api/auth/register`,
           data
         )
       );
       
-      console.log('✅ Usuario registrado:', usuario);
-      
-      localStorage.setItem('user', JSON.stringify(usuario));
-      localStorage.setItem('auth_method', 'native');
-      
-      return usuario;
+      console.log('✅ Usuario registrado:', response);
+      return response;
       
     } catch (error) {
       console.error('❌ Error en registerNative:', error);
@@ -145,70 +120,19 @@ export class AuthService {
     }
   }
 
-  // ========================================
-  // ✅ OBTENER USUARIO NATIVO ACTUAL
-  // ========================================
-  getCurrentUserNative(): UsuarioNativo | null {
-    const method = localStorage.getItem('auth_method');
-    if (method !== 'native') return null;
-    
-    const data = localStorage.getItem('user');
-    return data ? JSON.parse(data) : null;
-  }
-
-  // ========================================
-  // ✅ VERIFICAR AUTENTICACIÓN (CON LOGS DE DEBUG)
-  // ========================================
-  isAuthenticated(): boolean {
-    console.log('==== 🔍 isAuthenticated() EJECUTÁNDOSE ====');
-    
-    // Verificar cada condición por separado
-    const token = localStorage.getItem('auth_token');
-    const method = localStorage.getItem('auth_method');
-    const user = localStorage.getItem('user');
-    const hasFirebase = !!this.currentUser;
-    const hasNative = !!this.getCurrentUserNative();
-    
-    console.log('🔵 Token existe:', !!token);
-    console.log('🔵 Token (primeros 30):', token ? token.substring(0, 30) + '...' : 'null');
-    console.log('🔵 Método:', method);
-    console.log('🔵 User existe:', !!user);
-    console.log('🔵 Firebase user:', hasFirebase);
-    console.log('🔵 Native user:', hasNative);
-    
-    // Verificar condiciones
-    const isAuth = hasFirebase || hasNative || !!token;
-    
-    console.log('🔵 RESULTADO:', isAuth);
-    console.log('==========================================');
-    
-    return isAuth;
-  }
-
-  // ========================================
-  // ✅ OBTENER TOKEN JWT
-  // ========================================
-  getAuthToken(): string | null {
-    return localStorage.getItem('auth_token');
-  }
-
-  // ========================================
-  // MÉTODOS FIREBASE (actualizados)
-  // ========================================
-  loginEmail(email: string, password: string) {
-    return signInWithEmailAndPassword(this.af, email, password);
-  }
-
+  // ============================================
+  // LOGIN CON GOOGLE
+  // ============================================
   async loginGoogle() {
     try {
       console.log('🔵 Iniciando login con Google...');
       
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await signInWithPopup(this.af, provider);
       
-      // Intercambia con backend Firebase
+      const result = await signInWithPopup(this.af, provider);
       const idToken = await result.user.getIdToken();
+      
       console.log('✅ Token de Firebase obtenido');
       
       const response = await firstValueFrom(
@@ -221,21 +145,20 @@ export class AuthService {
       
       console.log('✅ Response del backend:', response);
       
-      // ========== GUARDAR TOKEN JWT (CRÍTICO) ==========
+      // Guardar token JWT
       if (response.access_token) {
         localStorage.setItem('auth_token', response.access_token);
-        console.log('✅ Token JWT guardado en localStorage');
+        console.log('✅ Token JWT guardado');
       }
       
       // Guardar usuario
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user));
-        console.log('✅ Usuario guardado:', response.user);
+        localStorage.setItem('auth_method', 'firebase');
+        console.log('✅ Usuario Firebase guardado');
       }
       
-      localStorage.setItem('auth_method', 'firebase');
-      
-      return result;
+      return response;
       
     } catch (error) {
       console.error('❌ Error en loginGoogle:', error);
@@ -243,19 +166,22 @@ export class AuthService {
     }
   }
 
+  // ============================================
+  // LOGOUT
+  // ============================================
   async logout() {
     console.log('🔵 Cerrando sesión...');
     
     const method = localStorage.getItem('auth_method');
     
-    // Limpia localStorage
+    // Limpiar localStorage
     localStorage.removeItem('user');
     localStorage.removeItem('auth_method');
-    localStorage.removeItem('auth_token');  // ← CRÍTICO: Eliminar token
+    localStorage.removeItem('auth_token');
     
     console.log('✅ LocalStorage limpio');
     
-    // Si era Firebase, cierra sesión
+    // Si era Firebase, cerrar sesión
     if (method === 'firebase' && this.currentUser) {
       await signOut(this.af);
       console.log('✅ Sesión de Firebase cerrada');
@@ -264,33 +190,52 @@ export class AuthService {
     console.log('✅ Logout completo');
   }
 
-  async getIdToken(user?: User) {
-    const u = user ?? await new Promise<User | null>((resolve) => {
-      const unsub = onAuthStateChanged(this.af, (usr) => { unsub(); resolve(usr); });
+  // ============================================
+  // VERIFICAR AUTENTICACIÓN
+  // ============================================
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('auth_token');
+    const user = localStorage.getItem('user');
+    const method = localStorage.getItem('auth_method');
+    
+    const isAuth = !!(token && user);
+    
+    console.log('🔍 isAuthenticated:', {
+      hasToken: !!token,
+      hasUser: !!user,
+      method: method,
+      result: isAuth
     });
-    return u ? u.getIdToken() : null;
+    
+    return isAuth;
   }
 
-  exchangeWithBackend(idToken: string) {
-    return firstValueFrom(
-      this.http.post<FirebaseResponse>(
-        `${environment.apiBase}/api/auth/firebase`,
-        { idToken },
-        { withCredentials: true }
-      )
-    );
+  // ============================================
+  // OBTENER TOKEN JWT
+  // ============================================
+  getAuthToken(): string | null {
+    return localStorage.getItem('auth_token');
   }
 
-  async register(nombre: string, ap_p: string, ap_m: string, email: string, password: string) {
-    const cred = await createUserWithEmailAndPassword(this.af, email, password);
-    await updateProfile(cred.user, { displayName: nombre });
-    return cred;
+  // ============================================
+  // OBTENER USUARIO ACTUAL
+  // ============================================
+  getCurrentUserNative(): any | null {
+    const data = localStorage.getItem('user');
+    if (!data) return null;
+    
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('❌ Error parseando usuario:', error);
+      return null;
+    }
   }
 
-  sendVerificationEmail() {
-    const user = this.af.currentUser;
-    if (!user) return Promise.resolve();
-    const url = `${location.origin}/#/verificado`;
-    return sendEmailVerification(user, { url, handleCodeInApp: false });
+  // ============================================
+  // OBTENER MÉTODO DE AUTENTICACIÓN
+  // ============================================
+  getAuthMethod(): 'native' | 'firebase' | null {
+    return localStorage.getItem('auth_method') as any;
   }
 }

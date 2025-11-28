@@ -1,4 +1,3 @@
-<!-- Evita que el click dentro del modal burbujee al overlay -->
 <div class="overlay" *ngIf="open" (click)="close.emit()"></div>
 
 <div class="modal" *ngIf="open" role="dialog" aria-modal="true" aria-labelledby="loginTitle"
@@ -30,9 +29,12 @@
           </small>
         </label>
 
-        <a class="link" href="#">¿Olvidaste tu contraseña?</a>
+        <!-- ✅ NUEVO: Link para recuperar contraseña -->
+        <button type="button" class="link" (click)="goForgotPassword.emit()" [disabled]="loading" 
+                style="text-align: left; margin-top: -5px;">
+          ¿Olvidaste tu contraseña?
+        </button>
 
-        <!-- Forzamos también (click) por si el ngSubmit no disparaba -->
         <button class="btn btn-primary wfull"
                 type="submit"
                 (click)="submit()"

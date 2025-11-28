@@ -1,0 +1,33 @@
+<!-- pages/verify-email/verify-email.component.html -->
+<div class="container">
+  <div class="card">
+    <!-- LOADING STATE -->
+    <div *ngIf="loading" class="state">
+      <div class="spinner"></div>
+      <h1>Verificando email...</h1>
+      <p>Por favor espera un momento</p>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div *ngIf="!loading && success" class="state">
+      <div class="icon success-icon">✓</div>
+      <h1>¡Email Verificado!</h1>
+      <p class="message">Tu cuenta ha sido activada exitosamente.</p>
+      <p class="submessage">Ya puedes iniciar sesión con tu cuenta.</p>
+      <button class="btn btn-success" (click)="goToHome()">
+        Ir al inicio
+      </button>
+    </div>
+
+    <!-- ERROR STATE -->
+    <div *ngIf="!loading && !success && errorMsg" class="state">
+      <div class="icon error-icon">✕</div>
+      <h1>Error de Verificación</h1>
+      <p class="message error-message">{{ errorMsg }}</p>
+      <p class="submessage">Si crees que esto es un error, intenta registrarte nuevamente o contacta con soporte.</p>
+      <button class="btn btn-error" (click)="goToHome()">
+        Volver al inicio
+      </button>
+    </div>
+  </div>
+</div>

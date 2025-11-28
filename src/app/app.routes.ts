@@ -18,6 +18,13 @@ export const routes: Routes = [
         .then(m => m.TournamentViewComponent)
   },
 
+  {
+    path: 'verificar-email',
+    loadComponent: () =>
+      import('./auth/verify-email/verify-email.component')
+        .then(m => m.VerifyEmailComponent)
+  },
+
   // ============================================
   // RUTAS PROTEGIDAS (requieren autenticación)
   // ============================================

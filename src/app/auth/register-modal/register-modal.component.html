@@ -9,7 +9,18 @@
     </header>
 
     <div class="body">
-      <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+      <!-- ✅ MENSAJE DE ÉXITO -->
+      <div *ngIf="successMsg" class="success-alert">
+        <div class="success-icon">✓</div>
+        <div class="success-content">
+          <h3>¡Registro Exitoso!</h3>
+          <p>{{ successMsg }}</p>
+          <small>Redirigiendo al login...</small>
+        </div>
+      </div>
+
+      <!-- FORMULARIO (ocultar si hay mensaje de éxito) -->
+      <form *ngIf="!successMsg" class="form" [formGroup]="form" (ngSubmit)="submit()">
         <div class="row">
           <label>
             Nombre(s)
@@ -65,9 +76,10 @@
         </button>
       </form>
 
-      <div class="or"><span>o</span></div>
+      <div class="or" *ngIf="!successMsg"><span>o</span></div>
 
-      <button class="btn btn-google wfull" type="button" (click)="loginWithGoogle()" [disabled]="loading">
+      <button class="btn btn-google wfull" type="button" (click)="loginWithGoogle()" 
+              [disabled]="loading || !!successMsg" *ngIf="!successMsg">
         <span class="g">G</span> Registrarse con Google
       </button>
 

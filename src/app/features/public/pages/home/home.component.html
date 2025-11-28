@@ -176,7 +176,8 @@
   [open]="showLogin"
   (close)="showLogin = false"
   (success)="onLoginSuccess($event)"
-  (goRegister)="showLogin=false; showRegister=true">
+  (goRegister)="showLogin=false; showRegister=true"
+  (goForgotPassword)="showLogin=false; showForgot=true">
 </app-login-modal>
 
 <app-register-modal
@@ -186,3 +187,9 @@
   (success)="onRegisterSuccess($event)"
   (goLogin)="showRegister=false; showLogin=true">
 </app-register-modal>
+
+<app-forgot-password-modal
+  [open]="showForgot"
+  (close)="showForgot = false"
+  (goBack)="showForgot=false; showLogin=true">
+</app-forgot-password-modal>

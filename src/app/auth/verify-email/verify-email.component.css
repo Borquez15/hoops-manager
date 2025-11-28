@@ -1,0 +1,194 @@
+/* pages/verify-email/verify-email.component.css */
+
+/* ============================================ */
+/* CONTAINER */
+/* ============================================ */
+.container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 20px;
+}
+
+/* ============================================ */
+/* CARD */
+/* ============================================ */
+.card {
+  max-width: 550px;
+  width: 100%;
+  background: white;
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================ */
+/* STATE */
+/* ============================================ */
+.state {
+  text-align: center;
+}
+
+/* ============================================ */
+/* ICONS */
+/* ============================================ */
+.icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 60px;
+  font-weight: 900;
+  color: white;
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.success-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+}
+
+.error-icon {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 10px 40px rgba(239, 68, 68, 0.4);
+}
+
+/* ============================================ */
+/* SPINNER */
+/* ============================================ */
+.spinner {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 30px;
+  border: 6px solid #e5e7eb;
+  border-top-color: #e57f3d;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+/* ============================================ */
+/* TEXT */
+/* ============================================ */
+h1 {
+  color: #1e293b;
+  font-size: 32px;
+  margin: 0 0 20px;
+  font-weight: 800;
+}
+
+.message {
+  color: #64748b;
+  font-size: 18px;
+  margin: 0 0 10px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.error-message {
+  color: #dc2626;
+}
+
+.submessage {
+  color: #94a3b8;
+  font-size: 14px;
+  margin: 0 0 30px;
+  line-height: 1.5;
+}
+
+/* ============================================ */
+/* BUTTONS */
+/* ============================================ */
+.btn {
+  padding: 16px 40px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+  color: white;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.btn-success:hover {
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+}
+
+.btn-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.btn-error:hover {
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
+@media (max-width: 640px) {
+  .card {
+    padding: 40px 30px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .icon {
+    width: 80px;
+    height: 80px;
+    font-size: 48px;
+  }
+
+  .message {
+    font-size: 16px;
+  }
+
+  .submessage {
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 14px 32px;
+    font-size: 15px;
+  }
+}

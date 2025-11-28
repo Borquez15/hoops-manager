@@ -18,13 +18,34 @@ export class AuthInterceptorService implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     console.log('🔵 INTERCEPTOR: Interceptando petición a', req.url);
     
-    // Obtener token del localStorage
+    // ✅ RUTAS PÚBLICAS QUE NO NECESITAN TOKEN
+    const publicRoutes = [
+      '/api/auth/register',
+      '/api/auth/login',
+      '/api/auth/verify-email',      // ✅ AGREGAR
+      '/api/auth/forgot-password',    // ✅ AGREGAR
+      '/api/auth/reset-password',     // ✅ AGREGAR
+      '/api/auth/firebase'
+    ];
+
+    // ✅ VERIFICAR SI ES RUTA PÚBLICA
+    const isPublicRoute = publicRoutes.some(route => req.url.includes(route));
+
+    if (isPublicRoute) {
+      console.log('🔓 INTERCEPTOR: Ruta pública detectada, sin token');
+      return next.handle(req).pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error('❌ INTERCEPTOR: Error en ruta pública', error.status);
+          return throwError(() => error);
+        })
+      );
+    }
+
+    // ✅ PARA RUTAS PROTEGIDAS, AGREGAR TOKEN
     const token = localStorage.getItem('auth_token');
     
     console.log('🔵 INTERCEPTOR: ¿Token existe?', !!token);
-    console.log('🔵 INTERCEPTOR: Token (primeros 50):', token?.substring(0, 50));
     
-    // Si hay token, agregarlo al header
     if (token) {
       req = req.clone({
         setHeaders: {
@@ -33,7 +54,7 @@ export class AuthInterceptorService implements HttpInterceptor {
       });
       console.log('✅ INTERCEPTOR: Header Authorization agregado');
     } else {
-      console.log('❌ INTERCEPTOR: NO hay token en localStorage');
+      console.log('⚠️ INTERCEPTOR: NO hay token para ruta protegida');
     }
     
     // Manejar respuesta
@@ -43,9 +64,11 @@ export class AuthInterceptorService implements HttpInterceptor {
         
         // Si es error 401 (no autorizado), redirigir al login
         if (error.status === 401) {
-          console.error('Token inválido o expirado. Redirigiendo al login...');
+          console.error('⚠️ Token inválido o expirado. Redirigiendo al login...');
           localStorage.removeItem('auth_token');
-          this.router.navigate(['/login']);
+          localStorage.removeItem('user');
+          localStorage.removeItem('auth_method');
+          this.router.navigate(['/']);
         }
         
         return throwError(() => error);

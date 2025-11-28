@@ -1,6 +1,4 @@
-// ============================================
-// register-modal.component.ts - NUEVO
-// ============================================
+// register-modal.component.ts
 import {
   Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges
 } from '@angular/core';
@@ -27,6 +25,7 @@ export class RegisterModalComponent implements OnChanges {
   hide = true;
   loading = false;
   errorMsg = '';
+  successMsg = '';  // ✅ NUEVO
 
   form = this.fb.group({
     nombre:    ['', [Validators.required, Validators.minLength(2)]],
@@ -40,6 +39,13 @@ export class RegisterModalComponent implements OnChanges {
   ngOnChanges(ch: SimpleChanges) {
     if (ch['open']) {
       document.body.style.overflow = ch['open'].currentValue ? 'hidden' : '';
+      
+      // Resetear mensajes al abrir/cerrar
+      if (!ch['open'].currentValue) {
+        this.successMsg = '';
+        this.errorMsg = '';
+        this.form.reset();
+      }
     }
   }
 
@@ -47,6 +53,7 @@ export class RegisterModalComponent implements OnChanges {
     if (this.loading) return;
 
     this.errorMsg = '';
+    this.successMsg = '';
     this.form.markAllAsTouched();
     
     if (this.form.invalid) {
@@ -64,16 +71,23 @@ export class RegisterModalComponent implements OnChanges {
     this.loading = true;
 
     try {
-      const usuario = await this.auth.registerNative({
+      const response = await this.auth.registerNative({
         ...rest as any,
         ap_m: ap_m || null,
         password: password!
       });
       
-      console.log('✅ Registro exitoso:', usuario);
-      this.success.emit({ user: usuario });
-      this.close.emit();
+      console.log('✅ Registro exitoso:', response);
+      
+      // ✅ MOSTRAR MENSAJE DE ÉXITO
+      this.successMsg = '✅ Cuenta creada exitosamente. Revisa tu email para verificar tu cuenta.';
       this.form.reset();
+      
+      // ✅ Cerrar modal y redirigir al login después de 4 segundos
+      setTimeout(() => {
+        this.close.emit();
+        this.goLogin.emit();
+      }, 4000);
       
     } catch (error: any) {
       console.error('❌ Error en registro:', error);
@@ -92,6 +106,7 @@ export class RegisterModalComponent implements OnChanges {
     if (this.loading) return;
     
     this.errorMsg = '';
+    this.successMsg = '';
     this.loading = true;
 
     try {
