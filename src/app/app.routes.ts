@@ -112,6 +112,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
+  {
+  path: 'buscar',
+  loadComponent: () =>
+    import('./features/public/pages/tournament-search/tournament-search.component')
+      .then(m => m.TournamentSearchComponent)
+},
+
+
   // Ruta 404 - redirige al home
   {
     path: '**',

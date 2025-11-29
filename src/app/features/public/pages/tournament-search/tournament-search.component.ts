@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,55 +22,76 @@ export class TournamentSearchComponent {
   constructor(
     private searchService: TournamentSearchService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private zone: NgZone
   ) {}
 
+  // ✅ NUEVO MÉTODO: Manejar Enter
+  handleEnter(): void {
+    console.log('🎯 Enter presionado');
+  this.onSearch();
+}
+
+  // ✅ MÉTODO ACTUALIZADO: Búsqueda
   onSearch(): void {
-    // ✅ GUARDAR el valor ANTES de cualquier operación
     const query = this.searchQuery.trim();
     
-    console.log('🔍 onSearch() llamado con query:', `"${query}"`);
-    console.log('🔍 searchQuery actual:', `"${this.searchQuery}"`);
+    console.log('\n🔍 ===== INICIO DE BÚSQUEDA =====');
+    console.log('Query:', `"${query}"`);
     
     if (!query) {
-      console.log('⚠️ Query vacío, no haciendo nada');
+      console.log('⚠️ Query vacío, cancelando');
       return;
     }
 
-    this.searching = true;
-    this.hasSearched = true;
-    this.cdr.detectChanges();
-
-    console.log('🔍 Ejecutando búsqueda para:', query);
+    // ✅ Ejecutar dentro de NgZone para forzar detección de cambios
+    this.zone.run(() => {
+      this.searching = true;
+      this.hasSearched = true;
+      this.match = null;
+      this.suggestions = [];
+      
+      console.log('🔄 Estado actualizado: searching=true');
+    });
 
     this.searchService.search(query).subscribe({
       next: (response: SearchResponse) => {
-        console.log('✅ Respuesta recibida:', response);
-        this.match = response.match;
-        this.suggestions = response.suggestions;
-        this.searching = false;
-        this.cdr.detectChanges();
+        console.log('✅ Respuesta recibida del servidor:', response);
         
-        console.log('Match:', this.match);
-        console.log('Suggestions:', this.suggestions.length, 'encontradas');
+        // ✅ Forzar actualización en NgZone
+        this.zone.run(() => {
+          this.match = response.match;
+          this.suggestions = response.suggestions;
+          this.searching = false;
+          
+          console.log('📊 Resultados procesados:');
+          console.log('  - Match:', this.match ? this.match.nombre : 'ninguno');
+          console.log('  - Sugerencias:', this.suggestions.length);
+          console.log('  - searching:', this.searching);
+        });
       },
       error: (error) => {
         console.error('❌ Error en búsqueda:', error);
-        this.match = null;
-        this.suggestions = [];
-        this.hasSearched = true;
-        this.searching = false;
-        this.cdr.detectChanges();
+        
+        // ✅ Forzar actualización en NgZone
+        this.zone.run(() => {
+          this.match = null;
+          this.suggestions = [];
+          this.searching = false;
+          this.hasSearched = true;
+        });
+        
         alert('Error al buscar torneos. Por favor intenta de nuevo.');
       }
     });
   }
 
   clearResults(): void {
-    this.match = null;
-    this.suggestions = [];
-    this.hasSearched = false;
-    this.cdr.detectChanges();
+    this.zone.run(() => {
+      this.match = null;
+      this.suggestions = [];
+      this.hasSearched = false;
+      this.searching = false;
+    });
   }
 
   viewTournament(torneo: TorneoPublico): void {

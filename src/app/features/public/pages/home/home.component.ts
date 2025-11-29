@@ -28,7 +28,7 @@ type SectionId = typeof SECTION_IDS[number];
     ContactSectionComponent,
     LoginModalComponent,
     RegisterModalComponent,
-    ForgotPasswordModalComponent,
+    ForgotPasswordModalComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
@@ -227,30 +227,46 @@ export class HomeComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const els = (SECTION_IDS as readonly SectionId[])
-      .map(id => document.getElementById(id))
-      .filter((e): e is HTMLElement => !!e);
+  const els = (SECTION_IDS as readonly SectionId[])
+    .map(id => document.getElementById(id))
+    .filter((e): e is HTMLElement => !!e);
 
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          const id = e.target.id as SectionId;
-          this.active = id;
-          history.replaceState(null, '', `#${id}`);
-        }
-      });
-    }, { 
-      threshold: [0, 0.25, 0.5, 0.75, 1],
-      rootMargin: '-100px 0px -50% 0px'
-    });
-
-    els.forEach(el => observer.observe(el));
-
-    window.addEventListener('scroll', () => {
-      if (window.scrollY < 200) {
-        this.active = 'inicio';
-        history.replaceState(null, '', '#inicio');
+  // ✅ CONFIGURACIÓN MEJORADA DEL OBSERVER
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio >= 0.3) {
+        const id = e.target.id as SectionId;
+        
+        // ✅ Actualizar la sección activa
+        this.active = id;
+        
+        // Actualizar URL sin recargar
+        history.replaceState(null, '', id === 'inicio' ? '/' : `#${id}`);
+        
+        console.log('📍 Sección activa:', id);
       }
     });
+  }, { 
+    // ✅ CONFIGURACIÓN CRÍTICA
+    threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+    rootMargin: '-20% 0px -60% 0px' // La sección debe estar en el 20% superior del viewport
+  });
+
+  // Observar todas las secciones
+  els.forEach(el => observer.observe(el));
+
+  // ✅ DETECTAR CUANDO ESTÁS ARRIBA DEL TODO (INICIO)
+  window.addEventListener('scroll', () => {
+    if (window.scrollY < 300) {
+      this.active = 'inicio';
+      history.replaceState(null, '', '/');
+    }
+  }, { passive: true });
+
+  // ✅ DETECTAR LA SECCIÓN INICIAL AL CARGAR
+  const hash = window.location.hash.replace('#', '') as SectionId;
+  if (hash && SECTION_IDS.includes(hash)) {
+    setTimeout(() => this.scrollTo(hash), 100);
   }
+}
 }
