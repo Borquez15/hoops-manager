@@ -1,11 +1,10 @@
-<div class="search-container" (click)="$event.stopPropagation()">
+<div class="search-container">
   <div class="search-card">
     <h1 class="search-title">TORNEOS</h1>
     <p class="search-subtitle">Puedes encontrar tus torneos aquí</p>
 
-    <!-- ⛔ FORMULARIO QUE BLOQUEA SUBMIT Y EVITA NAVEGACIÓN -->
-    <form (submit)="$event.preventDefault(); onSearch()" class="search-form">
-
+    <!-- ✅ FORM COMPLETAMENTE AISLADO -->
+    <form (submit)="onSearch($event)" novalidate>
       <div class="search-bar">
         <input
           type="text"
@@ -15,14 +14,14 @@
           placeholder="Escribe el nombre del torneo o su ID..."
           autocomplete="off"
           [disabled]="searching"
-          (keyup.enter)="onSearch()"
+          (keydown.enter)="onSearch($event)"
         />
 
         <button 
           type="button"
           class="search-button" 
           [disabled]="searching || !searchQuery.trim()"
-          (click)="onSearch()">
+          (click)="onSearch($event)">
 
           <svg *ngIf="!searching" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -49,7 +48,7 @@
     <!-- MATCH EXACTO -->
     <div *ngIf="match" class="results-section">
       <h3 class="section-title">✅ Resultado Exacto</h3>
-      <div class="tournament-card match-card" (click)="viewTournament(match)">
+      <div class="tournament-card match-card" (click)="viewTournament(match, $event)">
         <div class="tournament-logo">
           <span>{{ match.nombre.charAt(0) }}</span>
         </div>
@@ -63,7 +62,12 @@
           </div>
         </div>
 
-        <button class="btn-enter" (click)="viewTournament(match); $event.stopPropagation()">ENTRAR</button>
+        <button 
+          type="button"
+          class="btn-enter" 
+          (click)="viewTournament(match, $event)">
+          ENTRAR
+        </button>
       </div>
     </div>
 
@@ -72,8 +76,10 @@
       <h3 class="section-title">💡 Sugerencias ({{ suggestions.length }})</h3>
 
       <div class="tournaments-grid">
-        <div *ngFor="let torneo of suggestions" class="tournament-card"
-             (click)="viewTournament(torneo)">
+        <div 
+          *ngFor="let torneo of suggestions" 
+          class="tournament-card"
+          (click)="viewTournament(torneo, $event)">
              
           <div class="tournament-logo">
             <span>{{ torneo.nombre.charAt(0) }}</span>
@@ -88,7 +94,12 @@
             </div>
           </div>
 
-          <button class="btn-enter" (click)="viewTournament(torneo); $event.stopPropagation()">ENTRAR</button>
+          <button 
+            type="button"
+            class="btn-enter" 
+            (click)="viewTournament(torneo, $event)">
+            ENTRAR
+          </button>
         </div>
       </div>
     </div>

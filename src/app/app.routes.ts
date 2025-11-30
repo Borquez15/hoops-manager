@@ -2,7 +2,19 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  // Ruta pública (Home)
+  // ============================================
+  // RUTAS PÚBLICAS (SIN AUTENTICACIÓN)
+  // ============================================
+  
+  // ✅ BÚSQUEDA - SOLO UNA VEZ, AL PRINCIPIO
+  {
+    path: 'buscar',
+    loadComponent: () =>
+      import('./features/public/pages/tournament-search/tournament-search.component')
+        .then(m => m.TournamentSearchComponent)
+  },
+
+  // Home
   {
     path: '',
     loadComponent: () => 
@@ -10,7 +22,7 @@ export const routes: Routes = [
         .then(m => m.HomeComponent)
   },
   
-  // Vista pública de torneo (sin auth)
+  // Vista pública de torneo
   {
     path: 'torneos/:id',
     loadComponent: () =>
@@ -18,6 +30,7 @@ export const routes: Routes = [
         .then(m => m.TournamentViewComponent)
   },
 
+  // Aceptar árbitro
   {
     path: 'aceptar-arbitro',
     loadComponent: () =>
@@ -25,6 +38,7 @@ export const routes: Routes = [
         .then(m => m.AcceptRefereeInviteComponent)
   },
 
+  // Verificar email
   {
     path: 'verificar-email',
     loadComponent: () =>
@@ -33,7 +47,7 @@ export const routes: Routes = [
   },
 
   // ============================================
-  // RUTAS PROTEGIDAS (requieren autenticación)
+  // RUTAS PROTEGIDAS (REQUIEREN AUTENTICACIÓN)
   // ============================================
   
   // Dashboard
@@ -72,28 +86,34 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-   {
+  // Dashboard de árbitro
+  {
     path: 'arbitro',
-    canActivate: [authGuard],
     loadComponent: () => 
       import('./features/referee/referee-dashboard/referee-dashboard.component')
-        .then(m => m.RefereeDashboardComponent)
-  },
-  {
-    path: 'arbitro/partido/:id',
-    canActivate: [authGuard],
-    loadComponent: () => 
-      import('./features/referee/match-live/match-live.component')
-        .then(m => m.MatchLiveComponent)
-  },
-  {
-    path: 'arbitro/reporte/:id',
-    canActivate: [authGuard],
-    loadComponent: () => 
-      import('./features/referee/match-report/match-report.component')
-        .then(m => m.MatchReportComponent)
+        .then(m => m.RefereeDashboardComponent),
+    canActivate: [authGuard]
   },
 
+  // Partido en vivo (árbitro)
+  {
+    path: 'arbitro/partido/:id',
+    loadComponent: () => 
+      import('./features/referee/match-live/match-live.component')
+        .then(m => m.MatchLiveComponent),
+    canActivate: [authGuard]
+  },
+
+  // Reporte de partido
+  {
+    path: 'arbitro/reporte/:id',
+    loadComponent: () => 
+      import('./features/referee/match-report/match-report.component')
+        .then(m => m.MatchReportComponent),
+    canActivate: [authGuard]
+  },
+
+  // Partido en vivo (general)
   {
     path: 'partido/:id',
     loadComponent: () => 
@@ -101,7 +121,6 @@ export const routes: Routes = [
         .then(m => m.MatchLiveComponent),
     canActivate: [authGuard]
   },
-
 
   // Perfil
   {
@@ -112,15 +131,9 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  {
-  path: 'buscar',
-  loadComponent: () =>
-    import('./features/public/pages/tournament-search/tournament-search.component')
-      .then(m => m.TournamentSearchComponent)
-},
-
-
-  // Ruta 404 - redirige al home
+  // ============================================
+  // RUTA 404 - DEBE SER LA ÚLTIMA
+  // ============================================
   {
     path: '**',
     redirectTo: ''
