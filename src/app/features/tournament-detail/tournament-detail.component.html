@@ -120,48 +120,55 @@
       </section>
 
       <section class="card card-wide">
-        <div class="card-header">
-          <h2 class="card-title">Equipos</h2>
-          <span class="badge-count">{{ equipos.length }} / {{ getMinimumTeams() }} mínimo</span>
-          <button class="btn-icon btn-add" (click)="abrirModalEquipo()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-            </svg>
-          </button>
-        </div>
+  <div class="card-header">
+    <h2 class="card-title">Equipos</h2>
 
-        <div class="card-body">
-          <div class="list">
-            <div class="list-item" *ngFor="let equipo of equipos; let i = index">
-              <div class="equipo-logo">
-                <img *ngIf="equipo.logo_url" [src]="equipo.logo_url" [alt]="equipo.nombre">
-                <span *ngIf="!equipo.logo_url">{{ equipo.nombre.charAt(0) }}</span>
-              </div>
-              <span class="list-item-text">
-                {{ equipo.nombre }}
-                <small class="jugadores-count">{{ getJugadoresCount(equipo) }} jugadores</small>
-              </span>
-              <div class="list-item-actions">
-                <button class="btn-icon-small" (click)="editarEquipo(i)">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                  </svg>
-                </button>
-                <button class="btn-icon-small btn-delete" (click)="eliminarEquipo(i, equipo.id_equipo)">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                  </svg>
-                </button>
-              </div>
+    <span class="badge-count">{{ equipos.length }} / {{ getMinimumTeams() }} mínimo</span>
+
+    <button class="btn-icon btn-add" (click)="abrirModalEquipo()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+      </svg>
+    </button>
+  </div>
+
+      <div class="card-body">
+        <div class="list">
+
+          <div class="list-item" *ngFor="let equipo of equipos; let i = index">
+            <div class="equipo-logo">
+              <img *ngIf="equipo.logo_url" [src]="equipo.logo_url" [alt]="equipo.nombre">
+              <span *ngIf="!equipo.logo_url">{{ equipo.nombre.charAt(0) }}</span>
             </div>
 
-            <div class="empty-state" *ngIf="equipos.length === 0">
-              <p>No hay equipos agregados</p>
-              <small>Agrega al menos {{ getMinimumTeams() }} equipos</small>
+            <span class="list-item-text">
+              {{ equipo.nombre }}
+              <small class="jugadores-count">{{ (equipo.jugadores?.length) ?? 0 }} jugadores</small>
+            </span>
+
+            <div class="list-item-actions">
+              <button class="btn-icon-small" (click)="editarEquipo(i)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+                </svg>
+              </button>
+
+              <button class="btn-icon-small btn-delete" (click)="eliminarEquipo(i, equipo.id_equipo)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+              </button>
             </div>
           </div>
+
+          <div class="empty-state" *ngIf="equipos.length === 0">
+            <p>No hay equipos agregados</p>
+            <small>Agrega al menos {{ getMinimumTeams() }} equipos</small>
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
+
     </div>
 
     <div class="section-divider"></div>
@@ -231,6 +238,7 @@
   (closeModal)="cerrarModalEquipo()"
   (equipoUpdated)="onEquipoUpdated()"
 ></app-team-modal>
+
 
 <app-referee-modal
   [isOpen]="modalArbitroAbierto"

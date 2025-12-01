@@ -45,7 +45,7 @@ interface EquipoConJugadores {
   id_equipo?: number;
   nombre: string;
   logo_url?: string;
-  jugadores: JugadorEquipo[];
+  jugadores?: JugadorEquipo[];
 }
 
 @Component({
