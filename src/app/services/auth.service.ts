@@ -10,7 +10,7 @@ import {
 } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { environment } from '../../environment/environment';
+import { environment } from '../../environment/environment.prod';
 
 export interface UsuarioNativo {
   id_usuario: number;

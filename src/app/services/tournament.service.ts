@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { environment } from '../../environment/environment';
+import { environment } from '../../environment/environment.prod';
 import { Tournament, Equipo, Arbitro, Match } from '../models/tournament.model';
 
 @Injectable({
