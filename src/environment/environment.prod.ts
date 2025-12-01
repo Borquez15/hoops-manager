@@ -8,5 +8,5 @@ export const environment = {
     messagingSenderId: '91417343471',
     appId: '1:91417343471:web:9abef41b66cf9e17b7321a',
   },
-  apiBase: 'https://hoopsbackend-production.up.railway.app/'  // ← URL de Railway
+  apiBase: 'https://hoopsbackend-production.up.railway.app'  // ← URL de Railway
 };
