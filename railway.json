@@ -1,6 +1,0 @@
-{
-  "build": {
-    "builder": "static",
-    "outputDirectory": "dist/hoops-manager"
-  }
-}
