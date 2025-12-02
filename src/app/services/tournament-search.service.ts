@@ -23,7 +23,7 @@ export interface SearchResponse {
   providedIn: 'root'
 })
 export class TournamentSearchService {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoops-manager-production.up.railway.app';
 
   constructor(private http: HttpClient) {}
 
