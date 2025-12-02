@@ -49,7 +49,7 @@ export class TeamModalComponent implements OnChanges {
   @Output() closeModal = new EventEmitter<void>();
   @Output() equipoUpdated = new EventEmitter<void>();
 
-  apiUrl = 'http://localhost:8000';
+  apiUrl = 'https://hoopsbackend-production.up.railway.app';
   equipoTemp: EquipoConJugadores | null = null;
 
   nuevoJugador: any = {

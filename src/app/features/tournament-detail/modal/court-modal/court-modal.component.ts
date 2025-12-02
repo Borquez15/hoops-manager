@@ -22,7 +22,7 @@ export class CourtModalComponent {
   @Output() closeModal = new EventEmitter<void>();
   @Output() canchasUpdated = new EventEmitter<void>();
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   nuevaCancha: Cancha = { nombre: '', ubicacion: '', activa: true };
   loading = false;
   error: string | null = null;

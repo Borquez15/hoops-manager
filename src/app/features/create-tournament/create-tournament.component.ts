@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { RefereeModalComponent } from '../tournament-detail/modal/referee-modal/referee-modal.component';
+import { NgIf, NgFor } from '@angular/common';
+
+
 
 // ========== INTERFACES ==========
 interface Arbitro {
@@ -63,12 +67,14 @@ interface LookupResponse {
 @Component({
   selector: 'app-crear-torneo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,NgIf, NgFor, RefereeModalComponent],
   templateUrl: './create-tournament.component.html',
   styleUrls: ['./create-tournament.component.css']
 })
 export class CrearTorneoComponent implements OnInit {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  
+  modalArbitrosAbierto = false;
 
   // ========== CONFIGURACIÓN DEL TORNEO ==========
   config: TorneoConfig = {
@@ -201,6 +207,15 @@ export class CrearTorneoComponent implements OnInit {
   cambiarModalidad(modalidad: '3v3' | '5v5') {
     this.config.modalidad = modalidad;
   }
+
+  abrirModalArbitros() {
+    this.modalArbitrosAbierto = true;
+  }
+
+  cerrarModalArbitros() {
+    this.modalArbitrosAbierto = false;
+  }
+
 
   // ========== GESTIÓN DE CANCHAS ==========
   agregarCancha() {

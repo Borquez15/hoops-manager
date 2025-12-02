@@ -1,16 +1,16 @@
 :host{display:block;background:#0b0f14;color:#fff}
 
 :root{
-  /* HERO (ya los usabas) */
+  /* HERO */
   --hero-pos-x: 58%;
   --hero-pos-y: 34%;
   --hero-zoom: 112%;
   --hero-nudge-x: 0px;
   /* NAV */
-  --nav-offset: 22px;     /* empuje del menú hacia la derecha */
-  --logo-h: 44px;         /* ← tamaño del logo: súbelo/bájalo aquí */
-  --nav-pad-y: 12px;      /* padding vertical del header */
-  --nav-pad-x: 24px;      /* padding horizontal del header */
+  --nav-offset: 22px;
+  --logo-h: 44px;
+  --nav-pad-y: 12px;
+  --nav-pad-x: 24px;
   --nav-h: calc(var(--logo-h) + var(--nav-pad-y)*2);
 }
 
@@ -26,7 +26,8 @@
 }
 
 .nav__wrap{
-  max-width:1280px; margin:0 auto;
+  max-width:1280px; 
+  margin:0 auto;
   display:grid;
   grid-template-columns: 1fr auto 1fr;
   align-items:center;
@@ -39,7 +40,6 @@
 .nav__wrap > .btn{ 
   justify-self:end; 
   grid-column: 3 / 4; 
-  justify-self:end; 
 }
 
 /* ========================================
@@ -66,21 +66,8 @@
   transform-origin: left center;
 }
 
-.brand__logo{
-  display:grid;
-  place-items:center;
-  width:34px;
-  height:34px;
-  border:1px solid #2a2f36;
-  border-radius:.6rem
-}
-
-.brand__text strong{
-  color:#ff7a33
-}
-
 /* ========================================
-   MENU DE NAVEGACIÓN (cuando NO está autenticado)
+   MENÚ DE NAVEGACIÓN (cuando NO está autenticado)
    ======================================== */
 .menu{
   display:flex;
@@ -99,6 +86,7 @@
   font-weight:700; 
   letter-spacing:.3px;
   padding:.35rem 0;
+  white-space: nowrap;
 }
 
 .menu__link::after{
@@ -138,6 +126,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
 }
 
 .user-avatar-small {
@@ -154,6 +143,7 @@
   box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
   cursor: pointer;
   transition: transform 0.2s ease;
+  flex-shrink: 0;
 }
 
 .user-avatar-small:hover {
@@ -164,10 +154,14 @@
   color: white;
   font-size: 16px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 /* ========================================
-   HAMBURGUESA (cuando está autenticado)
+   HAMBURGUESA
    ======================================== */
 .hamburger {
   display: flex;
@@ -181,6 +175,7 @@
   padding: 0;
   z-index: 1001;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .hamburger span {
@@ -215,7 +210,7 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 9998;  /* ← Entre el nav (9999) y el fondo */
+  z-index: 9998;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -233,12 +228,13 @@
   top: 0;
   right: -100%;
   width: 300px;
+  max-width: 85vw;
   height: 100%;
   background: #2c3e50;
-  z-index: 10000;  /* ← MAYOR que el nav (9999) */
+  z-index: 10000;
   transition: right 0.3s ease;
   overflow-y: auto;
-  overflow-x: hidden;  /* ← Elimina scroll horizontal */
+  overflow-x: hidden;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -250,7 +246,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 100%;  /* ← Asegura que no se desborde */
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -279,6 +275,7 @@
   font-weight: bold;
   margin-bottom: 15px;
   box-shadow: 0 4px 10px rgba(255, 140, 66, 0.3);
+  flex-shrink: 0;
 }
 
 .user-name {
@@ -287,6 +284,8 @@
   font-weight: 600;
   margin: 0;
   text-align: center;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 /* ========================================
@@ -296,7 +295,7 @@
   flex: 1;
   padding: 20px 0;
   overflow-y: auto;
-  overflow-x: hidden;  /* ← Evita scroll horizontal */
+  overflow-x: hidden;
   width: 100%;
   box-sizing: border-box;
 }
@@ -317,8 +316,7 @@
   font-size: 16px;
   font-weight: 500;
   border-left: 3px solid transparent;
-  box-sizing: border-box;  /* ← Importante */
-  white-space: nowrap;  /* ← Evita que el texto se desborde */
+  box-sizing: border-box;
 }
 
 .sidebar-item:hover {
@@ -336,8 +334,9 @@
 
 .sidebar-item span {
   flex: 1;
-  overflow: hidden;  /* ← Evita desbordamiento */
-  text-overflow: ellipsis;  /* ← Agrega ... si es muy largo */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sidebar-item.danger {
@@ -371,15 +370,17 @@
   font-weight:800;
   letter-spacing:.4px;
   cursor:pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
 }
 
 .btn-primary{
   background:#ff7a33;
-  color:#1b1b1b
+  color:#1b1b1b;
 }
 
 .btn-primary:active{
-  transform:translateY(1px)
+  transform:translateY(1px);
 }
 
 /* ========================================
@@ -415,27 +416,31 @@
   width:min(680px, 90vw);
   margin-left: clamp(12px, 8vw, 120px);
   justify-self:start;
-  padding-top: calc(var(--nav-h) - 4px);
+  padding: calc(var(--nav-h) + 20px) 20px 20px;
+  box-sizing: border-box;
 }
 
 .hero__title{
-  font-size: clamp(34px, 6.2vw, 56px);
-  line-height:1.02;
+  font-size: clamp(28px, 6.2vw, 56px);
+  line-height:1.1;
   margin:0 0 1rem 0;
   font-weight:800;
   letter-spacing:.5px;
+  word-wrap: break-word;
 }
 
 .hero__lead{
   color:#d7d7d7;
   max-width:560px;
   margin:.5rem 0 1.4rem 0;
-  line-height:1.45;
+  line-height:1.5;
   font-weight:600;
+  font-size: clamp(14px, 2vw, 16px);
 }
 
 .hero__cta{
-  font-size:14px
+  font-size: clamp(12px, 2vw, 14px);
+  padding: clamp(0.6rem, 1.5vw, 0.7rem) clamp(0.8rem, 2vw, 1rem);
 }
 
 /* ========================================
@@ -443,7 +448,9 @@
    ======================================== */
 .foot{
   border-top:1px solid rgba(255,255,255,.06);
-  background:#0c1016
+  background:#0c1016;
+  padding: 20px;
+  text-align: center;
 }
 
 .foot__wrap{
@@ -451,7 +458,7 @@
   margin:0 auto;
   padding:1.2rem;
   color:#97a0aa;
-  font-size:.9rem
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
 }
 
 /* ========================================
@@ -461,41 +468,48 @@
   background-image:
     radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
     linear-gradient(0deg, rgba(0,0,0,.40), rgba(0,0,0,.40)),
-    url("/public/imagen/fondo.webp");
+    url("/imagen/fondo.webp");
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-position: center, center, calc(var(--hero-pos-x) + var(--hero-nudge-x, 0px)) var(--hero-pos-y);
   background-size: auto, auto, var(--hero-zoom) auto;
   box-shadow: 0 8px 24px rgba(0,0,0,.25);
 }
 
-@supports not (background-image: url("/public/imagen/fondo.webp")) {
+@supports not (background-image: url("/imagen/fondo.webp")) {
   .nav--brand-bg{
     background-image:
       radial-gradient(1200px 600px at 70% -20%, rgba(255,255,255,.06), transparent 60%),
       linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
-      url("/public/imagen/fondo.png");
+      url("/imagen/fondo.png");
   }
+}
+
+/* ========================================
+   SCROLL SPY - OFFSET PARA SECCIONES
+   ======================================== */
+section {
+  scroll-margin-top: 80px;
+}
+
+#inicio {
+  scroll-margin-top: 0;
+}
+
+.snap__section {
+  scroll-margin-top: 80px;
 }
 
 /* ========================================
    ANIMACIONES
    ======================================== */
 @keyframes slideIn {
-  from {
-    right: -100%;
-  }
-  to {
-    right: 0;
-  }
+  from { right: -100%; }
+  to { right: 0; }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .sidebar.open {
@@ -527,64 +541,100 @@
 }
 
 /* ========================================
-   RESPONSIVE
+   RESPONSIVE - TABLET
+   ======================================== */
+@media (max-width: 1024px){
+  .nav__wrap {
+    padding: var(--nav-pad-y) 20px;
+  }
+
+  .menu {
+    gap: 1.5rem;
+  }
+
+  .menu__link {
+    font-size: 14px;
+  }
+
+  .hero__content{
+    margin-left: clamp(12px, 6vw, 80px);
+  }
+}
+
+/* ========================================
+   RESPONSIVE - MÓVIL GRANDE
    ======================================== */
 @media (max-width: 900px){
-  /* El menú se oculta en móvil solo si está autenticado */
-  .user-section ~ .menu,
-  .isAuthenticated .menu {
-    display: none;
+  /* El menú se oculta en móvil */
+  .menu {
+    display: none !important;
   }
   
   .hero__content{
-    margin-left: clamp(12px, 4vw, 60px)
+    margin-left: clamp(12px, 4vw, 60px);
+    width: 90vw;
   }
 
   /* Ajustar grid del nav en móvil */
   .nav__wrap {
     grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
   }
 
-  .menu {
-    justify-self: center;
-    font-size: 14px;
-    gap: 1rem;
+  .brand__img {
+    height: 36px;
   }
 
-  .menu__link {
-    font-size: 13px;
+  .user-section {
+    gap: 12px;
   }
 }
 
+/* ========================================
+   RESPONSIVE - MÓVIL MEDIANO
+   ======================================== */
 @media (max-width: 768px) {
   /* Ocultar el nombre del usuario en móvil */
   .user-name-header {
     display: none;
   }
 
-  /* Ocultar el menú completamente en móvil */
-  .menu {
-    display: none !important;
-  }
-
   .sidebar {
     width: 280px;
+    max-width: 85vw;
   }
 
-  .user-section {
-    gap: 12px;
+  .hero__title {
+    font-size: clamp(24px, 8vw, 36px);
   }
 
-  /* Asegurar que el logo sea visible */
-  .brand__img {
-    height: 36px;
+  .hero__lead {
+    font-size: 14px;
+  }
+
+  .user-avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 32px;
+  }
+
+  .sidebar-item {
+    font-size: 15px;
+    padding: 14px 18px;
   }
 }
 
+/* ========================================
+   RESPONSIVE - MÓVIL PEQUEÑO
+   ======================================== */
 @media (max-width: 480px) {
-  .sidebar {
-    width: 100%;
-    max-width: 280px;
+  .nav__wrap {
+    padding: var(--nav-pad-y) 12px;
+    gap: 0.5rem;
+  }
+
+  .brand__img {
+    height: 32px;
   }
 
   .user-avatar-small {
@@ -593,26 +643,132 @@
     font-size: 16px;
   }
 
-  .nav__wrap {
-    padding: var(--nav-pad-y) 16px;
+  .hamburger {
+    width: 26px;
+    height: 22px;
   }
 
-  .brand__img {
-    height: 32px;
+  .sidebar {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .sidebar-header {
+    padding: 24px 16px;
+  }
+
+  .user-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .user-name {
+    font-size: 16px;
+  }
+
+  .sidebar-item {
+    font-size: 14px;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .sidebar-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hero__content {
+    margin-left: 0;
+    width: 100%;
+    padding: calc(var(--nav-h) + 20px) 16px 20px;
+  }
+
+  .hero__title {
+    font-size: clamp(22px, 7vw, 32px);
+    margin-bottom: 0.8rem;
+  }
+
+  .hero__lead {
+    font-size: 13px;
+    margin-bottom: 1.2rem;
+  }
+
+  .btn-primary {
+    font-size: 12px;
+    padding: 0.6rem 0.9rem;
+  }
+
+  .foot__wrap {
+    padding: 1rem;
   }
 }
 
 /* ========================================
-   SCROLL SPY - OFFSET PARA SECCIONES
+   RESPONSIVE - MUY PEQUEÑO
    ======================================== */
-section {
-  scroll-margin-top: 80px;
+@media (max-width: 360px) {
+  .hero__title {
+    font-size: 20px;
+  }
+
+  .hero__lead {
+    font-size: 12px;
+  }
+
+  .btn-primary {
+    font-size: 11px;
+    padding: 0.5rem 0.8rem;
+  }
+
+  .sidebar-item {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
 }
 
-#inicio {
-  scroll-margin-top: 0;
+/* ========================================
+   OPTIMIZACIÓN DE RENDIMIENTO
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-.snap__section {
-  scroll-margin-top: 80px;
+/* ========================================
+   MODO OSCURO (SI LO NECESITAS)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  /* Ya está en modo oscuro por defecto */
+}
+
+/* ========================================
+   ORIENTACIÓN LANDSCAPE EN MÓVILES
+   ======================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding: 120px 0 60px;
+  }
+
+  .sidebar-header {
+    padding: 20px 16px;
+  }
+
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-item {
+    padding: 10px 16px;
+  }
 }

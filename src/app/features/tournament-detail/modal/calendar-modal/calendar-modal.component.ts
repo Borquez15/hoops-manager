@@ -34,7 +34,7 @@ export class CalendarModalComponent implements OnChanges {
   @Input() tournamentId!: number;
   @Output() closeModal = new EventEmitter<void>();
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   calendario: CalendarMonth | null = null;
   anio = new Date().getFullYear();
   mes = new Date().getMonth() + 1;

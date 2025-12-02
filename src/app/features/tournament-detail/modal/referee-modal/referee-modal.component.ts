@@ -26,7 +26,7 @@ export class RefereeModalComponent implements OnInit {
   @Output() closeModal = new EventEmitter<void>();
   @Output() refereesUpdated = new EventEmitter<void>();
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
   // Formulario de invitación
   nuevoArbitroEmail = '';

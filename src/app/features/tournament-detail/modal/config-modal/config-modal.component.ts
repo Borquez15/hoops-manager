@@ -27,7 +27,7 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   @Output() saveTournament = new EventEmitter<Partial<Tournament>>();
   @Output() canchasUpdated = new EventEmitter<void>();
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
   editForm: Partial<Tournament> = {
     nombre: '',
