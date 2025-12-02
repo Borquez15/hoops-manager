@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { NgIf, NgFor } from '@angular/common';
 
 interface Equipo {
   id: number;
@@ -16,6 +17,15 @@ interface Cancha {
   ubicacion?: string;
 }
 
+interface Arbitro {
+  id_usuario: number;
+  nombre: string;
+  ap_p: string;
+  ap_m?: string;
+  email: string;
+  activo: boolean;
+}
+
 interface Match {
   id_partido: number;
   fecha: string;
@@ -23,6 +33,7 @@ interface Match {
   local?: Equipo;
   visitante?: Equipo;
   cancha?: Cancha;
+  arbitros?: Arbitro[];  // 👈 CAMBIAR: ahora es array
   estado: string;
 }
 
@@ -44,9 +55,17 @@ export class ProximosJuegosComponent implements OnChanges {
   partidosFiltrados: Match[] = [];
   loading = false;
   editandoId: number | null = null;
-  editForm = { fecha: '', hora: '', id_cancha: null as number | null, arbitro_id: null as number | null };
+  
+  // 👇 CAMBIAR: ahora arbitros_ids es array
+  editForm = { 
+    fecha: '', 
+    hora: '', 
+    id_cancha: null as number | null, 
+    arbitros_ids: [] as number[]  // 👈 ARRAY de IDs
+  };
+  
   canchasDisponibles: Cancha[] = [];
-  arbitrosDisponibles: any[] = [];
+  arbitrosDisponibles: Arbitro[] = [];
 
   // Filtros
   filtroTiempo: FiltroTiempo = 'todos';
@@ -76,7 +95,7 @@ export class ProximosJuegosComponent implements OnChanges {
       const [partidosResponse, canchasResponse, arbitrosResponse] = await Promise.all([
         this.http.get<Match[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/matches`).toPromise(),
         this.http.get<Cancha[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/courts`).toPromise(),
-        this.http.get<any[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/referees`).toPromise()
+        this.http.get<Arbitro[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/referees?activo=true`).toPromise()
       ]);
       
       this.partidos = partidosResponse || [];
@@ -85,11 +104,16 @@ export class ProximosJuegosComponent implements OnChanges {
       
       this.aplicarFiltros();
       
-      console.log('✅ Partidos cargados:', this.partidos.length);
+      console.log('✅ Datos cargados:', {
+        partidos: this.partidos.length,
+        canchas: this.canchasDisponibles.length,
+        arbitros: this.arbitrosDisponibles.length
+      });
     } catch (error) {
       console.error('❌ Error al cargar datos:', error);
       this.partidos = [];
       this.canchasDisponibles = [];
+      this.arbitrosDisponibles = [];
       this.partidosFiltrados = [];
     } finally {
       this.loading = false;
@@ -151,38 +175,75 @@ export class ProximosJuegosComponent implements OnChanges {
       fecha: partido.fecha,
       hora: partido.hora,
       id_cancha: partido.cancha?.id_cancha || null,
-      arbitro_id: (partido as any).arbitro?.id_arbitro || null
+      arbitros_ids: partido.arbitros?.map(a => a.id_usuario) || []  // 👈 EXTRAER IDs
     };
+    
+    console.log('📝 Editando partido:', {
+      id: partido.id_partido,
+      arbitrosActuales: partido.arbitros,
+      arbitrosIds: this.editForm.arbitros_ids
+    });
   }
 
   cancelarEdicion(): void {
     this.editandoId = null;
+    this.editForm = { fecha: '', hora: '', id_cancha: null, arbitros_ids: [] };
   }
 
- async guardarCambios(partidoId: number): Promise<void> {
-  try {
-    const payload: any = {
-      fecha: this.editForm.fecha,
-      hora: this.editForm.hora,
-      cancha_id: this.editForm.id_cancha ?? null,   // 👈 SIEMPRE enviar
-      arbitro_id: this.editForm.arbitro_id ?? null  // 👈 AGREGADO
-    };
-
-    await this.http.patch(
-      `${this.apiUrl}/tournaments/${this.tournamentId}/matches/${partidoId}`,
-      payload
-    ).toPromise();
-
-    alert('✅ Partido actualizado');
-
-    this.editandoId = null;
-    await this.loadData(); // 🔥 refresca todo el componente
-  } catch (error) {
-    console.error('❌ Error al actualizar partido:', error);
-    alert('❌ Error al actualizar partido');
+  // 👇 NUEVO: Toggle de árbitros
+  toggleArbitro(arbitroId: number): void {
+    const index = this.editForm.arbitros_ids.indexOf(arbitroId);
+    if (index > -1) {
+      // Ya está seleccionado -> quitar
+      this.editForm.arbitros_ids.splice(index, 1);
+    } else {
+      // No está seleccionado -> agregar
+      this.editForm.arbitros_ids.push(arbitroId);
+    }
+    
+    console.log('🔄 Árbitros seleccionados:', this.editForm.arbitros_ids);
   }
-}
 
+  // 👇 NUEVO: Verificar si árbitro está seleccionado
+  isArbitroSeleccionado(arbitroId: number): boolean {
+    return this.editForm.arbitros_ids.includes(arbitroId);
+  }
+
+  // 👇 NUEVO: Nombre completo del árbitro
+  getNombreCompletoArbitro(arbitro: Arbitro): string {
+    return `${arbitro.nombre} ${arbitro.ap_p} ${arbitro.ap_m || ''}`.trim();
+  }
+
+  async guardarCambios(partidoId: number): Promise<void> {
+    try {
+      // 👇 PAYLOAD CORREGIDO
+      const payload: any = {
+        fecha: this.editForm.fecha,
+        hora: this.editForm.hora,
+        cancha_id: this.editForm.id_cancha ?? null,
+        arbitros_ids: this.editForm.arbitros_ids  // 👈 ARRAY de IDs
+      };
+
+      console.log('💾 Guardando partido:', {
+        partidoId,
+        payload
+      });
+
+      await this.http.patch(
+        `${this.apiUrl}/tournaments/${this.tournamentId}/matches/${partidoId}`,
+        payload
+      ).toPromise();
+
+      console.log('✅ Partido actualizado correctamente');
+      alert('✅ Partido actualizado');
+
+      this.editandoId = null;
+      await this.loadData();
+    } catch (error: any) {
+      console.error('❌ Error al actualizar partido:', error);
+      alert(`❌ Error: ${error.error?.detail || 'Error al actualizar partido'}`);
+    }
+  }
 
   formatFecha(fecha: string): string {
     try {
@@ -230,5 +291,15 @@ export class ProximosJuegosComponent implements OnChanges {
 
   puedeIniciar(partido: Match): boolean {
     return partido.estado === 'PROGRAMADO' && !!partido.cancha;
+  }
+
+  // 👇 NUEVO: Mostrar árbitros del partido
+  getNombresArbitros(partido: Match): string {
+    if (!partido.arbitros || partido.arbitros.length === 0) {
+      return 'Sin árbitros';
+    }
+    return partido.arbitros
+      .map(a => `${a.nombre} ${a.ap_p}`)
+      .join(', ');
   }
 }

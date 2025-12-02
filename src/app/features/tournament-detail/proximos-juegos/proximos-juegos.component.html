@@ -143,13 +143,21 @@
             <span class="cancha sin-cancha" *ngIf="!partido.cancha">
               📍 Sin cancha asignada
             </span>
+            
+            <!-- 👇 MOSTRAR ÁRBITROS -->
+            <span class="arbitros-info" *ngIf="partido.arbitros && partido.arbitros.length > 0">
+              🧑‍⚖️ {{ getNombresArbitros(partido) }}
+            </span>
+            <span class="arbitros-info sin-arbitros" *ngIf="!partido.arbitros || partido.arbitros.length === 0">
+              🧑‍⚖️ Sin árbitros
+            </span>
+            
             <span class="estado" [ngClass]="getEstadoBadgeClass(partido.estado)">
               {{ partido.estado === 'EN_CURSO' ? 'EN CURSO' : partido.estado }}
             </span>
           </div>
           
           <div class="partido-acciones">
-            <!-- Botón INICIAR PARTIDO -->
             <button 
               *ngIf="puedeIniciar(partido)"
               class="btn-icon btn-play" 
@@ -161,7 +169,6 @@
               </svg>
             </button>
 
-            <!-- Botón VER (si está en curso o jugado) -->
             <button 
               *ngIf="partido.estado === 'EN_CURSO' || partido.estado === 'JUGADO'"
               class="btn-icon btn-view" 
@@ -233,18 +240,30 @@
             </select>
           </div>
 
-          <!-- ÁRBITRO -->
+          <!-- 👇 ÁRBITROS CON CHECKBOXES -->
           <div class="form-group">
-            <label>Árbitro</label>
-            <select [(ngModel)]="editForm.arbitro_id" class="form-control">
-              <option [ngValue]="null">Sin árbitro</option>
-              <option *ngFor="let arb of arbitrosDisponibles" [ngValue]="arb.id_arbitro">
-                🧑‍⚖️ {{ arb.nombre }}
-              </option>
-            </select>
+            <label>Árbitros ({{ editForm.arbitros_ids.length }} seleccionados)</label>
+            <div class="arbitros-selector">
+              <div 
+                *ngFor="let arb of arbitrosDisponibles" 
+                class="arbitro-checkbox-item"
+                [class.selected]="isArbitroSeleccionado(arb.id_usuario)"
+                (click)="toggleArbitro(arb.id_usuario)"
+              >
+                <input 
+                  type="checkbox" 
+                  [checked]="isArbitroSeleccionado(arb.id_usuario)"
+                  (click)="$event.stopPropagation()"
+                />
+                <span class="arbitro-name">{{ getNombreCompletoArbitro(arb) }}</span>
+              </div>
+
+              <div *ngIf="arbitrosDisponibles.length === 0" class="empty-arbitros">
+                No hay árbitros disponibles
+              </div>
+            </div>
           </div>
 
-          
           <div class="form-actions">
             <button class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
             <button class="btn btn-primary" (click)="guardarCambios(partido.id_partido)">Guardar</button>
