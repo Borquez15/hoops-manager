@@ -52,15 +52,18 @@ export class TournamentListComponent implements OnInit, OnDestroy {
    */
   goBack(): void {
     console.log('🔵 Regresando al HOME');
-    // Ajusta la ruta según tu configuración de rutas
-    // Puede ser '/home', '/inicio', '/', etc.
     this.router.navigate(['/home']);
   }
 
   /**
    * Navega al panel de administración del torneo
+   * ✅ CORREGIDO: Acepta number | undefined y valida
    */
-  viewTournament(id: number): void {
+  viewTournament(id?: number): void {
+    if (!id) {
+      console.error('❌ ID de torneo inválido o undefined');
+      return;
+    }
     console.log('🔵 Navegando al panel de administración del torneo:', id);
     this.router.navigate(['/torneo', id, 'admin']);
   }
@@ -84,7 +87,6 @@ export class TournamentListComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    // Usar finalize para asegurar que loading siempre se establece a false
     this.subscription = this.tournamentService.getTournaments()
       .pipe(
         finalize(() => {
@@ -112,28 +114,39 @@ export class TournamentListComponent implements OnInit, OnDestroy {
    * ========================================
    */
 
-  deleteTournament(id: number, event: Event): void {
+  /**
+ * Elimina un torneo
+ * ✅ CORREGIDO: Ambos parámetros opcionales
+ */
+deleteTournament(id?: number, event?: Event): void {
+  if (event) {
     event.stopPropagation();
-    
-    console.log('🔵 Intentando eliminar torneo:', id);
-    
-    if (confirm('¿Estás seguro de que deseas eliminar este torneo?')) {
-      this.loading = true; // Mostrar loading durante eliminación
-      
-      this.tournamentService.deleteTournament(id).subscribe({
-        next: () => {
-          console.log('✅ Torneo eliminado exitosamente');
-          this.loadTournaments();
-        },
-        error: (error) => {
-          console.error('❌ Error al eliminar torneo:', error);
-          this.error = 'Error al eliminar el torneo';
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
-      });
-    }
   }
+  
+  if (!id) {
+    console.error('❌ ID de torneo inválido o undefined');
+    return;
+  }
+  
+  console.log('🔵 Intentando eliminar torneo:', id);
+  
+  if (confirm('¿Estás seguro de que deseas eliminar este torneo?')) {
+    this.loading = true;
+    
+    this.tournamentService.deleteTournament(id).subscribe({
+      next: () => {
+        console.log('✅ Torneo eliminado exitosamente');
+        this.loadTournaments();
+      },
+      error: (error) => {
+        console.error('❌ Error al eliminar torneo:', error);
+        this.error = 'Error al eliminar el torneo';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+}
 
   /**
    * ========================================
