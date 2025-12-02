@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
@@ -53,6 +53,7 @@ interface PlayoffBracket {
 })
 export class PlayoffBracketComponent implements OnInit {
   @Input() tournamentId!: number;
+  @Output() playoffsLoaded = new EventEmitter<boolean>();  // ✅ NUEVO: Notifica si existen playoffs
   
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
@@ -70,21 +71,39 @@ export class PlayoffBracketComponent implements OnInit {
 
   loadBracket() {
     this.loading = true;
+    this.error = '';
+    
     this.http.get<PlayoffBracket>(`${this.apiUrl}/tournaments/${this.tournamentId}/playoffs`)
       .subscribe({
         next: (data) => {
+          console.log('✅ Bracket cargado:', data);
           this.bracket = data;
           this.loading = false;
+          this.playoffsLoaded.emit(true);  // ✅ Notificar que SÍ existen playoffs
           this.cdr.detectChanges();
-          console.log('✅ Bracket cargado:', data);
         },
         error: (e) => {
           console.error('❌ Error al cargar bracket:', e);
-          this.error = e.error?.detail || 'No se pudo cargar el bracket';
+          
+          if (e.status === 404) {
+            this.error = 'No se han generado playoffs para este torneo';
+            this.playoffsLoaded.emit(false);  // ✅ Notificar que NO existen playoffs
+          } else {
+            this.error = e.error?.detail || 'Error al cargar el bracket de playoffs';
+            this.playoffsLoaded.emit(false);
+          }
+          
           this.loading = false;
           this.cdr.detectChanges();
         }
       });
+  }
+
+  /**
+   * Recarga el bracket (útil después de generar playoffs)
+   */
+  reloadBracket() {
+    this.loadBracket();
   }
 
   getVictoriasNecesarias(formato: string): number {

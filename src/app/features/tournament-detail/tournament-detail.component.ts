@@ -77,6 +77,9 @@ export class TournamentDetailComponent implements OnInit {
   error: string | null = null;
   tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
   calendarGenerated = false;
+
+  playoffsGenerated = false;
+  generatingPlayoffs = false;
   
   generatingCalendar = false;
   calendarProgress = 0;
@@ -123,7 +126,6 @@ export class TournamentDetailComponent implements OnInit {
       console.log('✅ Torneo cargado:', this.tournament.nombre);
       console.log('📊 Estado del torneo:', this.tournament.estado);
       
-      // ✅ MAPEO CORRECTO DE ESTADOS
       if (this.tournament.estado) {
         const estado = this.tournament.estado.toUpperCase();
         
@@ -241,7 +243,6 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   abrirModalConfig(): void {
-    // ✅ Bloquear si torneo ya fue iniciado
     if (this.tournamentStatus !== 'configurando') {
       alert('⚠️ No se puede editar un torneo que ya fue iniciado');
       return;
@@ -268,13 +269,11 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
-  // ✅ NUEVO: Manejar regeneración de calendario desde el modal
   async onRegenerateCalendar(): Promise<void> {
     await this.loadTournamentData();
   }
 
   abrirModalEquipo(): void {
-    // ✅ Bloquear si torneo ya fue iniciado
     if (this.tournamentStatus !== 'configurando') {
       alert('⚠️ No se pueden agregar equipos a un torneo iniciado');
       return;
@@ -290,7 +289,6 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   editarEquipo(index: number): void {
-    // ✅ Bloquear si torneo ya fue iniciado
     if (this.tournamentStatus !== 'configurando') {
       alert('⚠️ No se pueden editar equipos en un torneo iniciado');
       return;
@@ -313,7 +311,6 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   async eliminarEquipo(index: number, id?: number): Promise<void> {
-    // ✅ Bloquear si torneo ya fue iniciado
     if (this.tournamentStatus !== 'configurando') {
       alert('⚠️ No se pueden eliminar equipos de un torneo iniciado');
       return;
@@ -332,7 +329,6 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   abrirModalArbitro(): void {
-    // Permitir agregar árbitros en cualquier momento
     this.modalArbitroAbierto = true;
   }
 
@@ -502,7 +498,6 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
-  // ✅ NUEVO: Finalizar torneo
   async finalizarTorneo(): Promise<void> {
     if (this.tournamentStatus !== 'iniciado') {
       alert('⚠️ Solo se pueden finalizar torneos que están activos');
@@ -534,5 +529,66 @@ export class TournamentDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/mis-torneos']);
+  }
+
+  // ========================================
+  // ✅ MÉTODOS DE PLAYOFFS - NUEVOS
+  // ========================================
+
+  /**
+   * Callback cuando el bracket notifica si existen playoffs
+   */
+  onPlayoffsLoaded(exists: boolean) {
+    console.log('🏆 Playoffs cargados:', exists);
+    this.playoffsGenerated = exists;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Genera el bracket de playoffs
+   */
+  generarPlayoffs() {
+    if (!this.tournament || this.generatingPlayoffs) return;
+
+    if (this.tournament.estado !== 'iniciado') {
+      alert('⚠️ El torneo debe estar iniciado para generar playoffs');
+      return;
+    }
+
+    if (!this.tournament.cupos_playoffs || this.tournament.cupos_playoffs === 0) {
+      alert('⚠️ No hay cupos de playoffs configurados');
+      return;
+    }
+
+    const mensaje = `¿Generar bracket de playoffs para ${this.tournament.cupos_playoffs} equipos?\n\nSe crearán las series según la tabla de posiciones actual.`;
+
+    if (!confirm(mensaje)) {
+      return;
+    }
+
+    this.generatingPlayoffs = true;
+
+    this.http.post<any>(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/playoffs/generate`,
+      {}
+    ).subscribe({
+      next: (response) => {
+        console.log('✅ Playoffs generados:', response);
+        alert(`✅ Playoffs generados exitosamente!\n\n📊 Series creadas: ${response.series_creadas}`);
+        
+        this.playoffsGenerated = true;
+        this.generatingPlayoffs = false;
+        this.cdr.detectChanges();
+        
+        // Recargar la página para ver el bracket
+        window.location.reload();
+      },
+      error: (error) => {
+        console.error('❌ Error al generar playoffs:', error);
+        alert(`❌ Error: ${error.error?.detail || 'No se pudieron generar los playoffs'}`);
+        this.generatingPlayoffs = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
