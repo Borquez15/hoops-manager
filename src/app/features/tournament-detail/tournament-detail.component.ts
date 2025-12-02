@@ -63,7 +63,7 @@ interface EquipoConJugadores {
   styleUrls: ['./tournament-detail.component.css']
 })
 export class TournamentDetailComponent implements OnInit {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
   tournamentId!: number;
   tournament: Tournament | null = null;

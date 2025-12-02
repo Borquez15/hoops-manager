@@ -14,11 +14,12 @@
           placeholder="Escribe el nombre del torneo o su ID..."
           autocomplete="off"
           [disabled]="searching"
-          (keydown.enter)="onSearch($event)"
+        />
+
         />
 
         <button 
-          type="button"
+          type="submit"
           class="search-button" 
           [disabled]="searching || !searchQuery.trim()"
           (click)="onSearch($event)">

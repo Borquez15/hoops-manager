@@ -214,7 +214,7 @@ export class TournamentViewComponent implements OnInit, OnDestroy {
     this.loadingStandings = true;
     this.cdr.detectChanges();
     
-    this.http.get<{torneo: number, rows: StandingRow[]}>(`http://localhost:8000/tournaments/${id}/standings`)
+    this.http.get<{torneo: number, rows: StandingRow[]}>(`https://hoopsbackend-production.up.railway.app/tournaments/${id}/standings`)
       .subscribe({
         next: (response) => {
           this.standings = response.rows || [];
@@ -235,7 +235,7 @@ export class TournamentViewComponent implements OnInit, OnDestroy {
     this.loadingScorers = true;
     this.cdr.detectChanges();
     
-    this.http.get<{torneo: number, rows: ScorerRow[]}>(`http://localhost:8000/tournaments/${id}/leaders/scorers?limit=10`)
+    this.http.get<{torneo: number, rows: ScorerRow[]}>(`https://hoopsbackend-production.up.railway.app/tournaments/${id}/leaders/scorers?limit=10`)
       .subscribe({
         next: (response) => {
           this.scorers = response.rows || [];
@@ -256,7 +256,7 @@ export class TournamentViewComponent implements OnInit, OnDestroy {
     this.loadingGames = true;
     this.cdr.detectChanges();
     
-    this.http.get<UpcomingGame[]>(`http://localhost:8000/tournaments/${id}/games/upcoming?limit=100`)
+    this.http.get<UpcomingGame[]>(`https://hoopsbackend-production.up.railway.app/tournaments/${id}/games/upcoming?limit=100`)
       .subscribe({
         next: (games) => {
           this.upcomingGames = games || [];
@@ -322,7 +322,7 @@ export class TournamentViewComponent implements OnInit, OnDestroy {
     if (!this.torneo || this.downloadingPDF) return;
     
     this.downloadingPDF = true;
-    const url = `http://localhost:8000/tournaments/${this.torneo.id_torneo}/pdf/standings`;
+    const url = `https://hoopsbackend-production.up.railway.app/tournaments/${this.torneo.id_torneo}/pdf/standings`;
     
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob) => {
@@ -344,7 +344,7 @@ export class TournamentViewComponent implements OnInit, OnDestroy {
     if (!this.torneo || this.downloadingPDF) return;
     
     this.downloadingPDF = true;
-    const url = `http://localhost:8000/tournaments/${this.torneo.id_torneo}/pdf/scorers`;
+    const url = `https://hoopsbackend-production.up.railway.app/tournaments/${this.torneo.id_torneo}/pdf/scorers`;
     
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob) => {
@@ -389,7 +389,7 @@ export class TournamentViewComponent implements OnInit, OnDestroy {
       params = params.set('fecha_hasta', unMes.toISOString().split('T')[0]);
     }
 
-    const url = `http://localhost:8000/tournaments/${this.torneo.id_torneo}/pdf/schedule`;
+    const url = `https://hoopsbackend-production.up.railway.app/tournaments/${this.torneo.id_torneo}/pdf/schedule`;
     
     this.http.get(url, { responseType: 'blob', params }).subscribe({
       next: (blob) => {

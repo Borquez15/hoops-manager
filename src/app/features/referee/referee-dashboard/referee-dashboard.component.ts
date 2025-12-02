@@ -33,7 +33,7 @@ type FiltroFecha = 'HOY' | 'MANANA' | 'SEMANA' | 'TODOS';
   styleUrls: ['./referee-dashboard.component.css']
 })
 export class RefereeDashboardComponent implements OnInit {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
   userName = '';
   torneos: Torneo[] = [];

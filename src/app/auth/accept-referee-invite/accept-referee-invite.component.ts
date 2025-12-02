@@ -26,7 +26,7 @@ export class AcceptRefereeInviteComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);  // ✅ AGREGAR
   auth = inject(AuthService);
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
   token = '';
   loading = true;

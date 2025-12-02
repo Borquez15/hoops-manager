@@ -52,7 +52,7 @@ interface Partido {
   styleUrls: ['./match-live.component.css']
 })
 export class MatchLiveComponent implements OnInit, OnDestroy {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   private partidoId!: number;
   private timerSubscription?: Subscription;
 

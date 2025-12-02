@@ -39,7 +39,7 @@ type FiltroEstado = 'todos' | 'PROGRAMADO' | 'EN_CURSO' | 'JUGADO';
 export class ProximosJuegosComponent implements OnChanges {
   @Input() tournamentId!: number;
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   partidos: Match[] = [];
   partidosFiltrados: Match[] = [];
   loading = false;

@@ -31,7 +31,7 @@ interface Partido {
   styleUrls: ['./match-report.component.css']
 })
 export class MatchReportComponent implements OnInit {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   private partidoId!: number;
 
   partido?: Partido;
