@@ -452,86 +452,71 @@ export class CrearTorneoComponent implements OnInit {
 
   // ========== CREAR TORNEO ==========
   async crearTorneo() {
-    // Solo validar configuración básica
-    if (!this.config.nombre.trim()) {
-      this.error = 'El nombre del torneo es obligatorio';
-      return;
+  if (!this.config.nombre.trim()) {
+    this.error = 'El nombre del torneo es obligatorio';
+    return;
+  }
+
+  this.loading = true;
+  this.error = null;
+
+  try {
+    console.log('🏀 Creando torneo con configuración:', this.config);
+
+    // 1. Crear torneo
+    const torneoResponse = await this.http.post<any>(
+      `${this.apiUrl}/tournaments`,
+      this.config
+    ).toPromise();
+
+    this.idTorneoCreado = torneoResponse.id_torneo;
+    console.log('✅ Torneo creado:', torneoResponse);
+
+    // 2. Agregar canchas
+    if (this.canchas.length > 0) {
+      for (const cancha of this.canchas) {
+        await this.http.post(
+          `${this.apiUrl}/tournaments/${this.idTorneoCreado}/courts`,
+          cancha
+        ).toPromise();
+      }
     }
 
-    this.loading = true;
-    this.error = null;
+    // 3. Agregar equipos
+    if (this.equipos.length > 0) {
+      for (const equipo of this.equipos) {
+        const equipoResponse: any = await this.http.post(
+          `${this.apiUrl}/tournaments/${this.idTorneoCreado}/teams`,
+          { nombre: equipo.nombre, logo_url: equipo.logo_url }
+        ).toPromise();
 
-    try {
-      console.log('🏀 Creando torneo con configuración:', this.config);
-
-      // 1. Crear torneo (solo configuración básica)
-      const torneoResponse = await this.http.post<any>(
-        `${this.apiUrl}/tournaments`,
-        this.config
-      ).toPromise();
-
-      this.idTorneoCreado = torneoResponse.id_torneo;
-      console.log('✅ Torneo creado:', torneoResponse);
-
-      // 2. Agregar canchas si las hay (opcional)
-      if (this.canchas.length > 0) {
-        for (const cancha of this.canchas) {
-          await this.http.post(
-            `${this.apiUrl}/tournaments/${this.idTorneoCreado}/courts`,
-            cancha
-          ).toPromise();
-        }
-        console.log('✅ Canchas agregadas');
-      }
-
-      // 3. Agregar equipos si los hay (opcional)
-      if (this.equipos.length > 0) {
-        for (const equipo of this.equipos) {
-          const equipoResponse: any = await this.http.post(
-            `${this.apiUrl}/tournaments/${this.idTorneoCreado}/teams`,
-            { nombre: equipo.nombre, logo_url: equipo.logo_url }
-          ).toPromise();
-
-          // Agregar jugadores del equipo si los tiene
-          if (equipo.jugadores && equipo.jugadores.length > 0) {
-            for (const jugador of equipo.jugadores) {
-              await this.http.post(
-                `${this.apiUrl}/teams/${equipoResponse.id_equipo}/players`,
-                {
-                  curp: jugador.curp,
-                  dorsal: jugador.dorsal,
-                  nombres: jugador.nombres,
-                  ap_p: jugador.ap_p,
-                  ap_m: jugador.ap_m,
-                  edad: jugador.edad
-                }
-              ).toPromise();
-            }
+        if (equipo.jugadores && equipo.jugadores.length > 0) {
+          for (const jugador of equipo.jugadores) {
+            await this.http.post(
+              `${this.apiUrl}/teams/${equipoResponse.id_equipo}/players`,
+              jugador
+            ).toPromise();
           }
         }
-        console.log('🏀 Equipos y jugadores agregados');
       }
-
-      // 4. Agregar árbitros si los hay (opcional)
-      if (this.arbitros.length > 0) {
-        // TODO: Implementar endpoint de árbitros cuando esté disponible
-        console.log('📝 Árbitros a agregar después:', this.arbitros);
-      }
-
-      this.torneoCreado = true;
-      
-      // Redirigir al torneo después de 2 segundos
-      setTimeout(() => {
-        this.router.navigate(['/torneo', this.idTorneoCreado]);
-      }, 2000);
-
-    } catch (err: any) {
-      console.error('❌ Error al crear torneo:', err);
-      this.error = err.error?.detail || 'Error al crear el torneo';
-    } finally {
-      this.loading = false;
     }
+
+    // 4. Invitación de árbitros ahora se hace SOLO dentro de Tournament Detail
+
+    this.torneoCreado = true;
+
+    // ⬅ Redirigir al panel admin (ya con id real)
+    setTimeout(() => {
+      this.router.navigate(['/torneo', this.idTorneoCreado, 'admin']);
+    }, 1000);
+
+  } catch (err: any) {
+    console.error('❌ Error al crear torneo:', err);
+    this.error = err.error?.detail || 'Error al crear el torneo';
+  } finally {
+    this.loading = false;
   }
+}
 
   // ========== UTILIDADES ==========
   volver() {
