@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { TournamentService } from '../../services/tournament.service';
 import { Tournament } from '../../models/tournament.model';
-
+import { PlayoffBracketComponent } from './modal/playoff-bracket/playoff-bracket.component';
 import { ConfigModalComponent } from './modal/config-modal/config-modal.component';
 import { TeamModalComponent } from './modal/team-modal/team-modal.component';
 import { RefereeModalComponent } from './modal/referee-modal/referee-modal.component';
@@ -58,7 +58,8 @@ interface EquipoConJugadores {
     ConfigModalComponent,
     TeamModalComponent,
     RefereeModalComponent,
-    ProximosJuegosComponent
+    ProximosJuegosComponent,
+    PlayoffBracketComponent
   ],
   templateUrl: './tournament-detail.component.html',
   styleUrls: ['./tournament-detail.component.css']
