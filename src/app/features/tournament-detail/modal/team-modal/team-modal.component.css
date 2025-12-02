@@ -27,6 +27,21 @@
   justify-content: center;
 }
 
+/* === ALERTAS === */
+.alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.alert-error {
+  background: #fee;
+  color: #c00;
+  border: 1px solid #fcc;
+}
+
 /* === INPUTS === */
 .form-group {
   margin-bottom: 18px;
@@ -56,6 +71,24 @@
   outline: none;
 }
 
+.form-control:disabled {
+  background: #e9ecef;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.form-hint.success {
+  color: #10b981;
+  font-weight: 600;
+}
+
 /* === SECCIÓN DE JUGADORES === */
 .jugadores-modal-section {
   background: #ffffff;
@@ -79,6 +112,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 20px;
 }
 
 .jugador-item-modal {
@@ -89,10 +123,16 @@
   align-items: center;
   gap: 16px;
   border: 1px solid #e3e6ea;
+  transition: 0.2s;
+}
+
+.jugador-item-modal:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .jugador-item-modal.inactive {
   opacity: 0.55;
+  background: #f0f0f0;
 }
 
 .jugador-dorsal {
@@ -103,6 +143,7 @@
   border-radius: 8px;
   min-width: 42px;
   text-align: center;
+  font-size: 1.1rem;
 }
 
 .jugador-info {
@@ -112,6 +153,7 @@
 .jugador-nombre {
   font-weight: 700;
   color: #232c3b;
+  margin-bottom: 4px;
 }
 
 .jugador-curp {
@@ -132,6 +174,8 @@
   font-size: 1.2rem;
   cursor: pointer;
   transition: 0.2s;
+  background: #e5e7eb;
+  color: #6b7280;
 }
 
 .btn-icon-small:hover {
@@ -148,6 +192,10 @@
   color: white;
 }
 
+.btn-delete:hover {
+  background: #e02020;
+}
+
 /* === AGREGAR JUGADOR === */
 .agregar-jugador-modal-form {
   margin-top: 30px;
@@ -161,6 +209,7 @@
   margin-bottom: 16px;
   font-size: 1.1rem;
   font-weight: 700;
+  color: #202733;
 }
 
 .form-row {
@@ -176,6 +225,50 @@
 .input-with-button {
   display: flex;
   gap: 10px;
+}
+
+.input-with-button .form-control {
+  flex: 1;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #ff7f3f;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #e66f2f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 127, 63, 0.3);
 }
 
 .btn-block {
@@ -198,20 +291,22 @@
 .empty-state-small {
   text-align: center;
   color: #6b7280;
-  padding: 10px 0;
-  font-size: 0.9rem;
+  padding: 20px 0;
+  font-size: 0.95rem;
+  font-style: italic;
 }
+
 /* === MODAL OVERLAY EQUIPO (CENTRADO EN PANTALLA) === */
 .modal-overlay {
   position: fixed;
-  inset: 0;                    /* top:0; right:0; bottom:0; left:0 */
+  inset: 0;
   background: rgba(0, 0, 0, 0.75);
   display: flex;
   justify-content: center;
-  align-items: flex-start;     /* que aparezca arriba, no pegado abajo */
+  align-items: flex-start;
   padding: 40px 16px;
-  overflow-y: auto;            /* si el formulario es muy largo, que se pueda hacer scroll */
-  z-index: 2000;               /* por encima de todo lo demás */
+  overflow-y: auto;
+  z-index: 2000;
 }
 
 /* Contenedor principal del modal de equipo */
@@ -247,6 +342,7 @@
   font-size: 1.4rem;
   cursor: pointer;
   transition: transform 0.15s ease, color 0.15s ease;
+  padding: 4px 8px;
 }
 
 .btn-close:hover {
@@ -258,6 +354,25 @@
   max-height: calc(100vh - 190px);
   overflow-y: auto;
   padding-right: 4px;
+}
+
+/* Scrollbar personalizada */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 127, 63, 0.5);
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 127, 63, 0.7);
 }
 
 .modal-footer {
@@ -288,5 +403,17 @@
 
   .modal-header h2 {
     font-size: 1.2rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .jugador-item-modal {
+    flex-wrap: wrap;
+  }
+
+  .jugador-info {
+    width: 100%;
   }
 }

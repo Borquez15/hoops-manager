@@ -14,6 +14,11 @@
     <!-- BODY -->
     <div class="modal-body" *ngIf="equipoTemp">
 
+      <!-- MENSAJE DE ERROR -->
+      <div class="alert alert-error" *ngIf="errorMensaje">
+        {{ errorMensaje }}
+      </div>
+
       <!-- INFORMACIÓN DEL EQUIPO -->
       <div class="equipo-info-section">
         <div class="equipo-logo-grande">
@@ -73,6 +78,7 @@
                 class="btn-icon-small"
                 [class.active]="jugador?.activo"
                 (click)="toggleJugadorActivo(i)"
+                title="Activar/Desactivar jugador"
               >
                 ✓
               </button>
@@ -80,6 +86,7 @@
               <button 
                 class="btn-icon-small btn-delete"
                 (click)="eliminarJugadorDelEquipo(i)"
+                title="Eliminar jugador"
               >
                 ✕
               </button>
@@ -109,20 +116,21 @@
                   [(ngModel)]="nuevoJugador.curp"
                   maxlength="18"
                   placeholder="18 caracteres"
-                  (input)="nuevoJugador.curp = nuevoJugador.curp.toUpperCase()"
+                  (input)="onCurpInput()"
                 />
 
                 <button 
                   class="btn btn-secondary btn-sm"
                   (click)="buscarPorCURP()"
                   [disabled]="buscandoCURP || nuevoJugador.curp.length !== 18"
+                  type="button"
                 >
                   <span *ngIf="!buscandoCURP">🔍</span>
                   <span *ngIf="buscandoCURP">...</span>
                 </button>
               </div>
 
-              <small class="form-hint" *ngIf="jugadorEncontrado">
+              <small class="form-hint success" *ngIf="jugadorEncontrado">
                 ✓ Jugador encontrado en el sistema
               </small>
 
@@ -189,6 +197,7 @@
           <button
             class="btn btn-secondary btn-block"
             (click)="agregarJugadorAlEquipo()"
+            type="button"
           >
             + Agregar Jugador
           </button>
