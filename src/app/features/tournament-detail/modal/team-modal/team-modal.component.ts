@@ -67,27 +67,40 @@ export class TeamModalComponent implements OnChanges {
   buscandoCURP = false;
   errorMensaje: string = '';
 
+  // Guardar jugadores originales para comparar cambios
+  jugadoresOriginales: JugadorEquipo[] = [];
+
   constructor(private http: HttpClient) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.equipo) {
-      // Hacer una copia profunda para no modificar el original
+    if (changes['equipo'] && this.equipo) {
+      console.log('🔄 Modal recibió equipo:', this.equipo);
+      
+      // Hacer una copia profunda completa
       this.equipoTemp = {
         id_equipo: this.equipo.id_equipo,
         nombre: this.equipo.nombre || '',
+        logo_url: this.equipo.logo_url,
         jugadores: this.equipo.jugadores 
           ? JSON.parse(JSON.stringify(this.equipo.jugadores))
           : []
       };
+
+      // Guardar copia de jugadores originales
+      this.jugadoresOriginales = this.equipo.jugadores 
+        ? JSON.parse(JSON.stringify(this.equipo.jugadores))
+        : [];
+
+      console.log('📋 Jugadores cargados:', this.equipoTemp.jugadores?.length || 0);
+      
+      this.resetFormularioJugador();
+      this.errorMensaje = '';
     }
-    this.resetFormularioJugador();
-    this.errorMensaje = '';
   }
 
   get jugadoresOrdenados(): JugadorEquipo[] {
-    return this.equipoTemp?.jugadores
-      ? [...this.equipoTemp.jugadores].sort((a, b) => a.dorsal - b.dorsal)
-      : [];
+    if (!this.equipoTemp?.jugadores) return [];
+    return [...this.equipoTemp.jugadores].sort((a, b) => a.dorsal - b.dorsal);
   }
 
   onCurpInput() {
@@ -110,9 +123,8 @@ export class TeamModalComponent implements OnChanges {
       .get<any>(`${this.apiUrl}/players/lookup?curp=${curp}`)
       .subscribe({
         next: (data) => {
-          console.log('Respuesta del servidor:', data);
+          console.log('📡 Respuesta del servidor:', data);
           
-          // Manejar diferentes estructuras de respuesta
           let persona = data?.jugador || data?.persona || data?.data?.persona || data;
 
           if (data?.exists && persona?.curp) {
@@ -122,7 +134,6 @@ export class TeamModalComponent implements OnChanges {
             this.nuevoJugador.ap_m = persona.ap_m ?? '';
             this.nuevoJugador.edad = persona.edad ?? null;
             
-            // Forzar actualización de la vista
             setTimeout(() => {
               this.buscandoCURP = false;
             }, 0);
@@ -133,7 +144,7 @@ export class TeamModalComponent implements OnChanges {
           }
         },
         error: (err) => {
-          console.error('Error en búsqueda:', err);
+          console.error('❌ Error en búsqueda:', err);
           this.jugadorEncontrado = null;
           this.errorMensaje = 'Error al buscar la CURP';
           this.buscandoCURP = false;
@@ -146,20 +157,17 @@ export class TeamModalComponent implements OnChanges {
 
     this.errorMensaje = '';
 
-    // Validar CURP
     const curp = this.nuevoJugador.curp.trim().toUpperCase();
     if (!curp || curp.length !== 18) {
       this.errorMensaje = 'La CURP debe tener 18 caracteres';
       return;
     }
 
-    // Validar dorsal
     if (this.nuevoJugador.dorsal < 0 || this.nuevoJugador.dorsal > 99) {
       this.errorMensaje = 'El dorsal debe estar entre 0 y 99';
       return;
     }
 
-    // Validar datos del jugador
     if (!this.jugadorEncontrado && 
         (!this.nuevoJugador.nombres.trim() || !this.nuevoJugador.ap_p.trim())) {
       this.errorMensaje = 'Debes completar nombres y apellido paterno';
@@ -176,7 +184,7 @@ export class TeamModalComponent implements OnChanges {
       return;
     }
 
-    // Validar CURP duplicada en el equipo
+    // Validar CURP duplicada
     const curpDuplicada = this.equipoTemp.jugadores?.some(
       j => j.persona.curp.toUpperCase() === curp
     );
@@ -186,7 +194,6 @@ export class TeamModalComponent implements OnChanges {
       return;
     }
 
-    // Crear objeto persona
     const persona: HoopsJugador = {
       curp: curp,
       nombres: this.nuevoJugador.nombres.trim(),
@@ -195,7 +202,6 @@ export class TeamModalComponent implements OnChanges {
       edad: this.nuevoJugador.edad || undefined,
     };
 
-    // Crear nuevo jugador
     const nuevo: JugadorEquipo = {
       id_equipo: this.equipoTemp.id_equipo ?? 0,
       dorsal: this.nuevoJugador.dorsal,
@@ -203,16 +209,14 @@ export class TeamModalComponent implements OnChanges {
       persona,
     };
 
-    // Agregar al array
     if (!this.equipoTemp.jugadores) {
       this.equipoTemp.jugadores = [];
     }
     this.equipoTemp.jugadores.push(nuevo);
 
-    console.log('Jugador agregado:', nuevo);
-    console.log('Lista actual:', this.equipoTemp.jugadores);
+    console.log('✅ Jugador agregado:', nuevo);
+    console.log('📊 Total jugadores:', this.equipoTemp.jugadores.length);
 
-    // Resetear formulario
     this.resetFormularioJugador();
   }
 
@@ -245,12 +249,12 @@ export class TeamModalComponent implements OnChanges {
     
     if (confirm('¿Eliminar este jugador del equipo?')) {
       this.equipoTemp.jugadores.splice(i, 1);
+      console.log('🗑️ Jugador eliminado. Total:', this.equipoTemp.jugadores.length);
     }
   }
 
   private mostrarErrorBackend(err: any) {
     const detail = err?.error?.detail ?? err?.error;
-
     let msg = 'Error al guardar equipo';
 
     if (typeof detail === 'string') {
@@ -274,95 +278,99 @@ export class TeamModalComponent implements OnChanges {
 
     const isEdit = !!this.equipoTemp.id_equipo;
 
-    console.log('Guardando equipo:', {
+    console.log('💾 Guardando equipo:', {
       isEdit,
-      equipo: this.equipoTemp,
-      jugadores: this.equipoTemp.jugadores
+      equipo: this.equipoTemp.nombre,
+      id: this.equipoTemp.id_equipo,
+      jugadores: this.equipoTemp.jugadores?.length || 0
     });
 
-    // ========= CREAR EQUIPO (POST /tournaments/{id}/teams) =========
     if (!isEdit) {
-      const url = `${this.apiUrl}/tournaments/${this.tournamentId}/teams`;
-
-      const formData = new FormData();
-      formData.append('nombre', this.equipoTemp.nombre.trim());
-
-      this.http.post<any>(url, formData).subscribe({
-        next: (resp) => {
-          console.log('✅ Equipo creado:', resp);
-
-          const nuevoId = resp?.id_equipo;
-          if (!nuevoId) {
-            this.equipoUpdated.emit();
-            this.close();
-            return;
-          }
-
-          const jugadores = this.equipoTemp?.jugadores ?? [];
-          if (!jugadores.length) {
-            this.equipoUpdated.emit();
-            this.close();
-            return;
-          }
-
-          // ====== Crear jugadores en /teams/{id_equipo}/players ======
-          const peticiones = jugadores.map(j => {
-            const payload = {
-              curp: j.persona.curp.toUpperCase(),
-              dorsal: j.dorsal,
-              nombres: j.persona.nombres,
-              ap_p: j.persona.ap_p,
-              ap_m: j.persona.ap_m || '',
-              edad: j.persona.edad || null,
-            };
-
-            console.log('Enviando jugador:', payload);
-
-            return this.http.post(
-              `${this.apiUrl}/teams/${nuevoId}/players`,
-              payload
-            );
-          });
-
-          forkJoin(peticiones).subscribe({
-            next: (resJugadores) => {
-              console.log('✅ Jugadores creados:', resJugadores);
-              alert('Equipo y jugadores guardados exitosamente');
-              this.equipoUpdated.emit();
-              this.close();
-            },
-            error: (err) => {
-              console.error('❌ Error al crear jugadores:', err);
-              this.mostrarErrorBackend(err);
-              // Aún recargamos para ver el equipo
-              this.equipoUpdated.emit();
-              this.close();
-            }
-          });
-        },
-        error: (err) => {
-          console.error('❌ Error al crear equipo:', err);
-          this.mostrarErrorBackend(err);
-        }
-      });
-
-      return;
+      // ========= CREAR EQUIPO NUEVO =========
+      this.crearEquipoNuevo();
+    } else {
+      // ========= EDITAR EQUIPO EXISTENTE =========
+      this.editarEquipoExistente();
     }
+  }
 
-    // ========= EDITAR EQUIPO (PUT /tournaments/{id}/teams/{id_equipo}) =========
-    const url = `${this.apiUrl}/tournaments/${this.tournamentId}/teams/${this.equipoTemp.id_equipo}`;
+  private crearEquipoNuevo() {
+    const url = `${this.apiUrl}/tournaments/${this.tournamentId}/teams`;
+    const formData = new FormData();
+    formData.append('nombre', this.equipoTemp!.nombre.trim());
 
-    const body = {
-      nombre: this.equipoTemp.nombre.trim(),
-      logo_url: this.equipoTemp.logo_url ?? null,
+    this.http.post<any>(url, formData).subscribe({
+      next: (resp) => {
+        console.log('✅ Equipo creado:', resp);
+
+        const nuevoId = resp?.id_equipo;
+        if (!nuevoId) {
+          this.equipoUpdated.emit();
+          this.close();
+          return;
+        }
+
+        const jugadores = this.equipoTemp?.jugadores ?? [];
+        if (!jugadores.length) {
+          this.equipoUpdated.emit();
+          this.close();
+          return;
+        }
+
+        const peticiones = jugadores.map(j => {
+          const payload = {
+            curp: j.persona.curp.toUpperCase(),
+            dorsal: j.dorsal,
+            nombres: j.persona.nombres,
+            ap_p: j.persona.ap_p,
+            ap_m: j.persona.ap_m || '',
+            edad: j.persona.edad || null,
+          };
+
+          return this.http.post(
+            `${this.apiUrl}/teams/${nuevoId}/players`,
+            payload
+          );
+        });
+
+        forkJoin(peticiones).subscribe({
+          next: (resJugadores) => {
+            console.log('✅ Jugadores creados:', resJugadores);
+            alert('Equipo y jugadores guardados exitosamente');
+            this.equipoUpdated.emit();
+            this.close();
+          },
+          error: (err) => {
+            console.error('❌ Error al crear jugadores:', err);
+            this.mostrarErrorBackend(err);
+            this.equipoUpdated.emit();
+            this.close();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('❌ Error al crear equipo:', err);
+        this.mostrarErrorBackend(err);
+      }
+    });
+  }
+
+  private editarEquipoExistente() {
+    const equipoId = this.equipoTemp!.id_equipo!;
+    
+    // 1. Actualizar nombre del equipo
+    const urlEquipo = `${this.apiUrl}/tournaments/${this.tournamentId}/teams/${equipoId}`;
+    const bodyEquipo = {
+      nombre: this.equipoTemp!.nombre.trim(),
+      logo_url: this.equipoTemp!.logo_url ?? null,
     };
 
-    this.http.put(url, body).subscribe({
-      next: (resp: any) => {
-        console.log('✅ Equipo actualizado:', resp);
-        alert('Equipo actualizado exitosamente');
-        this.equipoUpdated.emit();
-        this.close();
+    this.http.put(urlEquipo, bodyEquipo).subscribe({
+      next: () => {
+        console.log('✅ Nombre actualizado');
+        
+        // 2. Sincronizar jugadores
+        this.sincronizarJugadores(equipoId);
       },
       error: (err) => {
         console.error('❌ Error al actualizar equipo:', err);
@@ -371,8 +379,121 @@ export class TeamModalComponent implements OnChanges {
     });
   }
 
+  private sincronizarJugadores(equipoId: number) {
+    const jugadoresActuales = this.equipoTemp?.jugadores || [];
+    const jugadoresOriginales = this.jugadoresOriginales;
+
+    console.log('🔄 Sincronizando jugadores:', {
+      actuales: jugadoresActuales.length,
+      originales: jugadoresOriginales.length
+    });
+
+    // Identificar jugadores a AGREGAR (no estaban en originales)
+    const jugadoresAgregar = jugadoresActuales.filter(actual => {
+      return !jugadoresOriginales.some(orig => 
+        orig.persona.curp === actual.persona.curp
+      );
+    });
+
+    // Identificar jugadores a ELIMINAR (estaban en originales pero no en actuales)
+    const jugadoresEliminar = jugadoresOriginales.filter(orig => {
+      return !jugadoresActuales.some(actual =>
+        actual.persona.curp === orig.persona.curp
+      );
+    });
+
+    // Identificar jugadores a ACTUALIZAR (cambiaron dorsal o activo)
+    const jugadoresActualizar = jugadoresActuales.filter(actual => {
+      const orig = jugadoresOriginales.find(o => 
+        o.persona.curp === actual.persona.curp
+      );
+      return orig && (orig.dorsal !== actual.dorsal || orig.activo !== actual.activo);
+    });
+
+    console.log('📊 Cambios detectados:', {
+      agregar: jugadoresAgregar.length,
+      eliminar: jugadoresEliminar.length,
+      actualizar: jugadoresActualizar.length
+    });
+
+    const peticiones: any[] = [];
+
+    // AGREGAR nuevos jugadores
+    jugadoresAgregar.forEach(j => {
+      const payload = {
+        curp: j.persona.curp.toUpperCase(),
+        dorsal: j.dorsal,
+        nombres: j.persona.nombres,
+        ap_p: j.persona.ap_p,
+        ap_m: j.persona.ap_m || '',
+        edad: j.persona.edad || null,
+      };
+
+      peticiones.push(
+        this.http.post(
+          `${this.apiUrl}/teams/${equipoId}/players`,
+          payload
+        )
+      );
+    });
+
+    // ELIMINAR jugadores
+    jugadoresEliminar.forEach(j => {
+      peticiones.push(
+        this.http.delete(
+          `${this.apiUrl}/teams/${equipoId}/players/${j.dorsal}`
+        )
+      );
+    });
+
+    // ACTUALIZAR jugadores
+    jugadoresActualizar.forEach(j => {
+      const orig = jugadoresOriginales.find(o => 
+        o.persona.curp === j.persona.curp
+      );
+
+      if (orig) {
+        const payload = {
+          dorsal: j.dorsal,
+          activo: j.activo
+        };
+
+        peticiones.push(
+          this.http.put(
+            `${this.apiUrl}/teams/${equipoId}/players/${orig.dorsal}`,
+            payload
+          )
+        );
+      }
+    });
+
+    if (peticiones.length === 0) {
+      console.log('ℹ️ No hay cambios en jugadores');
+      alert('Equipo actualizado exitosamente');
+      this.equipoUpdated.emit();
+      this.close();
+      return;
+    }
+
+    forkJoin(peticiones).subscribe({
+      next: (results) => {
+        console.log('✅ Jugadores sincronizados:', results);
+        alert('Equipo y jugadores actualizados exitosamente');
+        this.equipoUpdated.emit();
+        this.close();
+      },
+      error: (err) => {
+        console.error('❌ Error al sincronizar jugadores:', err);
+        this.mostrarErrorBackend(err);
+        this.equipoUpdated.emit();
+        this.close();
+      }
+    });
+  }
+
   close() {
     this.equipoTemp = null;
+    this.jugadoresOriginales = [];
     this.resetFormularioJugador();
     this.errorMensaje = '';
     this.closeModal.emit();
