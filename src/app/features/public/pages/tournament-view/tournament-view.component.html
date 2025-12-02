@@ -282,6 +282,16 @@
           </div>
         </div>
       </div>
+
+      <!-- ✅ PLAYOFF BRACKET -->
+      <div class="panel span-2" *ngIf="torneo && torneo.cupos_playoffs > 0">
+        <div class="panel-header">
+          <h3>🏆 Playoff Bracket</h3>
+        </div>
+
+        <app-playoff-bracket [tournamentId]="torneo.id_torneo"></app-playoff-bracket>
+      </div>
+
     </div>
 
     <!-- Notificación de descarga -->

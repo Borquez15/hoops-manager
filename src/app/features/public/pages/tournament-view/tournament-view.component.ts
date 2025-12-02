@@ -6,6 +6,7 @@ import { TournamentSearchService, TorneoPublico } from '../../../../services/tou
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { WebSocketService, WebSocketMessage } from '../../../../services/websocket.service';
 import { Subscription } from 'rxjs';
+import { PlayoffBracketComponent } from '../../../tournament-detail/modal/playoff-bracket/playoff-bracket.component';
 
 interface StandingRow {
   id_equipo: number;
@@ -50,7 +51,7 @@ interface ScheduleFilters {
 @Component({
   standalone: true,
   selector: 'app-tournament-view',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PlayoffBracketComponent],
   templateUrl: './tournament-view.component.html',
   styleUrls: ['./tournament-view.component.css']
 })

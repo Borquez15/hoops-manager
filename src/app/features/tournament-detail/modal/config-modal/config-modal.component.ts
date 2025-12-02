@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Tournament } from '../../../../models/tournament.model';
 import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
-import { NgIf, NgFor } from '@angular/common';
 
 interface Cancha {
   id_cancha?: number;
@@ -24,13 +23,13 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() tournament: Tournament | null = null;
   @Input() canchas: Cancha[] = [];
-  @Input() hasCalendar = false; // ✅ NUEVO: Para saber si ya tiene calendario
-  @Input() tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando'; // ✅ NUEVO
+  @Input() hasCalendar = false;
+  @Input() tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
   
   @Output() closeModal = new EventEmitter<void>();
   @Output() saveTournament = new EventEmitter<Partial<Tournament>>();
   @Output() canchasUpdated = new EventEmitter<void>();
-  @Output() regenerateCalendar = new EventEmitter<void>(); // ✅ NUEVO: Evento para regenerar
+  @Output() regenerateCalendar = new EventEmitter<void>();
 
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
@@ -38,6 +37,7 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     nombre: '',
     vueltas: 1,
     cupos_playoffs: 0,
+    formato_playoffs: 'directo', // ✅ AGREGADO
     modalidad: '5v5',
     dias_por_semana: 2,
     partidos_por_dia: 2,
@@ -50,7 +50,6 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   error: string | null = null;
   Math = Math;
 
-  // ✅ Variables para controlar los cambios
   originalConfig: Partial<Tournament> = {};
   configChanged = false;
 
@@ -69,23 +68,22 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   resetForm(): void {
     if (this.tournament) {
       this.editForm = { ...this.tournament };
-      this.originalConfig = { ...this.tournament }; // ✅ Guardar configuración original
+      this.originalConfig = { ...this.tournament };
     }
     this.error = null;
     this.configChanged = false;
   }
 
-  // ✅ DETECTAR CAMBIOS EN LA CONFIGURACIÓN
   checkConfigChanges(): void {
     if (!this.originalConfig) {
       this.configChanged = false;
       return;
     }
 
-    // Comparar campos importantes que afectan el calendario
     const changed = 
       this.editForm.vueltas !== this.originalConfig.vueltas ||
       this.editForm.cupos_playoffs !== this.originalConfig.cupos_playoffs ||
+      this.editForm.formato_playoffs !== this.originalConfig.formato_playoffs || // ✅ AGREGADO
       this.editForm.dias_por_semana !== this.originalConfig.dias_por_semana ||
       this.editForm.partidos_por_dia !== this.originalConfig.partidos_por_dia ||
       this.editForm.hora_ini !== this.originalConfig.hora_ini ||
@@ -95,17 +93,62 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     this.configChanged = changed;
   }
 
-  incrementar(campo: 'vueltas' | 'cupos_playoffs' | 'dias_por_semana' | 'partidos_por_dia') {
+  // ✅ INCREMENTO NORMAL PARA OTROS CAMPOS
+  incrementar(campo: 'vueltas' | 'dias_por_semana' | 'partidos_por_dia') {
     const value = Number(this.editForm[campo] ?? 0);
     this.editForm[campo] = (value + 1) as any;
-    this.checkConfigChanges(); // ✅ Verificar cambios
+    this.checkConfigChanges();
   }
 
-  decrementar(campo: 'vueltas' | 'cupos_playoffs' | 'dias_por_semana' | 'partidos_por_dia') {
+  decrementar(campo: 'vueltas' | 'dias_por_semana' | 'partidos_por_dia') {
     const value = Number(this.editForm[campo] ?? 0);
     if (value > 0) {
       this.editForm[campo] = (value - 1) as any;
-      this.checkConfigChanges(); // ✅ Verificar cambios
+      this.checkConfigChanges();
+    }
+  }
+
+  // ✅ INCREMENTO INTELIGENTE DE PLAYOFFS (0, 2, 4, 8, 16)
+  incrementarPlayoffs() {
+    const valores = [0, 2, 4, 8, 16];
+    const actual = this.editForm.cupos_playoffs || 0;
+    const indiceActual = valores.indexOf(actual);
+    
+    if (indiceActual < valores.length - 1) {
+      this.editForm.cupos_playoffs = valores[indiceActual + 1] as any;
+      
+      // Si era 0 y se activan playoffs, poner formato por defecto
+      if (actual === 0) {
+        this.editForm.formato_playoffs = 'mejor_de_3' as any;
+      }
+    }
+    
+    this.checkConfigChanges();
+  }
+
+  // ✅ DECREMENTO INTELIGENTE DE PLAYOFFS
+  decrementarPlayoffs() {
+    const valores = [0, 2, 4, 8, 16];
+    const actual = this.editForm.cupos_playoffs || 0;
+    const indiceActual = valores.indexOf(actual);
+    
+    if (indiceActual > 0) {
+      this.editForm.cupos_playoffs = valores[indiceActual - 1] as any;
+      
+      // Si queda en 0, resetear formato
+      if (this.editForm.cupos_playoffs === 0) {
+        this.editForm.formato_playoffs = 'directo' as any;
+      }
+    }
+    
+    this.checkConfigChanges();
+  }
+
+  // ✅ MÉTODO PARA CAMBIAR FORMATO DE PLAYOFFS
+  setFormatoPlayoffs(formato: string) {
+    if (!this.isLocked()) {
+      this.editForm.formato_playoffs = formato as any;
+      this.checkConfigChanges();
     }
   }
 
@@ -145,7 +188,6 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     }
   }
 
-  // ✅ NUEVO: Regenerar calendario
   async regenerarCalendario(): Promise<void> {
     if (!this.tournament?.id_torneo) return;
 
@@ -158,7 +200,6 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     }
 
     try {
-      // Si hay cambios en la config, guardarlos primero
       if (this.configChanged) {
         console.log('💾 Guardando configuración antes de regenerar...');
         await this.http.put(
@@ -176,7 +217,7 @@ export class ConfigModalComponent implements OnInit, OnChanges {
       ).toPromise();
 
       alert('✅ Calendario regenerado exitosamente');
-      this.regenerateCalendar.emit(); // Emitir evento para recargar
+      this.regenerateCalendar.emit();
       this.close();
     } catch (err: any) {
       const detail = err.error?.detail || 'No se pudo regenerar';
@@ -199,7 +240,6 @@ export class ConfigModalComponent implements OnInit, OnChanges {
       return;
     }
 
-    // ✅ Si hay calendario y cambió la configuración, advertir
     if (this.hasCalendar && this.configChanged) {
       const confirmar = confirm(
         '⚠️ Has modificado parámetros que afectan el calendario.\n\n' +
@@ -215,7 +255,6 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     this.saveTournament.emit(this.editForm);
   }
 
-  // ✅ Verificar si el torneo está bloqueado para edición
   isLocked(): boolean {
     return this.tournamentStatus !== 'configurando';
   }

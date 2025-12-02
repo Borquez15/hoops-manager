@@ -4,23 +4,20 @@ export type Modalidad = '3v3' | '5v5';
 export type EstadoTorneo = 'DRAFT' | 'ACTIVO' | 'FINALIZADO';
 
 export interface Tournament {
-  id_torneo: number;
+  id_torneo?: number;
   nombre: string;
   vueltas: number;
   cupos_playoffs: number;
-  modalidad: Modalidad;  // ✅ Tipo literal, no string genérico
+  formato_playoffs?: string; // ✅ AGREGAR ESTA LÍNEA
+  modalidad: string;
+  estado?: string;
   dias_por_semana: number;
   partidos_por_dia: number;
   hora_ini: string;
   hora_fin: string;
   slot_min: number;
-  estado?: EstadoTorneo;
   creado_por?: number;
   creado_en?: string;
-  usuario_id?: string;
-  created_at?: string;
-
-  canchas?: Cancha[];
 }
 
 export interface Cancha {

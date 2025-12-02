@@ -7,7 +7,6 @@
   <form (ngSubmit)="save()">
     <div class="modal-body">
       
-      <!-- ✅ ALERTA SI TORNEO ESTÁ BLOQUEADO -->
       <div *ngIf="isLocked()" class="alert alert-warning" style="margin-bottom: 20px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
@@ -15,7 +14,6 @@
         ⚠️ Este torneo ya fue iniciado. No se puede editar la configuración.
       </div>
 
-      <!-- ✅ ALERTA SI HAY CAMBIOS Y YA EXISTE CALENDARIO -->
       <div *ngIf="!isLocked() && hasCalendar && configChanged" class="alert alert-info" style="margin-bottom: 20px; background: #e3f2fd; border-color: #2196f3; color: #1565c0;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
@@ -58,20 +56,73 @@
             <div class="counter">
               <button 
                 type="button" 
-                (click)="decrementar('cupos_playoffs')"
+                (click)="decrementarPlayoffs()"
                 [disabled]="isLocked()"
               >−</button>
               <span>{{ editForm.cupos_playoffs }}</span>
               <button 
                 type="button" 
-                (click)="incrementar('cupos_playoffs')"
+                (click)="incrementarPlayoffs()"
                 [disabled]="isLocked()"
               >+</button>
             </div>
           </div>
         </div>
 
-        <div class="form-group">
+        <!-- ✅ FORMATO DE PLAYOFFS -->
+        <div class="form-section" *ngIf="editForm.cupos_playoffs && editForm.cupos_playoffs > 0" style="margin-top: 20px;">
+          <label style="font-weight: 600; margin-bottom: 12px; display: block;">
+            🏆 Formato de Playoffs
+          </label>
+          
+          <div class="playoff-format-grid">
+            <button 
+              type="button"
+              class="format-btn"
+              [class.active]="editForm.formato_playoffs === 'directo'"
+              (click)="!isLocked() && (editForm.formato_playoffs = 'directo'); checkConfigChanges()"
+              [disabled]="isLocked()">
+              <div class="format-icon">🎯</div>
+              <div class="format-title">Eliminación Directa</div>
+              <div class="format-desc">1 partido decide</div>
+            </button>
+            
+            <button 
+              type="button"
+              class="format-btn"
+              [class.active]="editForm.formato_playoffs === 'mejor_de_3'"
+              (click)="!isLocked() && (editForm.formato_playoffs = 'mejor_de_3'); checkConfigChanges()"
+              [disabled]="isLocked()">
+              <div class="format-icon">🥉</div>
+              <div class="format-title">Mejor de 3</div>
+              <div class="format-desc">Primero a 2 victorias</div>
+            </button>
+            
+            <button 
+              type="button"
+              class="format-btn"
+              [class.active]="editForm.formato_playoffs === 'mejor_de_5'"
+              (click)="!isLocked() && (editForm.formato_playoffs = 'mejor_de_5'); checkConfigChanges()"
+              [disabled]="isLocked()">
+              <div class="format-icon">🥈</div>
+              <div class="format-title">Mejor de 5</div>
+              <div class="format-desc">Primero a 3 victorias</div>
+            </button>
+            
+            <button 
+              type="button"
+              class="format-btn"
+              [class.active]="editForm.formato_playoffs === 'mejor_de_7'"
+              (click)="!isLocked() && (editForm.formato_playoffs = 'mejor_de_7'); checkConfigChanges()"
+              [disabled]="isLocked()">
+              <div class="format-icon">🥇</div>
+              <div class="format-title">Mejor de 7</div>
+              <div class="format-desc">Primero a 4 victorias</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
           <label>Modalidad de juego</label>
           <div class="mode-buttons">
             <input type="text" [readonly]="true" value="3 vs 3" class="mode-input" />
@@ -224,7 +275,6 @@
         </div>
       </div>
 
-      <!-- ✅ SECCIÓN REGENERAR CALENDARIO -->
       <div *ngIf="!isLocked() && hasCalendar" class="form-section">
         <hr />
         <h4 class="section-title">

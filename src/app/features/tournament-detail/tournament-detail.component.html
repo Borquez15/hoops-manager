@@ -225,6 +225,16 @@
       [tournamentId]="tournamentId">
     </app-proximos-juegos>
 
+    <!-- ✅ PLAYOFF BRACKET -->
+    <section class="card card-wide" *ngIf="calendarGenerated && tournament && tournament.cupos_playoffs > 0">
+      <div class="card-header">
+        <h2 class="card-title">🏆 Playoffs</h2>
+      </div>
+      <div class="card-body">
+        <app-playoff-bracket [tournamentId]="tournamentId"></app-playoff-bracket>
+      </div>
+    </section>
+
     <!-- ✅ BOTONES DE ACCIÓN SEGÚN EL ESTADO -->
     <div class="action-bar" *ngIf="tournamentStatus === 'configurando'">
       <button 

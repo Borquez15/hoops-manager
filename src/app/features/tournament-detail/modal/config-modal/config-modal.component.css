@@ -422,3 +422,80 @@ textarea:disabled {
     text-align: left;
   }
 }
+
+/* ============================================
+   ESTILOS PARA FORMATO DE PLAYOFFS
+   AGREGAR AL FINAL DE config-modal.component.css
+============================================ */
+
+.playoff-format-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.format-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 16px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.format-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 127, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.format-btn.active {
+  background: linear-gradient(135deg, #ff7f00, #ff9933);
+  border-color: #ff7f00;
+  box-shadow: 0 4px 12px rgba(255, 127, 0, 0.3);
+}
+
+.format-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.format-icon {
+  font-size: 2rem;
+}
+
+.format-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1e2b3b;
+}
+
+.format-btn.active .format-title,
+.format-btn.active .format-desc {
+  color: white;
+}
+
+.format-desc {
+  font-size: 0.75rem;
+  color: #666;
+  opacity: 0.9;
+}
+
+@media (max-width: 780px) {
+  .playoff-format-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .format-btn {
+    padding: 12px 8px;
+  }
+  
+  .format-icon {
+    font-size: 1.5rem;
+  }
+}

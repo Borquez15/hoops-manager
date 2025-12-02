@@ -1,0 +1,198 @@
+<div class="playoff-container">
+  
+  <!-- LOADING -->
+  <div *ngIf="loading" class="playoff-loading">
+    <div class="spinner"></div>
+    <p>Cargando playoffs...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="!loading && error" class="playoff-empty">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+    </svg>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- SIN PLAYOFFS -->
+  <div *ngIf="!loading && !error && !hasPlayoffs()" class="playoff-empty">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+    </svg>
+    <p>No hay playoffs generados</p>
+    <small>Los playoffs se generarán cuando termine la fase regular</small>
+  </div>
+
+  <!-- BRACKET -->
+  <div *ngIf="!loading && !error && hasPlayoffs() && bracket" class="bracket-wrapper">
+    
+    <!-- HEADER -->
+    <div class="bracket-header">
+      <h2>🏆 PLAYOFF BRACKET</h2>
+      <span class="formato-badge">{{ getFormatoTexto(bracket.formato) }}</span>
+    </div>
+
+    <div class="bracket-grid">
+      
+      <!-- OCTAVOS DE FINAL (si existen) -->
+      <div class="bracket-column" *ngIf="bracket.octavos.length > 0">
+        <h3 class="column-title">{{ getFaseTexto('OCTAVOS') }}</h3>
+        <div class="series-list">
+          <div *ngFor="let serie of bracket.octavos" class="serie-card">
+            <div class="serie-header">
+              <span class="serie-number">Serie {{ serie.numero_serie }}</span>
+              <span class="serie-status" [ngClass]="getEstadoClase(serie.estado)">
+                {{ serie.estado }}
+              </span>
+            </div>
+
+            <!-- EQUIPO 1 -->
+            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_1.id_equipo">
+              <div class="team-info">
+                <img *ngIf="serie.equipo_1.logo_url" [src]="serie.equipo_1.logo_url" [alt]="serie.equipo_1.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_1.logo_url" class="team-initials">{{ serie.equipo_1.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_1.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
+            </div>
+
+            <!-- EQUIPO 2 -->
+            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_2.id_equipo">
+              <div class="team-info">
+                <img *ngIf="serie.equipo_2.logo_url" [src]="serie.equipo_2.logo_url" [alt]="serie.equipo_2.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_2.logo_url" class="team-initials">{{ serie.equipo_2.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_2.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
+            </div>
+
+            <!-- INFO DE LA SERIE -->
+            <div class="serie-info">
+              <small>Primero a {{ getVictoriasNecesarias(serie.formato) }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUARTOS DE FINAL -->
+      <div class="bracket-column" *ngIf="bracket.cuartos.length > 0">
+        <h3 class="column-title">{{ getFaseTexto('CUARTOS') }}</h3>
+        <div class="series-list">
+          <div *ngFor="let serie of bracket.cuartos" class="serie-card">
+            <div class="serie-header">
+              <span class="serie-number">Serie {{ serie.numero_serie }}</span>
+              <span class="serie-status" [ngClass]="getEstadoClase(serie.estado)">
+                {{ serie.estado }}
+              </span>
+            </div>
+
+            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_1.id_equipo">
+              <div class="team-info">
+                <img *ngIf="serie.equipo_1.logo_url" [src]="serie.equipo_1.logo_url" [alt]="serie.equipo_1.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_1.logo_url" class="team-initials">{{ serie.equipo_1.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_1.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
+            </div>
+
+            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_2.id_equipo">
+              <div class="team-info">
+                <img *ngIf="serie.equipo_2.logo_url" [src]="serie.equipo_2.logo_url" [alt]="serie.equipo_2.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_2.logo_url" class="team-initials">{{ serie.equipo_2.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_2.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
+            </div>
+
+            <div class="serie-info">
+              <small>Primero a {{ getVictoriasNecesarias(serie.formato) }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEMIFINALES -->
+      <div class="bracket-column" *ngIf="bracket.semifinales.length > 0">
+        <h3 class="column-title">{{ getFaseTexto('SEMIFINAL') }}</h3>
+        <div class="series-list">
+          <div *ngFor="let serie of bracket.semifinales" class="serie-card">
+            <div class="serie-header">
+              <span class="serie-number">Serie {{ serie.numero_serie }}</span>
+              <span class="serie-status" [ngClass]="getEstadoClase(serie.estado)">
+                {{ serie.estado }}
+              </span>
+            </div>
+
+            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_1.id_equipo">
+              <div class="team-info">
+                <img *ngIf="serie.equipo_1.logo_url" [src]="serie.equipo_1.logo_url" [alt]="serie.equipo_1.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_1.logo_url" class="team-initials">{{ serie.equipo_1.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_1.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
+            </div>
+
+            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_2.id_equipo">
+              <div class="team-info">
+                <img *ngIf="serie.equipo_2.logo_url" [src]="serie.equipo_2.logo_url" [alt]="serie.equipo_2.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_2.logo_url" class="team-initials">{{ serie.equipo_2.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_2.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
+            </div>
+
+            <div class="serie-info">
+              <small>Primero a {{ getVictoriasNecesarias(serie.formato) }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINAL -->
+      <div class="bracket-column" *ngIf="bracket.final">
+        <h3 class="column-title">{{ getFaseTexto('FINAL') }}</h3>
+        <div class="series-list">
+          <div class="serie-card serie-final">
+            <div class="serie-header">
+              <span class="serie-number">🏆 FINAL</span>
+              <span class="serie-status" [ngClass]="getEstadoClase(bracket.final.estado)">
+                {{ bracket.final.estado }}
+              </span>
+            </div>
+
+            <div class="matchup-team" [class.winner]="bracket.final.ganador?.id_equipo === bracket.final.equipo_1.id_equipo">
+              <div class="team-info">
+                <img *ngIf="bracket.final.equipo_1.logo_url" [src]="bracket.final.equipo_1.logo_url" [alt]="bracket.final.equipo_1.nombre" class="team-logo">
+                <span *ngIf="!bracket.final.equipo_1.logo_url" class="team-initials">{{ bracket.final.equipo_1.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ bracket.final.equipo_1.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ bracket.final.victorias_equipo_1 }}</span>
+            </div>
+
+            <div class="matchup-team" [class.winner]="bracket.final.ganador?.id_equipo === bracket.final.equipo_2.id_equipo">
+              <div class="team-info">
+                <img *ngIf="bracket.final.equipo_2.logo_url" [src]="bracket.final.equipo_2.logo_url" [alt]="bracket.final.equipo_2.nombre" class="team-logo">
+                <span *ngIf="!bracket.final.equipo_2.logo_url" class="team-initials">{{ bracket.final.equipo_2.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ bracket.final.equipo_2.nombre }}</span>
+              </div>
+              <span class="team-wins">{{ bracket.final.victorias_equipo_2 }}</span>
+            </div>
+
+            <div class="serie-info">
+              <small>Primero a {{ getVictoriasNecesarias(bracket.final.formato) }}</small>
+            </div>
+
+            <!-- CAMPEÓN -->
+            <div class="champion-banner" *ngIf="bracket.final.ganador">
+              <span class="trophy">🏆</span>
+              <span class="champion-text">CAMPEÓN</span>
+              <span class="champion-name">{{ bracket.final.ganador.nombre }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
