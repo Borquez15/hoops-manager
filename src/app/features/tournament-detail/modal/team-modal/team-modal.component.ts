@@ -383,26 +383,27 @@ export class TeamModalComponent implements OnChanges {
     const jugadoresActuales = this.equipoTemp?.jugadores || [];
     const jugadoresOriginales = this.jugadoresOriginales;
 
-    console.log('🔄 Sincronizando jugadores:', {
-      actuales: jugadoresActuales.length,
-      originales: jugadoresOriginales.length
-    });
+    console.log('🔄 Sincronizando jugadores para equipo:', equipoId);
+    console.log('📊 Jugadores actuales:', jugadoresActuales);
+    console.log('📊 Jugadores originales:', jugadoresOriginales);
 
     // Identificar jugadores a AGREGAR (no estaban en originales)
     const jugadoresAgregar = jugadoresActuales.filter(actual => {
-      return !jugadoresOriginales.some(orig => 
+      const yaExistia = jugadoresOriginales.some(orig => 
         orig.persona.curp === actual.persona.curp
       );
+      console.log(`  Jugador ${actual.persona.curp} - Ya existía: ${yaExistia}`);
+      return !yaExistia;
     });
 
-    // Identificar jugadores a ELIMINAR (estaban en originales pero no en actuales)
+    // Identificar jugadores a ELIMINAR
     const jugadoresEliminar = jugadoresOriginales.filter(orig => {
       return !jugadoresActuales.some(actual =>
         actual.persona.curp === orig.persona.curp
       );
     });
 
-    // Identificar jugadores a ACTUALIZAR (cambiaron dorsal o activo)
+    // Identificar jugadores a ACTUALIZAR
     const jugadoresActualizar = jugadoresActuales.filter(actual => {
       const orig = jugadoresOriginales.find(o => 
         o.persona.curp === actual.persona.curp
@@ -416,10 +417,14 @@ export class TeamModalComponent implements OnChanges {
       actualizar: jugadoresActualizar.length
     });
 
+    console.log('➕ Jugadores a agregar:', jugadoresAgregar);
+    console.log('➖ Jugadores a eliminar:', jugadoresEliminar);
+    console.log('🔄 Jugadores a actualizar:', jugadoresActualizar);
+
     const peticiones: any[] = [];
 
     // AGREGAR nuevos jugadores
-    jugadoresAgregar.forEach(j => {
+    jugadoresAgregar.forEach((j, index) => {
       const payload = {
         curp: j.persona.curp.toUpperCase(),
         dorsal: j.dorsal,
@@ -428,6 +433,8 @@ export class TeamModalComponent implements OnChanges {
         ap_m: j.persona.ap_m || '',
         edad: j.persona.edad || null,
       };
+
+      console.log(`📤 [${index + 1}] POST /teams/${equipoId}/players`, payload);
 
       peticiones.push(
         this.http.post(
@@ -439,6 +446,8 @@ export class TeamModalComponent implements OnChanges {
 
     // ELIMINAR jugadores
     jugadoresEliminar.forEach(j => {
+      console.log(`🗑️  DELETE /teams/${equipoId}/players/${j.dorsal}`);
+      
       peticiones.push(
         this.http.delete(
           `${this.apiUrl}/teams/${equipoId}/players/${j.dorsal}`
@@ -458,6 +467,8 @@ export class TeamModalComponent implements OnChanges {
           activo: j.activo
         };
 
+        console.log(`🔄 PUT /teams/${equipoId}/players/${orig.dorsal}`, payload);
+
         peticiones.push(
           this.http.put(
             `${this.apiUrl}/teams/${equipoId}/players/${orig.dorsal}`,
@@ -467,28 +478,34 @@ export class TeamModalComponent implements OnChanges {
       }
     });
 
+    console.log(`🎯 Total de peticiones a ejecutar: ${peticiones.length}`);
+
     if (peticiones.length === 0) {
       console.log('ℹ️ No hay cambios en jugadores');
-      alert('Equipo actualizado exitosamente');
+      alert('Equipo actualizado exitosamente (sin cambios en jugadores)');
       this.equipoUpdated.emit();
       this.close();
       return;
     }
 
+    console.log('🚀 Ejecutando peticiones...');
+
     forkJoin(peticiones).subscribe({
       next: (results) => {
         console.log('✅ Jugadores sincronizados:', results);
-        alert('Equipo y jugadores actualizados exitosamente');
+        alert(`✅ Equipo actualizado (${results.length} cambios en jugadores)`);
         this.equipoUpdated.emit();
         this.close();
       },
       error: (err) => {
         console.error('❌ Error al sincronizar jugadores:', err);
+        console.error('Error completo:', JSON.stringify(err, null, 2));
         this.mostrarErrorBackend(err);
         this.equipoUpdated.emit();
         this.close();
       }
     });
+  
   }
 
   close() {
