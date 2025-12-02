@@ -232,6 +232,18 @@
               </option>
             </select>
           </div>
+
+          <!-- ÁRBITRO -->
+          <div class="form-group">
+            <label>Árbitro</label>
+            <select [(ngModel)]="editForm.arbitro_id" class="form-control">
+              <option [ngValue]="null">Sin árbitro</option>
+              <option *ngFor="let arb of arbitrosDisponibles" [ngValue]="arb.id_arbitro">
+                🧑‍⚖️ {{ arb.nombre }}
+              </option>
+            </select>
+          </div>
+
           
           <div class="form-actions">
             <button class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>

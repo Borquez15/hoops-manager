@@ -44,8 +44,9 @@ export class ProximosJuegosComponent implements OnChanges {
   partidosFiltrados: Match[] = [];
   loading = false;
   editandoId: number | null = null;
-  editForm = { fecha: '', hora: '', id_cancha: null as number | null };
+  editForm = { fecha: '', hora: '', id_cancha: null as number | null, arbitro_id: null as number | null };
   canchasDisponibles: Cancha[] = [];
+  arbitrosDisponibles: any[] = [];
 
   // Filtros
   filtroTiempo: FiltroTiempo = 'todos';
@@ -72,13 +73,15 @@ export class ProximosJuegosComponent implements OnChanges {
     this.cdr.detectChanges();
     
     try {
-      const [partidosResponse, canchasResponse] = await Promise.all([
+      const [partidosResponse, canchasResponse, arbitrosResponse] = await Promise.all([
         this.http.get<Match[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/matches`).toPromise(),
-        this.http.get<Cancha[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/courts`).toPromise()
+        this.http.get<Cancha[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/courts`).toPromise(),
+        this.http.get<any[]>(`${this.apiUrl}/tournaments/${this.tournamentId}/referees`).toPromise()
       ]);
       
       this.partidos = partidosResponse || [];
       this.canchasDisponibles = canchasResponse || [];
+      this.arbitrosDisponibles = arbitrosResponse || [];
       
       this.aplicarFiltros();
       
@@ -147,7 +150,8 @@ export class ProximosJuegosComponent implements OnChanges {
     this.editForm = {
       fecha: partido.fecha,
       hora: partido.hora,
-      id_cancha: partido.cancha?.id_cancha || null
+      id_cancha: partido.cancha?.id_cancha || null,
+      arbitro_id: (partido as any).arbitro?.id_arbitro || null
     };
   }
 
@@ -155,30 +159,30 @@ export class ProximosJuegosComponent implements OnChanges {
     this.editandoId = null;
   }
 
-  async guardarCambios(partidoId: number): Promise<void> {
-    try {
-      const payload: any = {
-        fecha: this.editForm.fecha,
-        hora: this.editForm.hora
-      };
+ async guardarCambios(partidoId: number): Promise<void> {
+  try {
+    const payload: any = {
+      fecha: this.editForm.fecha,
+      hora: this.editForm.hora,
+      cancha_id: this.editForm.id_cancha ?? null,   // 👈 SIEMPRE enviar
+      arbitro_id: this.editForm.arbitro_id ?? null  // 👈 AGREGADO
+    };
 
-      if (this.editForm.id_cancha) {
-        payload.id_cancha = this.editForm.id_cancha;
-      }
+    await this.http.patch(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/matches/${partidoId}`,
+      payload
+    ).toPromise();
 
-      await this.http.patch(
-        `${this.apiUrl}/tournaments/${this.tournamentId}/matches/${partidoId}`,
-        payload
-      ).toPromise();
-      
-      alert('✅ Partido actualizado');
-      this.editandoId = null;
-      await this.loadData();
-    } catch (error) {
-      console.error('❌ Error al actualizar partido:', error);
-      alert('❌ Error al actualizar partido');
-    }
+    alert('✅ Partido actualizado');
+
+    this.editandoId = null;
+    await this.loadData(); // 🔥 refresca todo el componente
+  } catch (error) {
+    console.error('❌ Error al actualizar partido:', error);
+    alert('❌ Error al actualizar partido');
   }
+}
+
 
   formatFecha(fecha: string): string {
     try {
