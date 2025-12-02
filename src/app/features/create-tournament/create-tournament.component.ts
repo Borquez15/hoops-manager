@@ -485,31 +485,30 @@ export class CrearTorneoComponent implements OnInit {
     }
 
     // 3. Agregar equipos
+    // 3. Agregar equipos
     if (this.equipos.length > 0) {
       console.log('👥 Agregando equipos...');
       
       for (const equipo of this.equipos) {
-        // Preparar payload solo con campos válidos
-        const equipoPayload: any = {
-          nombre: equipo.nombre.trim()
-        };
-        
-        // Solo agregar logo_url si existe
-        if (equipo.logo_url && equipo.logo_url.trim()) {
-          equipoPayload.logo_url = equipo.logo_url.trim();
-        }
-        
-        console.log('📦 Creando equipo:', equipoPayload);
-        
+
+        // ---------- CREA FORMDATA ----------
+        const formData = new FormData();
+        formData.append("nombre", equipo.nombre.trim());
+
+        // si algún día usas logos locales:
+        // if (equipo.logo_file) formData.append("logo", equipo.logo_file);
+
+        console.log('📦 Creando equipo (form-data):', equipo.nombre);
+
         try {
           const equipoResponse: any = await this.http.post(
             `${this.apiUrl}/tournaments/${this.idTorneoCreado}/teams`,
-            equipoPayload
+            formData   // 👈 AHORA SÍ envía FormData
           ).toPromise();
 
           console.log('✅ Equipo creado:', equipoResponse);
 
-          // Agregar jugadores al equipo
+          // ---------- AGREGAR JUGADORES ----------
           if (equipo.jugadores && equipo.jugadores.length > 0) {
             console.log(`👤 Agregando ${equipo.jugadores.length} jugadores...`);
             
@@ -533,13 +532,11 @@ export class CrearTorneoComponent implements OnInit {
           
         } catch (equipoError: any) {
           console.error('❌ Error al crear equipo:', equipoError);
-          console.error('📦 Payload:', equipoPayload);
-          console.error('📋 Detalle:', equipoError.error);
-          console.error('📋 Detalle COMPLETO:', JSON.stringify(equipoError.error, null, 2));
           throw new Error(`Error al crear equipo "${equipo.nombre}": ${equipoError.error?.detail || 'Error desconocido'}`);
         }
       }
     }
+
 
     console.log('🎉 ¡Torneo creado exitosamente!');
     this.torneoCreado = true;
