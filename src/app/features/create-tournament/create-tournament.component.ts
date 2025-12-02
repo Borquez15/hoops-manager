@@ -474,49 +474,88 @@ export class CrearTorneoComponent implements OnInit {
 
     // 2. Agregar canchas
     if (this.canchas.length > 0) {
+      console.log('🏟️ Agregando canchas...');
       for (const cancha of this.canchas) {
         await this.http.post(
           `${this.apiUrl}/tournaments/${this.idTorneoCreado}/courts`,
           cancha
         ).toPromise();
       }
+      console.log('✅ Canchas agregadas');
     }
 
     // 3. Agregar equipos
     if (this.equipos.length > 0) {
+      console.log('👥 Agregando equipos...');
+      
       for (const equipo of this.equipos) {
-        const equipoResponse: any = await this.http.post(
-          `${this.apiUrl}/tournaments/${this.idTorneoCreado}/teams`,
-          { nombre: equipo.nombre, logo_url: equipo.logo_url }
-        ).toPromise();
+        // Preparar payload solo con campos válidos
+        const equipoPayload: any = {
+          nombre: equipo.nombre.trim()
+        };
+        
+        // Solo agregar logo_url si existe
+        if (equipo.logo_url && equipo.logo_url.trim()) {
+          equipoPayload.logo_url = equipo.logo_url.trim();
+        }
+        
+        console.log('📦 Creando equipo:', equipoPayload);
+        
+        try {
+          const equipoResponse: any = await this.http.post(
+            `${this.apiUrl}/tournaments/${this.idTorneoCreado}/teams`,
+            equipoPayload
+          ).toPromise();
 
-        if (equipo.jugadores && equipo.jugadores.length > 0) {
-          for (const jugador of equipo.jugadores) {
-            await this.http.post(
-              `${this.apiUrl}/teams/${equipoResponse.id_equipo}/players`,
-              jugador
-            ).toPromise();
+          console.log('✅ Equipo creado:', equipoResponse);
+
+          // Agregar jugadores al equipo
+          if (equipo.jugadores && equipo.jugadores.length > 0) {
+            console.log(`👤 Agregando ${equipo.jugadores.length} jugadores...`);
+            
+            for (const jugador of equipo.jugadores) {
+              await this.http.post(
+                `${this.apiUrl}/teams/${equipoResponse.id_equipo}/players`,
+                {
+                  curp: jugador.curp.trim().toUpperCase(),
+                  nombres: jugador.nombres.trim(),
+                  ap_p: jugador.ap_p.trim(),
+                  ap_m: jugador.ap_m?.trim() || '',
+                  dorsal: jugador.dorsal,
+                  edad: jugador.edad,
+                  activo: jugador.activo !== false
+                }
+              ).toPromise();
+            }
+            
+            console.log('✅ Jugadores agregados');
           }
+          
+        } catch (equipoError: any) {
+          console.error('❌ Error al crear equipo:', equipoError);
+          console.error('📦 Payload:', equipoPayload);
+          console.error('📋 Detalle:', equipoError.error);
+          throw new Error(`Error al crear equipo "${equipo.nombre}": ${equipoError.error?.detail || 'Error desconocido'}`);
         }
       }
     }
 
-    // 4. Invitación de árbitros ahora se hace SOLO dentro de Tournament Detail
-
+    console.log('🎉 ¡Torneo creado exitosamente!');
     this.torneoCreado = true;
 
-    // ⬅ Redirigir al panel admin (ya con id real)
+    // Redirigir al panel admin
     setTimeout(() => {
       this.router.navigate(['/torneo', this.idTorneoCreado, 'admin']);
-    }, 1000);
+    }, 1500);
 
   } catch (err: any) {
     console.error('❌ Error al crear torneo:', err);
-    this.error = err.error?.detail || 'Error al crear el torneo';
+    this.error = err.message || err.error?.detail || 'Error al crear el torneo';
   } finally {
     this.loading = false;
   }
 }
+
 
   // ========== UTILIDADES ==========
   volver() {
