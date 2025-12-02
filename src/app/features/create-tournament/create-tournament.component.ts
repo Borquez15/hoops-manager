@@ -535,6 +535,7 @@ export class CrearTorneoComponent implements OnInit {
           console.error('❌ Error al crear equipo:', equipoError);
           console.error('📦 Payload:', equipoPayload);
           console.error('📋 Detalle:', equipoError.error);
+          console.error('📋 Detalle COMPLETO:', JSON.stringify(equipoError.error, null, 2));
           throw new Error(`Error al crear equipo "${equipo.nombre}": ${equipoError.error?.detail || 'Error desconocido'}`);
         }
       }
