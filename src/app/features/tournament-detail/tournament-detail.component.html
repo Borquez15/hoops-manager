@@ -226,14 +226,29 @@
     </app-proximos-juegos>
 
     <!-- ✅ PLAYOFF BRACKET -->
-    <section class="card card-wide" *ngIf="calendarGenerated && tournament && tournament.cupos_playoffs > 0">
-      <div class="card-header">
-        <h2 class="card-title">🏆 Playoffs</h2>
-      </div>
-      <div class="card-body">
-        <app-playoff-bracket [tournamentId]="tournamentId"></app-playoff-bracket>
-      </div>
-    </section>
+    <!-- ✅ PLAYOFF BRACKET -->
+  <section class="card card-wide" *ngIf="calendarGenerated && tournament && tournament.cupos_playoffs > 0">
+    <div class="card-header">
+      <h2 class="card-title">🏆 Playoffs</h2>
+      
+      <!-- ✅ BOTÓN PARA GENERAR PLAYOFFS (SOLO SI NO ESTÁN GENERADOS) -->
+      <button 
+        *ngIf="!playoffsGenerated && tournamentStatus === 'iniciado'"
+        class="btn btn-primary"
+        (click)="generarPlayoffs()"
+        [disabled]="generatingPlayoffs"
+        style="background: #FF7F00; border-color: #FF7F00;">
+        {{ generatingPlayoffs ? '⏳ Generando...' : '⚡ Generar Playoffs' }}
+      </button>
+    </div>
+    
+    <div class="card-body">
+      <app-playoff-bracket 
+        [tournamentId]="tournamentId"
+        (playoffsLoaded)="onPlayoffsLoaded($event)">
+      </app-playoff-bracket>
+    </div>
+  </section>
 
     <!-- ✅ BOTONES DE ACCIÓN SEGÚN EL ESTADO -->
     <div class="action-bar" *ngIf="tournamentStatus === 'configurando'">
@@ -263,15 +278,27 @@
       </button>
     </div>
 
-    <!-- ✅ MENSAJE SI YA ESTÁ FINALIZADO -->
     <div class="action-bar" *ngIf="tournamentStatus === 'finalizado'">
-      <div class="alert" style="background: #e9ecef; border-color: #ced4da; color: #495057; text-align: center;">
+      <div class="alert" style="background: #e9ecef; border-color: #ced4da; color: #495057; text-align: center; margin-bottom: 16px;">
         <strong>🏁 Torneo Finalizado</strong>
-        <p style="margin: 8px 0 0 0;">Este torneo ha concluido y es de solo lectura.</p>
+        <p style="margin: 8px 0 0 0;">Este torneo ha concluido.</p>
       </div>
+      
+      <!-- ✅ BOTÓN PARA REACTIVAR -->
+      <button 
+        class="btn btn-lg btn-warning"
+        (click)="reactivarTorneo()"
+        style="background: #ffc107; border-color: #ffc107; color: #000;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+        </svg>
+        Reactivar Torneo
+      </button>
     </div>
   </main>
 </div>
+
+
 
 <!-- ✅ PASAR LOS NUEVOS PROPS AL MODAL -->
 <app-config-modal

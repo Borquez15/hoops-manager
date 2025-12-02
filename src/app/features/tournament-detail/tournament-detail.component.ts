@@ -416,6 +416,31 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
+  async reactivarTorneo(): Promise<void> {
+  if (this.tournamentStatus !== 'finalizado') {
+    alert('⚠️ Solo se pueden reactivar torneos finalizados');
+    return;
+  }
+
+  if (!confirm('¿Reactivar el torneo? Volverá al estado ACTIVO y podrás registrar más resultados.')) {
+    return;
+  }
+
+  try {
+    await this.http.post(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/reactivate`,
+      {},
+      { withCredentials: true }
+    ).toPromise();
+
+    alert('✅ ¡Torneo reactivado exitosamente!');
+    await this.loadTournamentData();
+  } catch (error: any) {
+    const mensaje = error?.error?.detail || 'Error al reactivar torneo';
+    alert(`❌ ${mensaje}`);
+  }
+}
+
   getMinimumTeams(): number {
     if (!this.tournament) return 2;
     return Math.max(this.tournament.cupos_playoffs || 0, 2);
@@ -510,7 +535,7 @@ export class TournamentDetailComponent implements OnInit {
 
     try {
       await this.http.post(
-        `${this.apiUrl}/tournaments/${this.tournamentId}/finalize`,
+        `${this.apiUrl}/tournaments/${this.tournamentId}/finish`,
         {},
         { withCredentials: true }
       ).toPromise();
