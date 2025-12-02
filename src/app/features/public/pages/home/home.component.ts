@@ -3,7 +3,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
+import { NgIf, NgFor } from '@angular/common';
 import { FeaturesSectionComponent } from '../../sections/features/features-section.component';
 import { TournamentsSectionComponent } from '../../sections/tournaments/tournaments-section.component';
 import { ContactSectionComponent } from '../../sections/contact/contact-section.component';
