@@ -40,7 +40,7 @@ export const routes: Routes = [
 
   // Verificar email
   {
-    path: 'verificar-email',
+    path: 'verify-email',
     loadComponent: () =>
       import('./auth/verify-email/verify-email.component')
         .then(m => m.VerifyEmailComponent)
