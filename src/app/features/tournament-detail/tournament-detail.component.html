@@ -56,7 +56,12 @@
       <section class="card">
         <div class="card-header">
           <h2 class="card-title">Configuración</h2>
-          <button class="btn-icon btn-edit" (click)="abrirModalConfig()">
+          <button 
+            class="btn-icon btn-edit" 
+            (click)="abrirModalConfig()"
+            [disabled]="tournamentStatus !== 'configurando'"
+            [title]="tournamentStatus !== 'configurando' ? 'No se puede editar un torneo iniciado' : 'Editar configuración'"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
             </svg>
@@ -120,55 +125,68 @@
       </section>
 
       <section class="card card-wide">
-  <div class="card-header">
-    <h2 class="card-title">Equipos</h2>
+        <div class="card-header">
+          <h2 class="card-title">Equipos</h2>
 
-    <span class="badge-count">{{ equipos.length }} / {{ getMinimumTeams() }} mínimo</span>
+          <span class="badge-count">{{ equipos.length }} / {{ getMinimumTeams() }} mínimo</span>
 
-    <button class="btn-icon btn-add" (click)="abrirModalEquipo()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-      </svg>
-    </button>
-  </div>
+          <button 
+            class="btn-icon btn-add" 
+            (click)="abrirModalEquipo()"
+            [disabled]="tournamentStatus !== 'configurando'"
+            [title]="tournamentStatus !== 'configurando' ? 'No se pueden agregar equipos a un torneo iniciado' : 'Agregar equipo'"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+          </button>
+        </div>
 
-      <div class="card-body">
-        <div class="list">
+        <div class="card-body">
+          <div class="list">
+            <div class="list-item" *ngFor="let equipo of equipos; let i = index">
+              <div class="equipo-logo">
+                <img *ngIf="equipo.logo_url" [src]="equipo.logo_url" [alt]="equipo.nombre">
+                <span *ngIf="!equipo.logo_url">{{ equipo.nombre.charAt(0) }}</span>
+              </div>
 
-          <div class="list-item" *ngFor="let equipo of equipos; let i = index">
-            <div class="equipo-logo">
-              <img *ngIf="equipo.logo_url" [src]="equipo.logo_url" [alt]="equipo.nombre">
-              <span *ngIf="!equipo.logo_url">{{ equipo.nombre.charAt(0) }}</span>
+              <span class="list-item-text">
+                {{ equipo.nombre }}
+                <small class="jugadores-count">{{ (equipo.jugadores?.length) ?? 0 }} jugadores</small>
+              </span>
+
+              <div class="list-item-actions">
+                <button 
+                  class="btn-icon-small" 
+                  (click)="editarEquipo(i)"
+                  [disabled]="tournamentStatus !== 'configurando'"
+                  [title]="tournamentStatus !== 'configurando' ? 'No se pueden editar equipos en un torneo iniciado' : 'Editar equipo'"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+                  </svg>
+                </button>
+
+                <button 
+                  class="btn-icon-small btn-delete" 
+                  (click)="eliminarEquipo(i, equipo.id_equipo)"
+                  [disabled]="tournamentStatus !== 'configurando'"
+                  [title]="tournamentStatus !== 'configurando' ? 'No se pueden eliminar equipos de un torneo iniciado' : 'Eliminar equipo'"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                  </svg>
+                </button>
+              </div>
             </div>
 
-            <span class="list-item-text">
-              {{ equipo.nombre }}
-              <small class="jugadores-count">{{ (equipo.jugadores?.length) ?? 0 }} jugadores</small>
-            </span>
-
-            <div class="list-item-actions">
-              <button class="btn-icon-small" (click)="editarEquipo(i)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
-                </svg>
-              </button>
-
-              <button class="btn-icon-small btn-delete" (click)="eliminarEquipo(i, equipo.id_equipo)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-              </button>
+            <div class="empty-state" *ngIf="equipos.length === 0">
+              <p>No hay equipos agregados</p>
+              <small>Agrega al menos {{ getMinimumTeams() }} equipos</small>
             </div>
-          </div>
-
-          <div class="empty-state" *ngIf="equipos.length === 0">
-            <p>No hay equipos agregados</p>
-            <small>Agrega al menos {{ getMinimumTeams() }} equipos</small>
           </div>
         </div>
-      </div>
-    </section>
-
+      </section>
     </div>
 
     <div class="section-divider"></div>
@@ -207,6 +225,7 @@
       [tournamentId]="tournamentId">
     </app-proximos-juegos>
 
+    <!-- ✅ BOTONES DE ACCIÓN SEGÚN EL ESTADO -->
     <div class="action-bar" *ngIf="tournamentStatus === 'configurando'">
       <button 
         class="btn btn-lg btn-success"
@@ -219,16 +238,42 @@
         Iniciar Torneo
       </button>
     </div>
+
+    <!-- ✅ BOTÓN FINALIZAR TORNEO (SOLO SI ESTÁ INICIADO) -->
+    <div class="action-bar" *ngIf="tournamentStatus === 'iniciado'">
+      <button 
+        class="btn btn-lg btn-danger"
+        (click)="finalizarTorneo()"
+        style="background: #dc3545; border-color: #dc3545;"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14.59 8L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+        </svg>
+        Finalizar Torneo
+      </button>
+    </div>
+
+    <!-- ✅ MENSAJE SI YA ESTÁ FINALIZADO -->
+    <div class="action-bar" *ngIf="tournamentStatus === 'finalizado'">
+      <div class="alert" style="background: #e9ecef; border-color: #ced4da; color: #495057; text-align: center;">
+        <strong>🏁 Torneo Finalizado</strong>
+        <p style="margin: 8px 0 0 0;">Este torneo ha concluido y es de solo lectura.</p>
+      </div>
+    </div>
   </main>
 </div>
 
+<!-- ✅ PASAR LOS NUEVOS PROPS AL MODAL -->
 <app-config-modal
   [isOpen]="modalConfigAbierto"
   [tournament]="tournament"
   [canchas]="canchas"
+  [hasCalendar]="calendarGenerated"
+  [tournamentStatus]="tournamentStatus"
   (closeModal)="cerrarModalConfig()"
   (saveTournament)="actualizarConfiguracion($event)"
   (canchasUpdated)="loadCanchas()"
+  (regenerateCalendar)="onRegenerateCalendar()"
 ></app-config-modal>
 
 <app-team-modal
@@ -238,7 +283,6 @@
   (closeModal)="cerrarModalEquipo()"
   (equipoUpdated)="onEquipoUpdated()"
 ></app-team-modal>
-
 
 <app-referee-modal
   [isOpen]="modalArbitroAbierto"

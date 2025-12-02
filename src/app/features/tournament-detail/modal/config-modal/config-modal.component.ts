@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Tournament } from '../../../../models/tournament.model';
 import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
+import { NgIf, NgFor } from '@angular/common';
 
 interface Cancha {
   id_cancha?: number;
@@ -23,9 +24,13 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() tournament: Tournament | null = null;
   @Input() canchas: Cancha[] = [];
+  @Input() hasCalendar = false; // ✅ NUEVO: Para saber si ya tiene calendario
+  @Input() tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando'; // ✅ NUEVO
+  
   @Output() closeModal = new EventEmitter<void>();
   @Output() saveTournament = new EventEmitter<Partial<Tournament>>();
   @Output() canchasUpdated = new EventEmitter<void>();
+  @Output() regenerateCalendar = new EventEmitter<void>(); // ✅ NUEVO: Evento para regenerar
 
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
@@ -45,6 +50,10 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   error: string | null = null;
   Math = Math;
 
+  // ✅ Variables para controlar los cambios
+  originalConfig: Partial<Tournament> = {};
+  configChanged = false;
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -60,19 +69,43 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   resetForm(): void {
     if (this.tournament) {
       this.editForm = { ...this.tournament };
+      this.originalConfig = { ...this.tournament }; // ✅ Guardar configuración original
     }
     this.error = null;
+    this.configChanged = false;
+  }
+
+  // ✅ DETECTAR CAMBIOS EN LA CONFIGURACIÓN
+  checkConfigChanges(): void {
+    if (!this.originalConfig) {
+      this.configChanged = false;
+      return;
+    }
+
+    // Comparar campos importantes que afectan el calendario
+    const changed = 
+      this.editForm.vueltas !== this.originalConfig.vueltas ||
+      this.editForm.cupos_playoffs !== this.originalConfig.cupos_playoffs ||
+      this.editForm.dias_por_semana !== this.originalConfig.dias_por_semana ||
+      this.editForm.partidos_por_dia !== this.originalConfig.partidos_por_dia ||
+      this.editForm.hora_ini !== this.originalConfig.hora_ini ||
+      this.editForm.hora_fin !== this.originalConfig.hora_fin ||
+      this.editForm.slot_min !== this.originalConfig.slot_min;
+
+    this.configChanged = changed;
   }
 
   incrementar(campo: 'vueltas' | 'cupos_playoffs' | 'dias_por_semana' | 'partidos_por_dia') {
     const value = Number(this.editForm[campo] ?? 0);
     this.editForm[campo] = (value + 1) as any;
+    this.checkConfigChanges(); // ✅ Verificar cambios
   }
 
   decrementar(campo: 'vueltas' | 'cupos_playoffs' | 'dias_por_semana' | 'partidos_por_dia') {
     const value = Number(this.editForm[campo] ?? 0);
     if (value > 0) {
       this.editForm[campo] = (value - 1) as any;
+      this.checkConfigChanges(); // ✅ Verificar cambios
     }
   }
 
@@ -112,6 +145,45 @@ export class ConfigModalComponent implements OnInit, OnChanges {
     }
   }
 
+  // ✅ NUEVO: Regenerar calendario
+  async regenerarCalendario(): Promise<void> {
+    if (!this.tournament?.id_torneo) return;
+
+    const mensaje = this.configChanged 
+      ? '⚠️ Has modificado la configuración.\n\n¿Regenerar el calendario con los NUEVOS valores?\n\nEsto borrará todos los partidos actuales.'
+      : '¿Regenerar el calendario?\n\nEsto borrará todos los partidos actuales y creará nuevos.';
+
+    if (!confirm(mensaje)) {
+      return;
+    }
+
+    try {
+      // Si hay cambios en la config, guardarlos primero
+      if (this.configChanged) {
+        console.log('💾 Guardando configuración antes de regenerar...');
+        await this.http.put(
+          `${this.apiUrl}/tournaments/${this.tournament.id_torneo}/config`,
+          this.editForm,
+          { withCredentials: true }
+        ).toPromise();
+      }
+
+      console.log('🔄 Regenerando calendario...');
+      await this.http.post(
+        `${this.apiUrl}/tournaments/${this.tournament.id_torneo}/matches/auto-schedule?replace=true`,
+        {},
+        { withCredentials: true }
+      ).toPromise();
+
+      alert('✅ Calendario regenerado exitosamente');
+      this.regenerateCalendar.emit(); // Emitir evento para recargar
+      this.close();
+    } catch (err: any) {
+      const detail = err.error?.detail || 'No se pudo regenerar';
+      alert('❌ Error: ' + detail);
+    }
+  }
+
   close(): void {
     this.closeModal.emit();
   }
@@ -127,6 +199,24 @@ export class ConfigModalComponent implements OnInit, OnChanges {
       return;
     }
 
+    // ✅ Si hay calendario y cambió la configuración, advertir
+    if (this.hasCalendar && this.configChanged) {
+      const confirmar = confirm(
+        '⚠️ Has modificado parámetros que afectan el calendario.\n\n' +
+        'Los cambios se guardarán, pero necesitarás REGENERAR el calendario ' +
+        'para aplicarlos a los partidos.\n\n¿Continuar?'
+      );
+      
+      if (!confirmar) {
+        return;
+      }
+    }
+
     this.saveTournament.emit(this.editForm);
+  }
+
+  // ✅ Verificar si el torneo está bloqueado para edición
+  isLocked(): boolean {
+    return this.tournamentStatus !== 'configurando';
   }
 }

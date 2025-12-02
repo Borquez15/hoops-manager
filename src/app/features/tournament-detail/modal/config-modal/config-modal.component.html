@@ -6,6 +6,23 @@
 >
   <form (ngSubmit)="save()">
     <div class="modal-body">
+      
+      <!-- ✅ ALERTA SI TORNEO ESTÁ BLOQUEADO -->
+      <div *ngIf="isLocked()" class="alert alert-warning" style="margin-bottom: 20px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        ⚠️ Este torneo ya fue iniciado. No se puede editar la configuración.
+      </div>
+
+      <!-- ✅ ALERTA SI HAY CAMBIOS Y YA EXISTE CALENDARIO -->
+      <div *ngIf="!isLocked() && hasCalendar && configChanged" class="alert alert-info" style="margin-bottom: 20px; background: #e3f2fd; border-color: #2196f3; color: #1565c0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        💡 Has modificado parámetros que afectan el calendario. Deberás regenerarlo después de guardar.
+      </div>
+
       <div class="form-section">
         <div class="form-group">
           <label>Nombre del torneo *</label>
@@ -14,6 +31,7 @@
             [(ngModel)]="editForm.nombre"
             name="nombre"
             placeholder="Ej: Liga Primavera 2025"
+            [disabled]="isLocked()"
           />
         </div>
 
@@ -21,18 +39,34 @@
           <div class="form-counter">
             <label>Vueltas a jugar</label>
             <div class="counter">
-              <button type="button" (click)="decrementar('vueltas')">−</button>
+              <button 
+                type="button" 
+                (click)="decrementar('vueltas')"
+                [disabled]="isLocked()"
+              >−</button>
               <span>{{ editForm.vueltas }}</span>
-              <button type="button" (click)="incrementar('vueltas')">+</button>
+              <button 
+                type="button" 
+                (click)="incrementar('vueltas')"
+                [disabled]="isLocked()"
+              >+</button>
             </div>
           </div>
 
           <div class="form-counter">
             <label>Clasificación de playoffs</label>
             <div class="counter">
-              <button type="button" (click)="decrementar('cupos_playoffs')">−</button>
+              <button 
+                type="button" 
+                (click)="decrementar('cupos_playoffs')"
+                [disabled]="isLocked()"
+              >−</button>
               <span>{{ editForm.cupos_playoffs }}</span>
-              <button type="button" (click)="incrementar('cupos_playoffs')">+</button>
+              <button 
+                type="button" 
+                (click)="incrementar('cupos_playoffs')"
+                [disabled]="isLocked()"
+              >+</button>
             </div>
           </div>
         </div>
@@ -45,7 +79,8 @@
               type="button"
               class="mode-btn"
               [class.active]="editForm.modalidad === '5v5'"
-              (click)="editForm.modalidad = '5v5'"
+              (click)="!isLocked() && (editForm.modalidad = '5v5')"
+              [disabled]="isLocked()"
             >
               5 vs 5
             </button>
@@ -56,18 +91,34 @@
           <div class="form-counter">
             <label>Días por semana</label>
             <div class="counter">
-              <button type="button" (click)="decrementar('dias_por_semana')">−</button>
+              <button 
+                type="button" 
+                (click)="decrementar('dias_por_semana')"
+                [disabled]="isLocked()"
+              >−</button>
               <span>{{ editForm.dias_por_semana }}</span>
-              <button type="button" (click)="incrementar('dias_por_semana')">+</button>
+              <button 
+                type="button" 
+                (click)="incrementar('dias_por_semana')"
+                [disabled]="isLocked()"
+              >+</button>
             </div>
           </div>
 
           <div class="form-counter">
             <label>Partidos por día</label>
             <div class="counter">
-              <button type="button" (click)="decrementar('partidos_por_dia')">−</button>
+              <button 
+                type="button" 
+                (click)="decrementar('partidos_por_dia')"
+                [disabled]="isLocked()"
+              >−</button>
               <span>{{ editForm.partidos_por_dia }}</span>
-              <button type="button" (click)="incrementar('partidos_por_dia')">+</button>
+              <button 
+                type="button" 
+                (click)="incrementar('partidos_por_dia')"
+                [disabled]="isLocked()"
+              >+</button>
             </div>
           </div>
         </div>
@@ -79,6 +130,8 @@
               type="time"
               [(ngModel)]="editForm.hora_ini"
               name="hora_ini"
+              (change)="checkConfigChanges()"
+              [disabled]="isLocked()"
               required
             />
           </div>
@@ -89,6 +142,8 @@
               type="time"
               [(ngModel)]="editForm.hora_fin"
               name="hora_fin"
+              (change)="checkConfigChanges()"
+              [disabled]="isLocked()"
               required
             />
           </div>
@@ -99,14 +154,16 @@
           <div class="counter">
             <button
               type="button"
-              (click)="editForm.slot_min = Math.max(10, (editForm.slot_min ?? 0) - 10)"
+              (click)="editForm.slot_min = Math.max(10, (editForm.slot_min ?? 0) - 10); checkConfigChanges()"
+              [disabled]="isLocked()"
             >
               −
             </button>
             <span>{{ editForm.slot_min ?? 0 }} min</span>
             <button
               type="button"
-              (click)="editForm.slot_min = (editForm.slot_min ?? 0) + 10"
+              (click)="editForm.slot_min = (editForm.slot_min ?? 0) + 10; checkConfigChanges()"
+              [disabled]="isLocked()"
             >
               +
             </button>
@@ -135,6 +192,7 @@
               type="button"
               class="btn-icon-small btn-delete" 
               (click)="eliminarCancha(cancha)"
+              [disabled]="isLocked()"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -143,7 +201,7 @@
           </li>
         </ul>
 
-        <div class="form-grid cancha-form">
+        <div class="form-grid cancha-form" *ngIf="!isLocked()">
           <input
             type="text"
             placeholder="Nombre de la cancha"
@@ -165,11 +223,45 @@
           </button>
         </div>
       </div>
+
+      <!-- ✅ SECCIÓN REGENERAR CALENDARIO -->
+      <div *ngIf="!isLocked() && hasCalendar" class="form-section">
+        <hr />
+        <h4 class="section-title">
+          <span class="icon">🔄</span> Regenerar Calendario
+        </h4>
+        
+        <div class="alert alert-info" style="background: #fff3cd; border-color: #ffc107; color: #856404;">
+          <p style="margin: 0 0 10px 0;">
+            <strong>⚠️ Cuidado:</strong> Regenerar el calendario borrará todos los partidos actuales y creará nuevos.
+          </p>
+          <button
+            type="button"
+            class="btn btn-warning"
+            (click)="regenerarCalendario()"
+            style="background: #ffc107; color: #000; border: none;"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 5px;">
+              <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+            </svg>
+            Regenerar Calendario
+          </button>
+        </div>
+      </div>
     </div>
 
     <div slot="footer" class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="close()">Cancelar</button>
-      <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+      <button type="button" class="btn btn-secondary" (click)="close()">
+        {{ isLocked() ? 'Cerrar' : 'Cancelar' }}
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="isLocked()"
+        *ngIf="!isLocked()"
+      >
+        Guardar Configuración
+      </button>
     </div>
   </form>
 </app-modal-base>
