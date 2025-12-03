@@ -406,9 +406,11 @@ private async generateCalendarConfirmed(): Promise<void> {
     }, 300);
     
     // ✅ GENERAR CON CONFIRM=TRUE
-    await this.tournamentService
-      .autoSchedule(this.tournamentId, undefined, true)
-      .toPromise();
+    await this.http.post(
+  `${this.apiUrl}/tournaments/${this.tournamentId}/matches/auto-schedule?confirm=true`,
+      {}
+    ).toPromise();
+
     
     console.log('✅ Calendario generado');
     

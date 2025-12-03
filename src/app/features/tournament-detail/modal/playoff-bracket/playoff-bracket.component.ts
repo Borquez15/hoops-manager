@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-
+import { NgIf, NgFor } from '@angular/common';
 interface Equipo {
   id_equipo: number;
   nombre: string;

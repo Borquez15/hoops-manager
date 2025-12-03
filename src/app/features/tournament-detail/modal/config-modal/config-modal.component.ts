@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Tournament } from '../../../../models/tournament.model';
 import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
-
+import { NgIf, NgFor } from '@angular/common';
 interface Cancha {
   id_cancha?: number;
   nombre: string;
