@@ -147,14 +147,27 @@
               </span>
             </div>
 
+            <!-- PARTIDOS DE LA FINAL -->
             <div *ngFor="let partido of bracket.final.partidos" class="match-item">
+
               <div class="match-info">
-                <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
-                <span class="match-date">{{ partido.fecha || 'Sin fecha' }}</span>
+                <span>
+                  {{ partido.equipo_local_nombre }} 
+                  vs 
+                  {{ partido.equipo_visitante_nombre }}
+                </span>
+
+                <span class="match-date">
+                  {{ partido.fecha ? (partido.fecha | date:'medium') : 'Sin fecha' }}
+                </span>
               </div>
 
-              <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
+              <button class="btn-edit" (click)="openEditMatch(partido)">
+                ✏️ Editar
+              </button>
+
             </div>
+
 
           </div>
         </div>
