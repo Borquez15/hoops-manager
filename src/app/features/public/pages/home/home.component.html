@@ -4,20 +4,20 @@
       <img class="brand__img" src="/imagen/logo-hoops-manager.png" alt="HoopsManager" />
     </a>
 
-    <!-- MenÃº de navegaciÃ³n principal (siempre visible) -->
+    <!-- Menú de navegación principal (siempre visible) -->
     <nav class="menu">
       <a class="menu__link" [class.menu__link--active]="active==='inicio'" (click)="go('inicio', $event)">INICIO</a>
-      <a class="menu__link" [class.menu__link--active]="active==='caracteristicas'" (click)="go('caracteristicas', $event)">CARACTERÃSTICAS</a>
+      <a class="menu__link" [class.menu__link--active]="active==='caracteristicas'" (click)="go('caracteristicas', $event)">CARACTERÍSTICAS</a>
       <a class="menu__link" [class.menu__link--active]="active==='torneos'" (click)="go('torneos', $event)">TORNEOS</a>
-      <a class="menu__link" [class.menu__link--active]="active==='contacto'" (click)="go('contacto', $event)">CONTÃCTANOS</a>
+      <a class="menu__link" [class.menu__link--active]="active==='contacto'" (click)="go('contacto', $event)">CONTÁCTANOS</a>
     </nav>
 
-    <!-- BotÃ³n de Iniciar SesiÃ³n (cuando NO estÃ¡ autenticado) -->
+    <!-- Botón de Iniciar Sesión (cuando NO está autenticado) -->
     <button class="btn btn-primary" *ngIf="!isAuthenticated" (click)="iniciarSesion()">
-      INICIAR SESIÃ“N
+      INICIAR SESIÓN
     </button>
 
-    <!-- SecciÃ³n de usuario autenticado -->
+    <!-- Sección de usuario autenticado -->
     <div class="user-section" *ngIf="isAuthenticated">
       <!-- Avatar de usuario (visible en desktop) -->
       <div class="user-avatar-header" (click)="toggleMenu()">
@@ -27,7 +27,7 @@
         <span class="user-name-header">{{ user?.nombre || 'Usuario' }}</span>
       </div>
 
-      <!-- BotÃ³n hamburguesa -->
+      <!-- Botón hamburguesa -->
       <button 
         class="hamburger" 
         [class.open]="menuOpen" 
@@ -55,7 +55,7 @@
       <h3 class="user-name">{{ user?.nombre || 'Usuario' }}</h3>
     </div>
 
-    <!-- MenÃº de navegaciÃ³n -->
+    <!-- Menú de navegación -->
     <nav class="sidebar-nav">
       <a routerLink="/crear-torneo" class="sidebar-item" (click)="closeMenu()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -78,7 +78,7 @@
           <circle cx="9" cy="11" r="1"/>
           <circle cx="9" cy="14" r="1"/>
         </svg>
-        <span>ÃRBITRO</span>
+        <span>ÁRBITRO</span>
       </a>
 
       <a (click)="go('inicio'); closeMenu()" class="sidebar-item">
@@ -99,7 +99,7 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
         </svg>
-        <span>CARACTERÃSTICAS</span>
+        <span>CARACTERÍSTICAS</span>
       </a>
 
       <a (click)="go('torneos'); closeMenu()" class="sidebar-item">
@@ -116,14 +116,14 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
         </svg>
-        <span>CONFIGURACIÃ“N</span>
+        <span>CONFIGURACIÓN</span>
       </a>
 
       <button class="sidebar-item danger" (click)="logout()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
         </svg>
-        <span>CERRAR SESIÃ“N</span>
+        <span>CERRAR SESIÓN</span>
       </button>
     </div>
   </div>
@@ -133,26 +133,26 @@
   <div class="hero__content">
     
     <h1 class="hero__title">
-      Â¡EL MEJOR GESTOR<br>
+      ¡EL MEJOR GESTOR<br>
       DE TORNEOS DE<br>
       BASKETBALL!
     </h1>
 
     <p class="hero__lead">
       HoopsManager es la plataforma definitiva para organizar y dar seguimiento a tus
-      torneos de baloncesto de manera simple e intuitiva. OlvÃ­date del papeleo y las
-      hojas de cÃ¡lculo. Con nuestra herramienta, puedes gestionar todo, desde la
-      inscripciÃ³n de equipos hasta la definiciÃ³n de los campeones.
+      torneos de baloncesto de manera simple e intuitiva. Olvídate del papeleo y las
+      hojas de cálculo. Con nuestra herramienta, puedes gestionar todo, desde la
+      inscripción de equipos hasta la definición de los campeones.
     </p>
     
     <button class="btn btn-primary hero__cta" type="button" (click)="crearTorneo($event)">
-      <span aria-hidden="true">ðŸ†</span> CREAR UN TORNEO
+      <span aria-hidden="true">🏆</span> CREAR UN TORNEO
     </button>
   </div>
 </main>
 
 <footer class="foot">
-  <div class="foot__wrap">Â© {{year}} HoopsManager</div>
+  <div class="foot__wrap">© {{year}} HoopsManager</div>
 </footer>
 
 <div class="snap" #snapContainer>
@@ -170,7 +170,7 @@
   </section>
 </div>
 
-<!-- Modales de autenticaciÃ³n (solo cuando NO estÃ¡ autenticado) -->
+<!-- Modales de autenticación (solo cuando NO está autenticado) -->
 <app-login-modal
   *ngIf="!isAuthenticated"
   [open]="showLogin"
