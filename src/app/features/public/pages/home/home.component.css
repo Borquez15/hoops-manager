@@ -501,14 +501,14 @@ section {
   scroll-margin-top: 0;
 }
 
-.snap {
+/*.snap {
     scroll-snap-type: y mandatory;
 }
 
 .snap__section {
     scroll-snap-align: start;
     height: 100vh;
-}
+}*/
 
 /* ========================================
    ANIMACIONES
