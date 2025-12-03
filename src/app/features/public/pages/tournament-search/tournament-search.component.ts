@@ -1,8 +1,9 @@
-import { Component, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TournamentSearchService, TorneoPublico, SearchResponse } from '../../../../services/tournament-search.service';
+import { TimeoutError } from 'rxjs';
 
 @Component({
   selector: 'app-tournament-search',
@@ -26,7 +27,6 @@ export class TournamentSearchComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
-  // 🔍 Buscar torneo
   onSearch(event?: Event): void {
     if (event) event.preventDefault();
 
@@ -39,7 +39,7 @@ export class TournamentSearchComponent {
     this.hasSearched = true;
     this.match = null;
     this.suggestions = [];
-    this.cdr.detectChanges(); // ✅ Forzar actualización
+    this.cdr.detectChanges();
 
     this.searchService.search(query).subscribe({
       next: (response: SearchResponse) => {
@@ -49,7 +49,7 @@ export class TournamentSearchComponent {
         this.suggestions = response.suggestions || [];
         this.searching = false;
         
-        this.cdr.detectChanges(); // ✅ Forzar actualización
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('❌ Error en búsqueda:', err);
@@ -59,23 +59,29 @@ export class TournamentSearchComponent {
         this.searching = false;
         this.hasSearched = true;
         
-        this.cdr.detectChanges(); // ✅ Forzar actualización
-        alert('Error al buscar torneos.');
+        // ✅ Manejo específico de timeout
+        if (err instanceof TimeoutError) {
+          alert('⏱️ La búsqueda tardó demasiado. Por favor, intenta de nuevo.');
+        } else if (err.status === 0) {
+          alert('❌ No se pudo conectar con el servidor. Verifica tu conexión.');
+        } else {
+          alert('❌ Error al buscar torneos.');
+        }
+        
+        this.cdr.detectChanges();
       }
     });
   }
 
-  // 🧹 Limpiar resultados
   clearResults(): void {
     this.searchQuery = '';
     this.match = null;
     this.suggestions = [];
     this.searching = false;
     this.hasSearched = false;
-    this.cdr.detectChanges(); // ✅ Forzar actualización
+    this.cdr.detectChanges();
   }
 
-  // 👁 Navegar al torneo
   viewTournament(t: TorneoPublico): void {
     this.router.navigate(['/torneos', t.id_torneo]);
   }
