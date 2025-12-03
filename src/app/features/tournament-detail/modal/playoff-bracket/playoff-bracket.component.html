@@ -46,8 +46,8 @@
         <!-- ========================= -->
         <div class="bracket-column" *ngIf="bracket.octavos.length > 0">
           <h3 class="column-title">{{ getFaseTexto('OCTAVOS') }}</h3>
-          <div class="series-list">
 
+          <div class="series-list">
             <div *ngFor="let serie of bracket.octavos" class="serie-card">
 
               <div class="serie-header">
@@ -57,14 +57,11 @@
                 </span>
               </div>
 
-              <!-- PARTIDOS -->
               <div *ngFor="let partido of serie.partidos" class="match-item">
                 <div class="match-info">
                   <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
                   <span class="match-date">{{ partido.fecha || 'Sin fecha' }}</span>
                 </div>
-
-                <!-- ✅ BOTÓN EDITAR PARTIDO (AHORA EN LA UBICACIÓN CORRECTA) -->
                 <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
               </div>
 
@@ -77,8 +74,8 @@
         <!-- ========================= -->
         <div class="bracket-column" *ngIf="bracket.cuartos.length > 0">
           <h3 class="column-title">{{ getFaseTexto('CUARTOS') }}</h3>
-          <div class="series-list">
 
+          <div class="series-list">
             <div *ngFor="let serie of bracket.cuartos" class="serie-card">
 
               <div class="serie-header">
@@ -93,22 +90,20 @@
                   <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
                   <span class="match-date">{{ partido.fecha || 'Sin fecha' }}</span>
                 </div>
-
                 <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
               </div>
 
             </div>
-
           </div>
         </div>
 
         <!-- ========================= -->
-        <!--   SEMIFINAL              -->
+        <!--        SEMIFINAL         -->
         <!-- ========================= -->
         <div class="bracket-column" *ngIf="bracket.semifinales.length > 0">
           <h3 class="column-title">{{ getFaseTexto('SEMIFINAL') }}</h3>
-          <div class="series-list">
 
+          <div class="series-list">
             <div *ngFor="let serie of bracket.semifinales" class="serie-card">
 
               <div class="serie-header">
@@ -123,17 +118,15 @@
                   <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
                   <span class="match-date">{{ partido.fecha || 'Sin fecha' }}</span>
                 </div>
-
                 <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
               </div>
 
             </div>
-
           </div>
         </div>
 
         <!-- ========================= -->
-        <!--       FINAL              -->
+        <!--          FINAL           -->
         <!-- ========================= -->
         <div class="bracket-column" *ngIf="bracket.final">
           <h3 class="column-title">{{ getFaseTexto('FINAL') }}</h3>
@@ -148,26 +141,22 @@
             </div>
 
             <!-- PARTIDOS DE LA FINAL -->
-            <div *ngFor="let partido of bracket.final.partidos" class="match-item">
+            <div class="partidos-list" *ngIf="bracket.final.partidos.length > 0">
 
-              <div class="match-info">
-                <span>
-                  {{ partido.equipo_local_nombre }} 
-                  vs 
-                  {{ partido.equipo_visitante_nombre }}
-                </span>
+              <div class="match-item" *ngFor="let partido of bracket.final.partidos">
 
-                <span class="match-date">
-                  {{ partido.fecha ? (partido.fecha | date:'medium') : 'Sin fecha' }}
-                </span>
+                <div class="match-info">
+                  <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
+                  <span class="match-date">
+                    {{ partido.fecha ? (partido.fecha | date:'dd MMM, HH:mm') : 'Sin fecha' }}
+                  </span>
+                </div>
+
+                <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
+
               </div>
 
-              <button class="btn-edit" (click)="openEditMatch(partido)">
-                ✏️ Editar
-              </button>
-
             </div>
-
 
           </div>
         </div>
