@@ -1,6 +1,6 @@
 // register-modal.component.ts
 import {
-  Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges
+  Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges, ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -16,6 +16,8 @@ import { AuthService } from '../../services/auth.service';
 export class RegisterModalComponent implements OnChanges {
   private fb   = inject(FormBuilder);
   private auth = inject(AuthService);
+
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() open = false;
   @Output() close = new EventEmitter<void>();
@@ -65,6 +67,7 @@ export class RegisterModalComponent implements OnChanges {
 
     if (password !== confirmPassword) {
       this.errorMsg = 'Las contraseñas no coinciden';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -94,10 +97,13 @@ export class RegisterModalComponent implements OnChanges {
       
       if (error.status === 409) {
         this.errorMsg = 'Este email ya está registrado';
+        this.cdr.detectChanges();
       } else {
         this.errorMsg = error.error?.detail || 'Error al registrarse';
+        this.cdr.detectChanges();
       }
     } finally {
+      this.cdr.detectChanges();
       this.loading = false;
     }
   }

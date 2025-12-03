@@ -1,7 +1,7 @@
 // login-modal.component.ts
 import {
   AfterViewInit, Component, EventEmitter, Input, OnChanges,
-  Output, SimpleChanges, inject
+  Output, SimpleChanges, inject, ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,6 +18,8 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
   private fb   = inject(FormBuilder);
   private auth = inject(AuthService);
 
+  private cdr = inject(ChangeDetectorRef);
+  
   @Input() open = false;
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<any>();
@@ -71,13 +73,17 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
         this.errorMsg = 'Credenciales inválidas';
       } else if (error.status === 403) {
         this.errorMsg = error.error?.detail || 'Debes verificar tu email antes de iniciar sesión';
+        this.cdr.detectChanges();
       } else if (error.status === 0) {
         this.errorMsg = '⚠️ No se puede conectar al servidor';
+        this.cdr.detectChanges();
       } else {
         this.errorMsg = error.error?.detail || 'Error al iniciar sesión';
+        this.cdr.detectChanges();
       }
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -97,8 +103,10 @@ export class LoginModalComponent implements AfterViewInit, OnChanges {
     } catch (error: any) {
       console.error('❌ Error en Google login:', error);
       this.errorMsg = 'No se pudo iniciar con Google';
+      this.cdr.detectChanges();
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 }
