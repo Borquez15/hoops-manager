@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TournamentSearchService, TorneoPublico, SearchResponse } from '../../../../services/tournament-search.service';
 import { TimeoutError } from 'rxjs';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-tournament-search',
@@ -41,17 +42,29 @@ export class TournamentSearchComponent {
       this.match = null;
       this.suggestions = [];
 
+      // Estados permitidos públicamente
+      const estadosPermitidos = ['ACTIVO', 'PLAYOFFS', 'FINALIZADO'];
+
       this.searchService.search(query).subscribe({
         next: (response: SearchResponse) => {
           console.log('✅ Resultados recibidos:', response);
-          
-          this.match = response.match;
-          this.suggestions = response.suggestions || [];
+
+          // FILTRO CLAVE 🔥🔥🔥
+          const filtrar = (t: TorneoPublico | null): TorneoPublico | null => {
+            if (!t) return null;
+            return estadosPermitidos.includes(t.estado.toUpperCase()) ? t : null;
+          };
+
+          this.match = filtrar(response.match);
+          this.suggestions = (response.suggestions || [])
+            .filter(t => estadosPermitidos.includes(t.estado.toUpperCase()));
+
           this.searching = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('❌ Error en búsqueda:', err);
-          
+
           this.match = null;
           this.suggestions = [];
           this.searching = false;
@@ -65,6 +78,7 @@ export class TournamentSearchComponent {
         }
       });
     }
+
 
 
   clearResults(): void {

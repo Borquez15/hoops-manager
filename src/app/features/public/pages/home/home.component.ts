@@ -159,7 +159,7 @@ export class HomeComponent implements AfterViewInit {
   // ============================================
   // BÚSQUEDA DE TORNEOS
   // ============================================
-  onSearch(): void {
+  oonSearch(): void {
     const query = this.searchQuery.trim();
     
     if (!query) {
@@ -171,11 +171,21 @@ export class HomeComponent implements AfterViewInit {
     this.searching = true;
     this.hasSearched = true;
 
+    const estadosPermitidos = ['ACTIVO', 'PLAYOFFS', 'FINALIZADO'];
+
     this.searchService.search(query).subscribe({
       next: (response: SearchResponse) => {
         console.log('✅ Resultados:', response);
-        this.match = response.match;
-        this.suggestions = response.suggestions;
+
+        const filtrar = (t: TorneoPublico | null): TorneoPublico | null => {
+          if (!t) return null;
+          return estadosPermitidos.includes(t.estado.toUpperCase()) ? t : null;
+        };
+
+        this.match = filtrar(response.match);
+        this.suggestions = (response.suggestions || [])
+          .filter(t => estadosPermitidos.includes(t.estado.toUpperCase()));
+
         this.searching = false;
       },
       error: (error) => {
@@ -185,6 +195,7 @@ export class HomeComponent implements AfterViewInit {
       }
     });
   }
+
 
   clearResults(): void {
     this.match = null;
