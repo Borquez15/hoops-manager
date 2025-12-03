@@ -503,28 +503,63 @@ section {
 
 .snap {
     scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
 }
 
+/* Cada sección ocupa pantalla completa y centrada */
 .snap__section {
-    height: 100vh;                 /* 🔥 vuelve a hacer cada sección pantalla completa */
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: var(--nav-h);    /* evitar que el header tape el contenido */
+
+    /* evita que el header tape contenido */
+    padding: calc(var(--nav-h) + 40px) 0 40px;
     box-sizing: border-box;
+
+    /* fondo premium estilo Apple */
+    background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.02), transparent 70%),
+                linear-gradient(180deg, #0d1016 0%, #0b0f14 100%);
 }
 
+/* Contenido interno centrado horizontal y vertical */
 .snap__section > * {
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    max-width: 1300px;            /* ajusta si quieres más ancho */
-    padding-left: 20px;
-    padding-right: 20px;
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    width: 100%;
+    max-width: 1200px; /* ancho premium */
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    box-sizing: border-box;
+
+    /* animación apple */
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeUp 0.8s ease forwards;
+}
+
+/* Animación suave de entrada */
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mejor comportamiento responsivo premium */
+@media (max-width: 768px) {
+    .snap__section > * {
+        max-width: 95%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .snap__section {
+        padding: calc(var(--nav-h) + 20px) 0 20px;
+    }
 }
 
 /* ========================================
