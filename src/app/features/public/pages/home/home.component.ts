@@ -141,10 +141,18 @@ export class HomeComponent implements AfterViewInit {
   // ============================================
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+    
+    // Bloquear/desbloquear scroll
+    if (this.menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
   }
 
   closeMenu() {
     this.menuOpen = false;
+    document.body.style.overflow = '';
   }
 
   async logout() {
@@ -152,6 +160,7 @@ export class HomeComponent implements AfterViewInit {
     this.menuOpen = false;
     this.user = null;
     this.isAuthenticated = false;
+    document.body.style.overflow = '';
     
     window.location.href = '/';
   }
