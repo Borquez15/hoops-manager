@@ -49,7 +49,7 @@
     <!-- MATCH EXACTO -->
     <div *ngIf="match" class="results-section">
       <h3 class="section-title">✅ Resultado Exacto</h3>
-      <div class="tournament-card match-card" (click)="viewTournament(match, $event)">
+      <div class="tournament-card match-card" (click)="viewTournament(match)">
         <div class="tournament-logo">
           <span>{{ match.nombre.charAt(0) }}</span>
         </div>
@@ -66,7 +66,7 @@
         <button 
           type="button"
           class="btn-enter" 
-          (click)="viewTournament(match, $event)">
+          (click)="viewTournament(match)">
           ENTRAR
         </button>
       </div>
@@ -80,7 +80,7 @@
         <div 
           *ngFor="let torneo of suggestions" 
           class="tournament-card"
-          (click)="viewTournament(torneo, $event)">
+          (click)="viewTournament(torneo)">
              
           <div class="tournament-logo">
             <span>{{ torneo.nombre.charAt(0) }}</span>
@@ -98,7 +98,7 @@
           <button 
             type="button"
             class="btn-enter" 
-            (click)="viewTournament(torneo, $event)">
+            (click)="viewTournament(torneo)">
             ENTRAR
           </button>
         </div>

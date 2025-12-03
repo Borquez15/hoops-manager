@@ -27,9 +27,7 @@ export class TournamentSearchComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
-  // =================================================
-  // 🔍 MÉTODO PRINCIPAL DE BÚSQUEDA
-  // =================================================
+  // 🔍 Buscar torneo
   onSearch(event?: Event): void {
     if (event) event.preventDefault();
 
@@ -47,7 +45,6 @@ export class TournamentSearchComponent {
           this.match = response.match;
           this.suggestions = response.suggestions || [];
           this.searching = false;
-
           this.cdr.detectChanges();
         });
       },
@@ -57,7 +54,6 @@ export class TournamentSearchComponent {
           this.suggestions = [];
           this.searching = false;
           this.hasSearched = true;
-
           alert('Error al buscar torneos.');
           this.cdr.detectChanges();
         });
@@ -65,9 +61,7 @@ export class TournamentSearchComponent {
     });
   }
 
-  // =================================================
-  // 🧹 Limpiar búsqueda
-  // =================================================
+  // 🧹 Limpiar resultados
   clearResults(): void {
     this.zone.run(() => {
       this.searchQuery = '';
@@ -75,14 +69,11 @@ export class TournamentSearchComponent {
       this.suggestions = [];
       this.searching = false;
       this.hasSearched = false;
-
       this.cdr.detectChanges();
     });
   }
 
-  // =================================================
   // 👁 Navegar al torneo
-  // =================================================
   viewTournament(t: TorneoPublico): void {
     this.router.navigate(['/torneos', t.id_torneo]);
   }
