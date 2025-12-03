@@ -20,12 +20,24 @@ export class AuthInterceptorService implements HttpInterceptor {
     
     // ✅ RUTAS PÚBLICAS QUE NO NECESITAN TOKEN
     const publicRoutes = [
+      // Autenticación
       '/api/auth/register',
       '/api/auth/login',
-      '/api/auth/verify-email',      // ✅ AGREGAR
-      '/api/auth/forgot-password',    // ✅ AGREGAR
-      '/api/auth/reset-password',     // ✅ AGREGAR
-      '/api/auth/firebase'
+      '/api/auth/verify-email',
+      '/api/auth/forgot-password',
+      '/api/auth/reset-password',
+      '/api/auth/firebase',
+      
+      // ✅ BÚSQUEDA Y VISTA PÚBLICA DE TORNEOS
+      '/tournaments/search',
+      '/tournaments/',
+      '/public',
+      
+      // ✅ DATOS PÚBLICOS DE TORNEOS
+      '/games/upcoming',
+      '/standings',
+      '/leaders/scorers',
+      '/pdf/',
     ];
 
     // ✅ VERIFICAR SI ES RUTA PÚBLICA
