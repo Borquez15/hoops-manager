@@ -112,7 +112,7 @@ export class TournamentDetailComponent implements OnInit {
     console.log('🔵 Iniciando carga del torneo:', this.tournamentId);
     this.loading = true;
     this.error = null;
-    this.cdr.detectChanges(); // ✅ Forzar actualización
+    this.cdr.detectChanges();
     
     try {
       const tournamentData = await this.tournamentService
@@ -161,7 +161,7 @@ export class TournamentDetailComponent implements OnInit {
       this.error = error?.message || 'Error al cargar';
     } finally {
       this.loading = false;
-      this.cdr.detectChanges(); // ✅ Forzar actualización
+      this.cdr.detectChanges();
     }
   }
 
@@ -183,7 +183,7 @@ export class TournamentDetailComponent implements OnInit {
       }
       
       console.log('✅ Equipos cargados:', this.equipos.length);
-      this.cdr.detectChanges(); // ✅ Forzar actualización
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('❌ Error al cargar equipos:', error);
       this.equipos = [];
@@ -205,7 +205,7 @@ export class TournamentDetailComponent implements OnInit {
           activo: j.activo,
           persona: j.persona
         }));
-        this.cdr.detectChanges(); // ✅ Forzar actualización
+        this.cdr.detectChanges();
       }
     } catch (error) {
       console.error('❌ Error al cargar jugadores:', error);
@@ -220,7 +220,7 @@ export class TournamentDetailComponent implements OnInit {
       
       this.arbitros = response || [];
       console.log('✅ Árbitros cargados:', this.arbitros.length);
-      this.cdr.detectChanges(); // ✅ Forzar actualización
+      this.cdr.detectChanges();
     } catch (error) {
       this.arbitros = [];
       this.cdr.detectChanges();
@@ -235,7 +235,7 @@ export class TournamentDetailComponent implements OnInit {
       
       this.canchas = response || [];
       console.log('✅ Canchas cargadas:', this.canchas.length);
-      this.cdr.detectChanges(); // ✅ Forzar actualización
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('❌ Error al cargar canchas:', error);
       this.canchas = [];
@@ -251,7 +251,7 @@ export class TournamentDetailComponent implements OnInit {
       
       this.calendarGenerated = (response || []).length > 0;
       console.log('📅 Calendario:', this.calendarGenerated ? 'GENERADO' : 'NO GENERADO');
-      this.cdr.detectChanges(); // ✅ Forzar actualización
+      this.cdr.detectChanges();
     } catch (error) {
       this.calendarGenerated = false;
       this.cdr.detectChanges();
@@ -330,7 +330,7 @@ export class TournamentDetailComponent implements OnInit {
     console.log('🔄 Equipo actualizado, recargando datos...');
     await this.loadEquipos();
     this.cerrarModalEquipo();
-    this.cdr.detectChanges(); // ✅ Forzar actualización CRÍTICA
+    this.cdr.detectChanges();
   }
 
   async eliminarEquipo(index: number, id?: number): Promise<void> {
@@ -346,7 +346,7 @@ export class TournamentDetailComponent implements OnInit {
         `${this.apiUrl}/tournaments/${this.tournamentId}/teams/${id}`
       ).toPromise();
       await this.loadEquipos();
-      this.cdr.detectChanges(); // ✅ Forzar actualización
+      this.cdr.detectChanges();
     } catch (error) {
       alert('❌ Error al eliminar equipo');
     }
@@ -364,7 +364,7 @@ export class TournamentDetailComponent implements OnInit {
 
   async onArbitrosUpdated(): Promise<void> {
     await this.loadArbitros();
-    this.cdr.detectChanges(); // ✅ Forzar actualización
+    this.cdr.detectChanges();
   }
 
   async generateCalendar(): Promise<void> {
@@ -506,7 +506,6 @@ export class TournamentDetailComponent implements OnInit {
       }
     });
   }
-
 
   async finalizarTemporadaRegular(): Promise<void> {
     if (this.tournamentStatus !== 'iniciado') {
@@ -662,20 +661,6 @@ export class TournamentDetailComponent implements OnInit {
     this.router.navigate(['/mis-torneos']);
   }
 
-  onPlayoffsLoaded(exists: boolean) {
-  console.log('🏆 Playoffs cargados:', exists);
-
-  this.playoffsGenerated = exists;
-  this.loadingPlayoffs = false;
-
-  if (exists) {
-    this.tournamentStatus = 'playoffs';   // ← MOSTRAR acciones de playoffs
-  }
-
-  this.cdr.detectChanges();
-  }
-
-
   generarPlayoffs() {
     if (!this.tournament || this.generatingPlayoffs) return;
 
@@ -696,7 +681,7 @@ export class TournamentDetailComponent implements OnInit {
     }
 
     this.generatingPlayoffs = true;
-    this.cdr.detectChanges(); // ✅ Mostrar estado de carga
+    this.cdr.detectChanges();
 
     this.http.post<any>(
       `${this.apiUrl}/tournaments/${this.tournamentId}/playoffs/generate`,
@@ -708,7 +693,7 @@ export class TournamentDetailComponent implements OnInit {
         
         this.playoffsGenerated = true;
         this.generatingPlayoffs = false;
-        this.cdr.detectChanges(); // ✅ Forzar actualización
+        this.cdr.detectChanges();
         
         window.location.reload();
       },
@@ -716,7 +701,7 @@ export class TournamentDetailComponent implements OnInit {
         console.error('❌ Error al generar playoffs:', error);
         alert(`❌ Error: ${error.error?.detail || 'No se pudieron generar los playoffs'}`);
         this.generatingPlayoffs = false;
-        this.cdr.detectChanges(); // ✅ Forzar actualización
+        this.cdr.detectChanges();
       }
     });
   }
