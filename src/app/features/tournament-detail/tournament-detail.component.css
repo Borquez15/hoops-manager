@@ -998,3 +998,8 @@ textarea:disabled {
     text-align: left;
   }
 }
+
+.badge-playoffs {
+  background: #ff7f00;
+  color: white;
+}

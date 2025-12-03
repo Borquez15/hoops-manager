@@ -75,7 +75,7 @@ export class TournamentDetailComponent implements OnInit {
   
   loading = false;
   error: string | null = null;
-  tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
+  tournamentStatus: 'configurando' | 'iniciado' | 'playoffs' | 'finalizado' = 'configurando';
   calendarGenerated = false;
 
   playoffsGenerated = false;
@@ -133,6 +133,8 @@ export class TournamentDetailComponent implements OnInit {
           this.tournamentStatus = 'configurando';
         } else if (estado === 'ACTIVO' || estado === 'INICIADO') {
           this.tournamentStatus = 'iniciado';
+        } else if (estado === 'PLAYOFFS') {  // ✅ AGREGAR
+          this.tournamentStatus = 'playoffs';
         } else if (estado === 'FINALIZADO') {
           this.tournamentStatus = 'finalizado';
         } else {
@@ -439,7 +441,36 @@ export class TournamentDetailComponent implements OnInit {
     const mensaje = error?.error?.detail || 'Error al reactivar torneo';
     alert(`❌ ${mensaje}`);
   }
+  }
+
+  async finalizarTemporadaRegular(): Promise<void> {
+  if (this.tournamentStatus !== 'iniciado') {
+    alert('⚠️ El torneo debe estar iniciado');
+    return;
+  }
+
+  if (!confirm('¿Finalizar la Temporada Regular?\n\nEsto marcará el fin de la fase regular y habilitará los playoffs.')) {
+    return;
+  }
+
+  try {
+    await this.http.post(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/finish-regular-season`,
+      {},
+      { withCredentials: true }
+    ).toPromise();
+
+    alert('✅ ¡Temporada Regular finalizada!\n\nAhora puedes gestionar los playoffs.');
+    await this.loadTournamentData();
+  } catch (error: any) {
+    const mensaje = error?.error?.detail || 'Error al finalizar temporada';
+    alert(`❌ ${mensaje}`);
+  }
 }
+
+irAPlayoffs(): void {
+  this.router.navigate([`/torneos/${this.tournamentId}/playoffs`]);
+  }
 
   getMinimumTeams(): number {
     if (!this.tournament) return 2;
@@ -487,16 +518,19 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   getStatusBadge(): { text: string; class: string } {
-    switch (this.tournamentStatus) {
-      case 'iniciado':
-        return { text: '🟢 Iniciado', class: 'badge-success' };
-      case 'finalizado':
-        return { text: '⚫ Finalizado', class: 'badge-finished' };
-      case 'configurando':
-      default:
-        return { text: '🔴 Configurando', class: 'badge-warning' };
+  switch (this.tournamentStatus) {
+    case 'iniciado':
+      return { text: '🟢 Iniciado', class: 'badge-success' };
+    case 'playoffs':
+      return { text: '🟠 Playoffs', class: 'badge-playoffs' };
+    case 'finalizado':
+      return { text: '⚫ Finalizado', class: 'badge-finished' };
+    case 'configurando':
+    default:
+      return { text: '🔴 Configurando', class: 'badge-warning' };
     }
   }
+
 
   async startTournament(): Promise<void> {
     if (!this.canStartTournament()) {

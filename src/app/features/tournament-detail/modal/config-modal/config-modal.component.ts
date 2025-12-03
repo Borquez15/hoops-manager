@@ -24,7 +24,7 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   @Input() tournament: Tournament | null = null;
   @Input() canchas: Cancha[] = [];
   @Input() hasCalendar = false;
-  @Input() tournamentStatus: 'configurando' | 'iniciado' | 'finalizado' = 'configurando';
+  @Input() tournamentStatus: 'configurando' | 'iniciado' | 'playoffs' | 'finalizado' = 'configurando';
   
   @Output() closeModal = new EventEmitter<void>();
   @Output() saveTournament = new EventEmitter<Partial<Tournament>>();
