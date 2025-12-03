@@ -609,7 +609,7 @@ irAPlayoffs(): void {
   generarPlayoffs() {
     if (!this.tournament || this.generatingPlayoffs) return;
 
-    if (this.tournament.estado !== 'iniciado') {
+    if (this.tournamentStatus !== 'iniciado') {
       alert('⚠️ El torneo debe estar iniciado para generar playoffs');
       return;
     }

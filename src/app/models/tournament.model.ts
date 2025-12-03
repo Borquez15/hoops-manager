@@ -1,16 +1,27 @@
 // src/app/models/tournament.model.ts
 
 export type Modalidad = '3v3' | '5v5';
-export type EstadoTorneo = 'DRAFT' | 'ACTIVO' | 'FINALIZADO';
+
+// 🔥 ACTUALIZAR ESTA LÍNEA - Agregar 'PLAYOFFS'
+export type EstadoTorneo = 'DRAFT' | 'ACTIVO' | 'PLAYOFFS' | 'FINALIZADO';
+
+// 🔥 AGREGAR ESTA LÍNEA NUEVA
+export type FormatoPlayoff = 'directo' | 'mejor_de_3' | 'mejor_de_5' | 'mejor_de_7';
 
 export interface Tournament {
   id_torneo?: number;
   nombre: string;
   vueltas: number;
   cupos_playoffs: number;
-  formato_playoffs?: string; // ✅ AGREGAR ESTA LÍNEA
+  
+  // 🔥 ACTUALIZAR ESTA LÍNEA - Usar el tipo FormatoPlayoff
+  formato_playoffs?: FormatoPlayoff;
+  
   modalidad: string;
-  estado?: string;
+  
+  // 🔥 ACTUALIZAR ESTA LÍNEA - Usar el tipo EstadoTorneo
+  estado?: EstadoTorneo;
+  
   dias_por_semana: number;
   partidos_por_dia: number;
   hora_ini: string;
