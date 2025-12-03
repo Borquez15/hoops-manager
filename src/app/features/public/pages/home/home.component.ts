@@ -65,9 +65,6 @@ export class HomeComponent implements AfterViewInit {
     this.loadUser();
   }
 
-  // ============================================
-  // CARGAR USUARIO
-  // ============================================
   private loadUser() {
     console.log('🔵 Cargando usuario...');
     
@@ -88,9 +85,6 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
-  // ============================================
-  // INICIAR SESIÓN
-  // ============================================
   iniciarSesion(ev?: Event) {
     ev?.preventDefault();
     
@@ -101,9 +95,6 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
-  // ============================================
-  // CREAR TORNEO
-  // ============================================
   crearTorneo(ev?: Event) {
     ev?.preventDefault();
     
@@ -114,14 +105,10 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
-  // ============================================
-  // CALLBACKS DE LOGIN/REGISTRO
-  // ============================================
   onLoginSuccess(data: any) {
     console.log('✅ Login exitoso:', data);
     this.showLogin = false;
     
-    // Actualizar estado
     this.user = data.user;
     this.isAuthenticated = true;
     
@@ -132,17 +119,12 @@ export class HomeComponent implements AfterViewInit {
     console.log('✅ Registro exitoso:', data);
     this.showRegister = false;
     
-    // No guardamos usuario aquí porque el registro requiere verificación de email
     console.log('📧 Revisa tu email para verificar tu cuenta');
   }
 
-  // ============================================
-  // MENÚ DE USUARIO
-  // ============================================
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
     
-    // Bloquear/desbloquear scroll
     if (this.menuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -165,9 +147,6 @@ export class HomeComponent implements AfterViewInit {
     window.location.href = '/';
   }
 
-  // ============================================
-  // BÚSQUEDA DE TORNEOS
-  // ============================================
   onSearch(): void {
     const query = this.searchQuery.trim();
     
@@ -214,9 +193,6 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
-  // ============================================
-  // NAVEGACIÓN
-  // ============================================
   async go(id: SectionId, ev?: Event) {
     ev?.preventDefault();
     if (this.router.url !== '/') {
@@ -229,54 +205,65 @@ export class HomeComponent implements AfterViewInit {
 
   private scrollTo(id: SectionId) {
     this.active = id;
-    if (id === 'inicio') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    // 🔒 FORZAR NAVEGACIÓN SIN SCROLL MANUAL
+    window.scrollTo({
+      top: element.offsetTop,
+      behavior: 'instant' as ScrollBehavior
+    });
   }
 
   ngAfterViewInit(): void {
-  const els = (SECTION_IDS as readonly SectionId[])
-    .map(id => document.getElementById(id))
-    .filter((e): e is HTMLElement => !!e);
 
-  // ✅ CONFIGURACIÓN MEJORADA DEL OBSERVER
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting && e.intersectionRatio >= 0.3) {
-        const id = e.target.id as SectionId;
-        
-        // ✅ Actualizar la sección activa
-        this.active = id;
-        
-        // Actualizar URL sin recargar
-        history.replaceState(null, '', id === 'inicio' ? '/' : `#${id}`);
-        
-        console.log('📍 Sección activa:', id);
+    // 🔒 BLOQUEAR SCROLL COMPLETAMENTE
+    document.body.style.overflow = 'hidden';
+
+    // Previene scroll con rueda
+    window.addEventListener('wheel', e => e.preventDefault(), { passive: false });
+
+    // Previene scroll táctil
+    window.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+    // Previene scroll con teclado
+    window.addEventListener('keydown', e => {
+      if (['ArrowUp','ArrowDown','PageUp','PageDown','Space'].includes(e.code)) {
+        e.preventDefault();
       }
     });
-  }, { 
-    // ✅ CONFIGURACIÓN CRÍTICA
-    threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-    rootMargin: '-20% 0px -60% 0px' // La sección debe estar en el 20% superior del viewport
-  });
 
-  // Observar todas las secciones
-  els.forEach(el => observer.observe(el));
+    const els = (SECTION_IDS as readonly SectionId[])
+      .map(id => document.getElementById(id))
+      .filter((e): e is HTMLElement => !!e);
 
-  // ✅ DETECTAR CUANDO ESTÁS ARRIBA DEL TODO (INICIO)
-  window.addEventListener('scroll', () => {
-    if (window.scrollY < 300) {
-      this.active = 'inicio';
-      history.replaceState(null, '', '/');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting && e.intersectionRatio >= 0.3) {
+          const id = e.target.id as SectionId;
+          this.active = id;
+          history.replaceState(null, '', id === 'inicio' ? '/' : `#${id}`);
+          console.log('📍 Sección activa:', id);
+        }
+      });
+    }, { 
+      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+      rootMargin: '-20% 0px -60% 0px'
+    });
+
+    els.forEach(el => observer.observe(el));
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY < 300) {
+        this.active = 'inicio';
+        history.replaceState(null, '', '/');
+      }
+    }, { passive: true });
+
+    const hash = window.location.hash.replace('#', '') as SectionId;
+    if (hash && SECTION_IDS.includes(hash)) {
+      setTimeout(() => this.scrollTo(hash), 100);
     }
-  }, { passive: true });
-
-  // ✅ DETECTAR LA SECCIÓN INICIAL AL CARGAR
-  const hash = window.location.hash.replace('#', '') as SectionId;
-  if (hash && SECTION_IDS.includes(hash)) {
-    setTimeout(() => this.scrollTo(hash), 100);
   }
-}
 }
