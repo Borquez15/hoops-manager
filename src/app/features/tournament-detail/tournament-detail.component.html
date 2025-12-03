@@ -233,7 +233,7 @@
       
       <!-- ✅ BOTÓN PARA GENERAR PLAYOFFS (SOLO SI NO ESTÁN GENERADOS) -->
       <button 
-        *ngIf="!playoffsGenerated && tournamentStatus === 'iniciado'"
+        *ngIf="!playoffsGenerated && (tournamentStatus === 'iniciado' || tournamentStatus === 'playoffs')"
         class="btn btn-primary"
         (click)="generarPlayoffs()"
         [disabled]="generatingPlayoffs"

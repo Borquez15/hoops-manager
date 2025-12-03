@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-
+import { NgIf, NgFor } from '@angular/common';
 import { TournamentService } from '../../services/tournament.service';
 import { Tournament } from '../../models/tournament.model';
 import { PlayoffBracketComponent } from './modal/playoff-bracket/playoff-bracket.component';
