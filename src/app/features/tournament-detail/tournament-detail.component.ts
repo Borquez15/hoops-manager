@@ -137,6 +137,7 @@ export class TournamentDetailComponent implements OnInit {
           this.tournamentStatus = 'iniciado';
         } else if (estado === 'PLAYOFFS') {
           this.tournamentStatus = 'playoffs';
+          this.playoffsGenerated = true;
         } else if (estado === 'FINALIZADO' || estado === 'TERMINADO') {
           this.tournamentStatus = 'finalizado';
         } else {
@@ -488,6 +489,25 @@ export class TournamentDetailComponent implements OnInit {
     }
   }
 
+  generarCalendarioPlayoffs() {
+    if (!confirm("¿Generar fechas automáticas para todos los partidos de playoffs?")) return;
+
+    this.http.post(
+      `${this.apiUrl}/tournaments/${this.tournamentId}/playoffs/auto-schedule`,
+      {}
+    ).subscribe({
+      next: () => {
+        alert("📅 Fechas generadas correctamente");
+        window.location.reload();
+      },
+      error: (err) => {
+        console.error(err);
+        alert("❌ Error al generar calendario");
+      }
+    });
+  }
+
+
   async finalizarTemporadaRegular(): Promise<void> {
     if (this.tournamentStatus !== 'iniciado') {
       alert('⚠️ El torneo debe estar iniciado');
@@ -643,12 +663,18 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   onPlayoffsLoaded(exists: boolean) {
-    console.log('🏆 Playoffs cargados:', exists);
-    
-    this.playoffsGenerated = exists;
-    this.loadingPlayoffs = false;
-    this.cdr.detectChanges(); // ✅ Forzar actualización
+  console.log('🏆 Playoffs cargados:', exists);
+
+  this.playoffsGenerated = exists;
+  this.loadingPlayoffs = false;
+
+  if (exists) {
+    this.tournamentStatus = 'playoffs';   // ← MOSTRAR acciones de playoffs
   }
+
+  this.cdr.detectChanges();
+  }
+
 
   generarPlayoffs() {
     if (!this.tournament || this.generatingPlayoffs) return;

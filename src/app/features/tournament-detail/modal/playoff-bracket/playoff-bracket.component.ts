@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { EditPlayoffMatchComponent } from './edit-playoff-match/edit-playoff-match.component';
 
 interface Equipo {
   id_equipo: number;
@@ -8,7 +9,8 @@ interface Equipo {
   logo_url?: string;
 }
 
-interface Partido {
+
+export interface Partido {
   id_partido_playoff: number;
   numero_partido: number;
   fecha?: string;
@@ -17,9 +19,12 @@ interface Partido {
   puntos_local?: number;
   puntos_visitante?: number;
   estado: string;
-  nombre_local?: string;
-  nombre_visitante?: string;
+
+  // NOMBRES CORRECTOS QUE ENVÍA EL BACKEND
+  equipo_local_nombre: string;
+  equipo_visitante_nombre: string;
 }
+
 
 interface Serie {
   id_serie: number;
@@ -58,7 +63,7 @@ interface PlayoffBracket {
 @Component({
   selector: 'app-playoff-bracket',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EditPlayoffMatchComponent],
   templateUrl: './playoff-bracket.component.html',
   styleUrls: ['./playoff-bracket.component.css']
 })
@@ -74,6 +79,17 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
   bracket: PlayoffBracket | null = null;
   loading = true;
   error = '';
+  selectedMatch: any = null;
+
+  openEditMatch(match: any) {
+    this.selectedMatch = match;
+  }
+
+  closeModal() {
+    this.selectedMatch = null;
+    this.loadBracket();
+  }
+
 
   // 🔥 SE EJECUTA SOLO UNA VEZ, NO SIRVE PARA INPUTS ASÍNCRONOS
   ngOnInit() {

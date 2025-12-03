@@ -298,6 +298,16 @@
         {{ generatingPlayoffs ? '⏳ Generando Playoffs...' : '⚡ Generar Playoffs' }}
       </button>
 
+      <!-- BOTÓN PARA GENERAR CALENDARIO DE PLAYOFFS -->
+      <button 
+        *ngIf="playoffsGenerated"
+        class="btn btn-primary"
+        (click)="generarCalendarioPlayoffs()"
+        style="margin-left: 12px; background:#007bff;">
+        🗓️ Generar calendario de playoffs
+      </button>
+
+
       <!-- ✅ Mostrar botón de gestionar si ya están generados -->
       <button 
         *ngIf="playoffsGenerated"
