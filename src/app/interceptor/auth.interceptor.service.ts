@@ -29,6 +29,7 @@ export class AuthInterceptorService implements HttpInterceptor {
       '/api/auth/firebase',
       
       // ✅ BÚSQUEDA Y VISTA PÚBLICA DE TORNEOS
+      '/api/tournaments/search',
       '/tournaments/search',
       '/tournaments/',
       '/public',
