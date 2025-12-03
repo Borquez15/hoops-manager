@@ -85,6 +85,8 @@ export class TournamentDetailComponent implements OnInit {
   calendarProgress = 0;
   calendarProgressMessage = '';
   
+  loadingPlayoffs: boolean = true;
+
   modalConfigAbierto = false;
   modalEquipoAbierto = false;
   modalArbitroAbierto = false;
@@ -127,20 +129,20 @@ export class TournamentDetailComponent implements OnInit {
       console.log('📊 Estado del torneo:', this.tournament.estado);
       
       if (this.tournament.estado) {
-        const estado = this.tournament.estado.toUpperCase();
-        
-        if (estado === 'DRAFT' || estado === 'CONFIGURANDO') {
-          this.tournamentStatus = 'configurando';
-        } else if (estado === 'ACTIVO' || estado === 'INICIADO') {
-          this.tournamentStatus = 'iniciado';
-        } else if (estado === 'PLAYOFFS') {  // ✅ AGREGAR
-          this.tournamentStatus = 'playoffs';
-        } else if (estado === 'FINALIZADO') {
-          this.tournamentStatus = 'finalizado';
-        } else {
-          this.tournamentStatus = 'configurando';
-        }
+      const estado = this.tournament.estado.toUpperCase();
+      
+      if (estado === 'DRAFT' || estado === 'CONFIGURANDO') {
+        this.tournamentStatus = 'configurando';
+      } else if (estado === 'ACTIVO' || estado === 'INICIADO' || estado === 'EN_CURSO') {
+        this.tournamentStatus = 'iniciado';  // ✅ Se mantiene 'iniciado' en el componente
+      } else if (estado === 'PLAYOFFS') {
+        this.tournamentStatus = 'playoffs';
+      } else if (estado === 'FINALIZADO' || estado === 'TERMINADO') {
+        this.tournamentStatus = 'finalizado';
+      } else {
+        this.tournamentStatus = 'configurando';
       }
+    }
       
       console.log('🎯 Estado mapeado a:', this.tournamentStatus);
       
@@ -598,6 +600,8 @@ irAPlayoffs(): void {
     }
   }
 
+  
+
   async finalizarTorneo(): Promise<void> {
     if (this.tournamentStatus !== 'iniciado') {
       alert('⚠️ Solo se pueden finalizar torneos que están activos');
@@ -639,10 +643,14 @@ irAPlayoffs(): void {
    * Callback cuando el bracket notifica si existen playoffs
    */
   onPlayoffsLoaded(exists: boolean) {
-    console.log('🏆 Playoffs cargados:', exists);
-    this.playoffsGenerated = exists;
-    this.cdr.detectChanges();
-  }
+  console.log('🏆 Playoffs cargados:', exists);
+  
+  this.playoffsGenerated = exists;
+  this.loadingPlayoffs = false; // ⬅️ ESTA ES LA PARTE QUE FALTABA
+
+  this.cdr.detectChanges();
+}
+
 
   /**
    * Genera el bracket de playoffs
