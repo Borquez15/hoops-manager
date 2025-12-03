@@ -29,72 +29,43 @@ export class TournamentSearchComponent {
   ) {}
 
   onSearch(event?: Event): void {
-    if (event) event.preventDefault();
+      if (event) event.preventDefault();
 
-    const query = this.searchQuery.trim();
-    if (!query) return;
+      const query = this.searchQuery.trim();
+      if (!query) return;
 
-    console.log('🔍 Iniciando búsqueda:', query);
-    
-    // ✅ Asegurar que los cambios se detecten
-    this.zone.run(() => {
+      console.log('🔍 Iniciando búsqueda:', query);
+      
       this.searching = true;
       this.hasSearched = true;
       this.match = null;
       this.suggestions = [];
-      this.cdr.detectChanges();
-    });
 
-    console.log('📊 Estado antes de búsqueda:', {
-      searching: this.searching,
-      hasSearched: this.hasSearched
-    });
-
-    this.searchService.search(query).subscribe({
-      next: (response: SearchResponse) => {
-        console.log('✅ Resultados recibidos:', response);
-        
-        this.zone.run(() => {
+      this.searchService.search(query).subscribe({
+        next: (response: SearchResponse) => {
+          console.log('✅ Resultados recibidos:', response);
+          
           this.match = response.match;
           this.suggestions = response.suggestions || [];
           this.searching = false;
+        },
+        error: (err) => {
+          console.error('❌ Error en búsqueda:', err);
           
-          console.log('📊 Estado después de búsqueda:', {
-            searching: this.searching,
-            match: this.match,
-            suggestions: this.suggestions.length
-          });
-          
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => {
-        console.error('❌ Error en búsqueda:', err);
-        console.error('❌ Tipo de error:', err.constructor.name);
-        console.error('❌ Status:', err.status);
-        
-        this.zone.run(() => {
           this.match = null;
           this.suggestions = [];
           this.searching = false;
           this.hasSearched = true;
-          
-          // ✅ Manejo específico de timeout
-          if (err instanceof TimeoutError) {
-            alert('⏱️ La búsqueda tardó demasiado. El servidor puede estar ocupado. Intenta de nuevo.');
-          } else if (err.status === 0) {
-            alert('❌ No se pudo conectar con el servidor. Verifica tu conexión a internet.');
-          } else if (err.status === 404) {
-            alert('❌ Endpoint no encontrado. Contacta a soporte.');
+
+          if (err.status === 0) {
+            alert('❌ No se pudo conectar con el servidor.');
           } else {
-            alert(`❌ Error al buscar torneos: ${err.message || 'Desconocido'}`);
+            alert('❌ Error al buscar torneos.');
           }
-          
-          this.cdr.detectChanges();
-        });
-      }
-    });
-  }
+        }
+      });
+    }
+
 
   clearResults(): void {
     this.searchQuery = '';
