@@ -13,6 +13,7 @@ import { ForgotPasswordModalComponent } from '../../../../auth/forgot-password/f
 import { AuthService } from '../../../../services/auth.service';
 import { TournamentSearchService, TorneoPublico, SearchResponse } from '../../../../services/tournament-search.service';
 
+
 const SECTION_IDS = ['inicio', 'caracteristicas', 'torneos', 'contacto'] as const;
 type SectionId = typeof SECTION_IDS[number];
 
