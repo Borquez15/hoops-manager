@@ -6,20 +6,14 @@ export type Modalidad = '3v3' | '5v5';
 export type EstadoTorneo = 'DRAFT' | 'ACTIVO' | 'FINALIZADO';
 
 export interface Torneo {
-  id_torneo?: number;
+  id_torneo: number;
   nombre: string;
   vueltas: number;
   cupos_playoffs: number;
-  formato_playoffs?: string; // ✅ AGREGAR ESTA LÍNEA
-  modalidad: string;
-  estado?: string;
-  dias_por_semana: number;
-  partidos_por_dia: number;
-  hora_ini: string;
-  hora_fin: string;
-  slot_min: number;
-  creado_por?: number;
-  creado_en?: string;
+  modalidad: Modalidad;
+  max_partidos_semana: number;
+  max_partidos_dia: number | null;
+  estado: EstadoTorneo;
 }
 
 export interface SearchResponse {

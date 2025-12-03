@@ -22,7 +22,7 @@
   <ng-container *ngIf="!loading && !error && !hasPlayoffs()">
     <div class="playoff-empty">
       <svg width="64" height="64" fill="currentColor">
-        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c-1.1-2-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
       </svg>
       <p>No hay playoffs generados</p>
       <small>Los playoffs se generarán cuando termine la fase regular</small>
@@ -39,8 +39,8 @@
       </div>
 
       <div class="bracket-grid">
-      
-      <!-- OCTAVOS DE FINAL (si existen) -->
+
+      <!-- OCTAVOS -->
       <div class="bracket-column" *ngIf="bracket.octavos.length > 0">
         <h3 class="column-title">{{ getFaseTexto('OCTAVOS') }}</h3>
         <div class="series-list">
@@ -53,26 +53,35 @@
             </div>
 
             <!-- EQUIPO 1 -->
-            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_1.id_equipo">
+            <div class="matchup-team" 
+              [class.winner]="serie.ganador === serie.equipo_1">
               <div class="team-info">
-                <img *ngIf="serie.equipo_1.logo_url" [src]="serie.equipo_1.logo_url" [alt]="serie.equipo_1.nombre" class="team-logo">
-                <span *ngIf="!serie.equipo_1.logo_url" class="team-initials">{{ serie.equipo_1.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ serie.equipo_1.nombre }}</span>
+                <img *ngIf="serie.equipo_local_info.logo_url" 
+                     [src]="serie.equipo_local_info.logo_url" 
+                     [alt]="serie.equipo_local_info.nombre" 
+                     class="team-logo">
+                <span *ngIf="!serie.equipo_local_info.logo_url" 
+                      class="team-initials">{{ serie.equipo_local_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_local_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
             </div>
 
             <!-- EQUIPO 2 -->
-            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_2.id_equipo">
+            <div class="matchup-team" 
+              [class.winner]="serie.ganador === serie.equipo_2">
               <div class="team-info">
-                <img *ngIf="serie.equipo_2.logo_url" [src]="serie.equipo_2.logo_url" [alt]="serie.equipo_2.nombre" class="team-logo">
-                <span *ngIf="!serie.equipo_2.logo_url" class="team-initials">{{ serie.equipo_2.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ serie.equipo_2.nombre }}</span>
+                <img *ngIf="serie.equipo_visitante_info.logo_url" 
+                     [src]="serie.equipo_visitante_info.logo_url" 
+                     [alt]="serie.equipo_visitante_info.nombre" 
+                     class="team-logo">
+                <span *ngIf="!serie.equipo_visitante_info.logo_url" 
+                      class="team-initials">{{ serie.equipo_visitante_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_visitante_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
             </div>
 
-            <!-- INFO DE LA SERIE -->
             <div class="serie-info">
               <small>Primero a {{ getVictoriasNecesarias(serie.formato) }}</small>
             </div>
@@ -80,7 +89,7 @@
         </div>
       </div>
 
-      <!-- CUARTOS DE FINAL -->
+      <!-- CUARTOS -->
       <div class="bracket-column" *ngIf="bracket.cuartos.length > 0">
         <h3 class="column-title">{{ getFaseTexto('CUARTOS') }}</h3>
         <div class="series-list">
@@ -92,20 +101,30 @@
               </span>
             </div>
 
-            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_1.id_equipo">
+            <!-- EQUIPO 1 -->
+            <div class="matchup-team" 
+              [class.winner]="serie.ganador === serie.equipo_1">
               <div class="team-info">
-                <img *ngIf="serie.equipo_1.logo_url" [src]="serie.equipo_1.logo_url" [alt]="serie.equipo_1.nombre" class="team-logo">
-                <span *ngIf="!serie.equipo_1.logo_url" class="team-initials">{{ serie.equipo_1.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ serie.equipo_1.nombre }}</span>
+                <img *ngIf="serie.equipo_local_info.logo_url" 
+                     [src]="serie.equipo_local_info.logo_url" 
+                     [alt]="serie.equipo_local_info.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_local_info.logo_url"
+                      class="team-initials">{{ serie.equipo_local_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_local_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
             </div>
 
-            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_2.id_equipo">
+            <!-- EQUIPO 2 -->
+            <div class="matchup-team"
+              [class.winner]="serie.ganador === serie.equipo_2">
               <div class="team-info">
-                <img *ngIf="serie.equipo_2.logo_url" [src]="serie.equipo_2.logo_url" [alt]="serie.equipo_2.nombre" class="team-logo">
-                <span *ngIf="!serie.equipo_2.logo_url" class="team-initials">{{ serie.equipo_2.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ serie.equipo_2.nombre }}</span>
+                <img *ngIf="serie.equipo_visitante_info.logo_url" 
+                     [src]="serie.equipo_visitante_info.logo_url" 
+                     [alt]="serie.equipo_visitante_info.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_visitante_info.logo_url"
+                      class="team-initials">{{ serie.equipo_visitante_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_visitante_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
             </div>
@@ -129,20 +148,30 @@
               </span>
             </div>
 
-            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_1.id_equipo">
+            <!-- EQUIPO 1 -->
+            <div class="matchup-team" 
+              [class.winner]="serie.ganador === serie.equipo_1">
               <div class="team-info">
-                <img *ngIf="serie.equipo_1.logo_url" [src]="serie.equipo_1.logo_url" [alt]="serie.equipo_1.nombre" class="team-logo">
-                <span *ngIf="!serie.equipo_1.logo_url" class="team-initials">{{ serie.equipo_1.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ serie.equipo_1.nombre }}</span>
+                <img *ngIf="serie.equipo_local_info.logo_url" 
+                     [src]="serie.equipo_local_info.logo_url" 
+                     [alt]="serie.equipo_local_info.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_local_info.logo_url"
+                      class="team-initials">{{ serie.equipo_local_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_local_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
             </div>
 
-            <div class="matchup-team" [class.winner]="serie.ganador?.id_equipo === serie.equipo_2.id_equipo">
+            <!-- EQUIPO 2 -->
+            <div class="matchup-team"
+              [class.winner]="serie.ganador === serie.equipo_2">
               <div class="team-info">
-                <img *ngIf="serie.equipo_2.logo_url" [src]="serie.equipo_2.logo_url" [alt]="serie.equipo_2.nombre" class="team-logo">
-                <span *ngIf="!serie.equipo_2.logo_url" class="team-initials">{{ serie.equipo_2.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ serie.equipo_2.nombre }}</span>
+                <img *ngIf="serie.equipo_visitante_info.logo_url" 
+                     [src]="serie.equipo_visitante_info.logo_url" 
+                     [alt]="serie.equipo_visitante_info.nombre" class="team-logo">
+                <span *ngIf="!serie.equipo_visitante_info.logo_url"
+                      class="team-initials">{{ serie.equipo_visitante_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ serie.equipo_visitante_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
             </div>
@@ -166,20 +195,30 @@
               </span>
             </div>
 
-            <div class="matchup-team" [class.winner]="bracket.final.ganador?.id_equipo === bracket.final.equipo_1.id_equipo">
+            <!-- FINAL: EQUIPO 1 -->
+            <div class="matchup-team"
+              [class.winner]="bracket.final.ganador === bracket.final.equipo_1">
               <div class="team-info">
-                <img *ngIf="bracket.final.equipo_1.logo_url" [src]="bracket.final.equipo_1.logo_url" [alt]="bracket.final.equipo_1.nombre" class="team-logo">
-                <span *ngIf="!bracket.final.equipo_1.logo_url" class="team-initials">{{ bracket.final.equipo_1.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ bracket.final.equipo_1.nombre }}</span>
+                <img *ngIf="bracket.final.equipo_local_info.logo_url" 
+                     [src]="bracket.final.equipo_local_info.logo_url" 
+                     [alt]="bracket.final.equipo_local_info.nombre" class="team-logo">
+                <span *ngIf="!bracket.final.equipo_local_info.logo_url"
+                      class="team-initials">{{ bracket.final.equipo_local_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ bracket.final.equipo_local_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ bracket.final.victorias_equipo_1 }}</span>
             </div>
 
-            <div class="matchup-team" [class.winner]="bracket.final.ganador?.id_equipo === bracket.final.equipo_2.id_equipo">
+            <!-- FINAL: EQUIPO 2 -->
+            <div class="matchup-team"
+              [class.winner]="bracket.final.ganador === bracket.final.equipo_2">
               <div class="team-info">
-                <img *ngIf="bracket.final.equipo_2.logo_url" [src]="bracket.final.equipo_2.logo_url" [alt]="bracket.final.equipo_2.nombre" class="team-logo">
-                <span *ngIf="!bracket.final.equipo_2.logo_url" class="team-initials">{{ bracket.final.equipo_2.nombre.charAt(0) }}</span>
-                <span class="team-name">{{ bracket.final.equipo_2.nombre }}</span>
+                <img *ngIf="bracket.final.equipo_visitante_info.logo_url" 
+                     [src]="bracket.final.equipo_visitante_info.logo_url" 
+                     [alt]="bracket.final.equipo_visitante_info.nombre" class="team-logo">
+                <span *ngIf="!bracket.final.equipo_visitante_info.logo_url"
+                      class="team-initials">{{ bracket.final.equipo_visitante_info.nombre.charAt(0) }}</span>
+                <span class="team-name">{{ bracket.final.equipo_visitante_info.nombre }}</span>
               </div>
               <span class="team-wins">{{ bracket.final.victorias_equipo_2 }}</span>
             </div>
@@ -192,7 +231,9 @@
             <div class="champion-banner" *ngIf="bracket.final.ganador">
               <span class="trophy">🏆</span>
               <span class="champion-text">CAMPEÓN</span>
-              <span class="champion-name">{{ bracket.final.ganador.nombre }}</span>
+              <span class="champion-name">
+                {{ bracket.final.ganador_info?.nombre }}
+              </span>
             </div>
           </div>
         </div>

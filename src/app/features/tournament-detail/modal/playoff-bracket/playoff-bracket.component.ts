@@ -23,17 +23,28 @@ interface Partido {
 
 interface Serie {
   id_serie: number;
+  id_torneo: number;
   fase: string;
   numero_serie: number;
-  equipo_1: Equipo;
-  equipo_2: Equipo;
+
+  // 🔥 AHORA COINCIDE CON EL BACKEND
+  equipo_1: number;
+  equipo_2: number;
+  ganador: number | null;
+
+  // 🔥 OBJETOS QUE VIENEN EN el backend
+  equipo_local_info: Equipo;
+  equipo_visitante_info: Equipo;
+  ganador_info?: Equipo | null;
+
   formato: string;
   victorias_equipo_1: number;
   victorias_equipo_2: number;
-  ganador?: Equipo;
   estado: string;
+
   partidos: Partido[];
 }
+
 
 interface PlayoffBracket {
   id_torneo: number;
