@@ -506,10 +506,21 @@ section {
 }
 
 .snap__section {
+    height: 100vh;                 /* 🔥 vuelve a hacer cada sección pantalla completa */
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: var(--nav-h); /* evita que quede debajo del header */
+    padding-top: var(--nav-h);    /* evitar que el header tape el contenido */
+    box-sizing: border-box;
+}
+
+.snap__section > * {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 1300px;            /* ajusta si quieres más ancho */
+    padding-left: 20px;
+    padding-right: 20px;
     box-sizing: border-box;
 }
 
