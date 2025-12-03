@@ -1,7 +1,6 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { NgIf, NgFor } from '@angular/common';
 
 interface Equipo {
   id_equipo: number;
@@ -64,37 +63,39 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
 
   bracket: PlayoffBracket | null = null;
-  loading = true;
+  loading = false; // ✅ CAMBIADO A FALSE
   error = '';
 
   ngOnInit() {
     console.log('🎯 ngOnInit - tournamentId:', this.tournamentId);
-    if (this.tournamentId) {
-      this.loadBracket();
-    } else {
-      this.loading = false;
-      this.error = 'No se proporcionó un ID de torneo válido';
-    }
+    // ✅ NO cargar aquí si tournamentId es undefined
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['tournamentId'] && !changes['tournamentId'].firstChange) {
-      console.log('🔄 tournamentId cambió:', this.tournamentId);
-      if (this.tournamentId) {
-        this.loadBracket();
-      }
+    console.log('🔄 ngOnChanges detectado:', changes);
+    
+    // ✅ Cargar cuando tournamentId cambie Y sea válido
+    if (changes['tournamentId'] && this.tournamentId) {
+      console.log('✅ tournamentId válido, cargando bracket:', this.tournamentId);
+      this.loadBracket();
     }
   }
 
   loadBracket() {
     console.log('📡 Cargando bracket para torneo:', this.tournamentId);
+    
+    if (!this.tournamentId) {
+      console.warn('⚠️ No hay tournamentId, saliendo...');
+      return;
+    }
+
     this.loading = true;
     this.error = '';
 
     this.http.get<PlayoffBracket>(`${this.apiUrl}/tournaments/${this.tournamentId}/playoffs`)
       .subscribe({
         next: (data) => {
-          console.log('✅ Bracket cargado:', data);
+          console.log('✅ Bracket cargado exitosamente:', data);
           this.bracket = data;
           this.loading = false;
         },
@@ -111,7 +112,7 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
       });
   }
 
-  getInitials(nombre?: string): string {
+  getInitials(nombre: string): string {
     if (!nombre) return '?';
     return nombre
       .split(' ')
