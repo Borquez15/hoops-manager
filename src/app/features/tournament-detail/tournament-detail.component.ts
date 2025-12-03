@@ -533,8 +533,19 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   irAPlayoffs(): void {
-    this.router.navigate([`/torneos/${this.tournamentId}/playoffs`]);
-  }
+  // Hacer scroll hasta la sección de playoffs
+  setTimeout(() => {
+    const playoffSection = document.querySelector('app-playoff-bracket');
+    if (playoffSection) {
+      playoffSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // Pequeño ajuste para compensar el header
+      setTimeout(() => {
+        window.scrollBy(0, -100);
+      }, 500);
+    }
+  }, 100);
+}
 
   getMinimumTeams(): number {
     if (!this.tournament) return 2;
