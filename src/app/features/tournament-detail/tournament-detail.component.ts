@@ -519,6 +519,11 @@ irAPlayoffs(): void {
     if (!this.calendarGenerated && currentTeams >= minimumTeams) {
       return 'Genera el calendario para iniciar.';
     }
+
+    if (!this.equipos.every(eq => (eq.jugadores?.length || 0) >= 7)) {
+      return 'Todos los equipos deben tener al menos 7 jugadores.';
+    }
+
     
     return null;
   }
@@ -528,22 +533,30 @@ irAPlayoffs(): void {
       console.log('❌ No tournament');
       return false;
     }
-    
+
     const hasMinTeams = this.equipos.length >= this.getMinimumTeams();
     const hasCalendar = this.calendarGenerated;
     const isConfiguring = this.tournamentStatus === 'configurando';
-    
+
+    // 🔥 NUEVO: validar que todos los equipos tengan al menos 7 jugadores
+    const allTeamsHaveMinPlayers = this.equipos.every(
+      eq => (eq.jugadores?.length || 0) >= 7
+    );
+
     console.log('🔍 canStartTournament check:', {
       hasMinTeams,
       hasCalendar,
       isConfiguring,
+      allTeamsHaveMinPlayers,   // 👈 agregado
       tournamentStatus: this.tournamentStatus,
       equipos: this.equipos.length,
       minTeams: this.getMinimumTeams()
     });
-    
-    return hasMinTeams && hasCalendar && isConfiguring;
+
+    // 🔥 SE AGREGA A TU VALIDACIÓN EXISTENTE
+    return hasMinTeams && hasCalendar && isConfiguring && allTeamsHaveMinPlayers;
   }
+
 
   getStatusBadge(): { text: string; class: string } {
   switch (this.tournamentStatus) {
