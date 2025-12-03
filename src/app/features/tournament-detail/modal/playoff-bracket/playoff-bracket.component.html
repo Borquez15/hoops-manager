@@ -1,38 +1,44 @@
 <div class="playoff-container">
-  
+
   <!-- LOADING -->
-  <div *ngIf="loading" class="playoff-loading">
-    <div class="spinner"></div>
-    <p>Cargando playoffs...</p>
-  </div>
+  <ng-container *ngIf="loading">
+    <div class="playoff-loading real-loading">
+      <div class="spinner"></div>
+      <p>Cargando playoffs...</p>
+    </div>
+  </ng-container>
 
   <!-- ERROR -->
-  <div *ngIf="!loading && error" class="playoff-empty">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-    </svg>
-    <p>{{ error }}</p>
-  </div>
+  <ng-container *ngIf="!loading && error">
+    <div class="playoff-empty">
+      <svg width="48" height="48" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      <p>{{ error }}</p>
+    </div>
+  </ng-container>
 
   <!-- SIN PLAYOFFS -->
-  <div *ngIf="!loading && !error && !hasPlayoffs()" class="playoff-empty">
-    <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-    </svg>
-    <p>No hay playoffs generados</p>
-    <small>Los playoffs se generarán cuando termine la fase regular</small>
-  </div>
+  <ng-container *ngIf="!loading && !error && !hasPlayoffs()">
+    <div class="playoff-empty">
+      <svg width="64" height="64" fill="currentColor">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+      </svg>
+      <p>No hay playoffs generados</p>
+      <small>Los playoffs se generarán cuando termine la fase regular</small>
+    </div>
+  </ng-container>
 
   <!-- BRACKET -->
-  <div *ngIf="!loading && !error && hasPlayoffs() && bracket" class="bracket-wrapper">
-    
-    <!-- HEADER -->
-    <div class="bracket-header">
-      <h2>🏆 PLAYOFF BRACKET</h2>
-      <span class="formato-badge">{{ getFormatoTexto(bracket.formato) }}</span>
-    </div>
+  <ng-container *ngIf="!loading && !error && hasPlayoffs() && bracket">
+    <div class="bracket-wrapper">
 
-    <div class="bracket-grid">
+      <div class="bracket-header">
+        <h2>🏆 PLAYOFF BRACKET</h2>
+        <span class="formato-badge">{{ getFormatoTexto(bracket.formato) }}</span>
+      </div>
+
+      <div class="bracket-grid">
       
       <!-- OCTAVOS DE FINAL (si existen) -->
       <div class="bracket-column" *ngIf="bracket.octavos.length > 0">
@@ -193,6 +199,8 @@
       </div>
 
     </div>
-  </div>
+
+    </div>
+  </ng-container>
 
 </div>

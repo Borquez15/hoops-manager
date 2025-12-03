@@ -1,8 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { NgIf, NgFor } from '@angular/common';
-
 
 interface Equipo {
   id_equipo: number;
@@ -53,10 +51,11 @@ interface PlayoffBracket {
   templateUrl: './playoff-bracket.component.html',
   styleUrls: ['./playoff-bracket.component.css']
 })
-export class PlayoffBracketComponent implements OnInit {
+export class PlayoffBracketComponent implements OnInit, OnChanges {
+
   @Input() tournamentId!: number;
-  @Output() playoffsLoaded = new EventEmitter<boolean>();  // ✅ NUEVO: Notifica si existen playoffs
-  
+  @Output() playoffsLoaded = new EventEmitter<boolean>();
+
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
@@ -65,8 +64,15 @@ export class PlayoffBracketComponent implements OnInit {
   loading = true;
   error = '';
 
+  // 🔥 SE EJECUTA SOLO UNA VEZ, NO SIRVE PARA INPUTS ASÍNCRONOS
   ngOnInit() {
-    if (this.tournamentId) {
+    if (this.tournamentId) this.loadBracket();
+  }
+
+  // 🔥 SE EJECUTA CADA VEZ QUE cambia tournamentId → ESTA ES LA CLAVE
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['tournamentId'] && this.tournamentId) {
+      console.log('🔄 tournamentId cambió → cargando bracket…', this.tournamentId);
       this.loadBracket();
     }
   }
@@ -74,38 +80,28 @@ export class PlayoffBracketComponent implements OnInit {
   loadBracket() {
     this.loading = true;
     this.error = '';
-    
+
     this.http.get<PlayoffBracket>(`${this.apiUrl}/tournaments/${this.tournamentId}/playoffs`)
       .subscribe({
         next: (data) => {
           console.log('✅ Bracket cargado:', data);
           this.bracket = data;
           this.loading = false;
-          this.playoffsLoaded.emit(true);  // ✅ Notificar que SÍ existen playoffs
-          this.cdr.detectChanges();
+          this.playoffsLoaded.emit(true);
         },
         error: (e) => {
           console.error('❌ Error al cargar bracket:', e);
-          
+
           if (e.status === 404) {
             this.error = 'No se han generado playoffs para este torneo';
-            this.playoffsLoaded.emit(false);  // ✅ Notificar que NO existen playoffs
           } else {
             this.error = e.error?.detail || 'Error al cargar el bracket de playoffs';
-            this.playoffsLoaded.emit(false);
           }
-          
+
           this.loading = false;
-          this.cdr.detectChanges();
+          this.playoffsLoaded.emit(false);
         }
       });
-  }
-
-  /**
-   * Recarga el bracket (útil después de generar playoffs)
-   */
-  reloadBracket() {
-    this.loadBracket();
   }
 
   getVictoriasNecesarias(formato: string): number {
@@ -149,9 +145,9 @@ export class PlayoffBracketComponent implements OnInit {
 
   hasPlayoffs(): boolean {
     if (!this.bracket) return false;
-    return this.bracket.octavos.length > 0 || 
-           this.bracket.cuartos.length > 0 || 
-           this.bracket.semifinales.length > 0 || 
+    return this.bracket.octavos.length > 0 ||
+           this.bracket.cuartos.length > 0 ||
+           this.bracket.semifinales.length > 0 ||
            !!this.bracket.final;
   }
 }
