@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
@@ -60,21 +60,20 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
   @Input() tournamentId!: number;
 
   private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef);
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
 
   bracket: PlayoffBracket | null = null;
-  loading = false; // ✅ CAMBIADO A FALSE
+  loading = false;
   error = '';
 
   ngOnInit() {
     console.log('🎯 ngOnInit - tournamentId:', this.tournamentId);
-    // ✅ NO cargar aquí si tournamentId es undefined
   }
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('🔄 ngOnChanges detectado:', changes);
     
-    // ✅ Cargar cuando tournamentId cambie Y sea válido
     if (changes['tournamentId'] && this.tournamentId) {
       console.log('✅ tournamentId válido, cargando bracket:', this.tournamentId);
       this.loadBracket();
@@ -91,6 +90,8 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
 
     this.loading = true;
     this.error = '';
+    this.bracket = null;
+    this.cdr.detectChanges(); // ✅ Forzar actualización
 
     this.http.get<PlayoffBracket>(`${this.apiUrl}/tournaments/${this.tournamentId}/playoffs`)
       .subscribe({
@@ -98,6 +99,7 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
           console.log('✅ Bracket cargado exitosamente:', data);
           this.bracket = data;
           this.loading = false;
+          this.cdr.detectChanges(); // ✅ Forzar actualización
         },
         error: (e) => {
           console.error('❌ Error al cargar bracket:', e);
@@ -108,6 +110,8 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
           } else {
             this.error = e.error?.detail || 'Error al cargar el bracket de playoffs';
           }
+          
+          this.cdr.detectChanges(); // ✅ Forzar actualización
         }
       });
   }
