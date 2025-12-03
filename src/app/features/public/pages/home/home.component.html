@@ -20,15 +20,15 @@
 
     <!-- Sección de usuario autenticado -->
     <div class="user-section" *ngIf="isAuthenticated">
-      <!-- Avatar de usuario (visible en desktop) -->
-      <div class="user-avatar-header" (click)="toggleMenu()">
+      <!-- Avatar de usuario -->
+      <div class="user-avatar-header">
         <div class="user-avatar-small">
           {{ user?.nombre?.charAt(0) || 'U' }}
         </div>
         <span class="user-name-header">{{ user?.nombre || 'Usuario' }}</span>
       </div>
 
-      <!-- Botón hamburguesa (móvil) -->
+      <!-- Botón hamburguesa -->
       <button 
         class="hamburger" 
         [class.open]="menuOpen" 
@@ -131,8 +131,10 @@
 </aside>
 
 <main class="hero">
+  <!-- Imagen de cancha de basketball -->
+  <div class="hero__basketball"></div>
+  
   <div class="hero__content">
-    
     <h1 class="hero__title">
       ¡EL MEJOR GESTOR<br>
       DE TORNEOS DE<br>
