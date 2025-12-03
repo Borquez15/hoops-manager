@@ -47,21 +47,23 @@ export class TournamentSearchComponent {
 
       this.searchService.search(query).subscribe({
         next: (response: SearchResponse) => {
-          console.log('✅ Resultados recibidos:', response);
+          this.zone.run(() => {
+            console.log('✅ Resultados recibidos:', response);
 
-          // FILTRO CLAVE 🔥🔥🔥
-          const filtrar = (t: TorneoPublico | null): TorneoPublico | null => {
-            if (!t) return null;
-            return estadosPermitidos.includes(t.estado.toUpperCase()) ? t : null;
-          };
+            const filtrar = (t: TorneoPublico | null): TorneoPublico | null => {
+              if (!t) return null;
+              return estadosPermitidos.includes(t.estado.toUpperCase()) ? t : null;
+            };
 
-          this.match = filtrar(response.match);
-          this.suggestions = (response.suggestions || [])
-            .filter(t => estadosPermitidos.includes(t.estado.toUpperCase()));
+            this.match = filtrar(response.match);
+            this.suggestions = (response.suggestions || [])
+              .filter(t => estadosPermitidos.includes(t.estado.toUpperCase()));
 
-          this.searching = false;
-          this.cdr.detectChanges();
+            this.searching = false;
+            this.hasSearched = true;
+          });
         },
+
         error: (err) => {
           console.error('❌ Error en búsqueda:', err);
 
