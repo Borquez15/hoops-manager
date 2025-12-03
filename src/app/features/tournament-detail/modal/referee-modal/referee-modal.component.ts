@@ -1,5 +1,5 @@
 // referee-modal.component.ts
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -28,18 +28,18 @@ export class RefereeModalComponent implements OnInit {
 
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
   
-  // Formulario de invitación
   nuevoArbitroEmail = '';
   enviando = false;
   
-  // Lista de invitaciones
   invitaciones: Invitation[] = [];
   cargandoInvitaciones = false;
   
-  // Vista activa (invitar o ver invitaciones)
   vistaActual: 'invitar' | 'lista' = 'invitar';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     if (this.isOpen) {
@@ -53,13 +53,18 @@ export class RefereeModalComponent implements OnInit {
 
   cambiarVista(vista: 'invitar' | 'lista'): void {
     this.vistaActual = vista;
+    this.cdr.detectChanges(); // ✅ Forzar actualización
+    
     if (vista === 'lista') {
       this.cargarInvitaciones();
     }
   }
 
   async cargarInvitaciones(): Promise<void> {
+    console.log('📡 Cargando invitaciones...');
+    
     this.cargandoInvitaciones = true;
+    this.cdr.detectChanges(); // ✅ Mostrar spinner
     
     try {
       const response = await this.http.get<Invitation[]>(
@@ -74,6 +79,7 @@ export class RefereeModalComponent implements OnInit {
       this.invitaciones = [];
     } finally {
       this.cargandoInvitaciones = false;
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     }
   }
 
@@ -83,7 +89,10 @@ export class RefereeModalComponent implements OnInit {
       return;
     }
 
+    console.log('📤 Enviando invitación a:', this.nuevoArbitroEmail);
+    
     this.enviando = true;
+    this.cdr.detectChanges(); // ✅ Mostrar estado de carga
     
     try {
       await this.http.post(
@@ -94,10 +103,13 @@ export class RefereeModalComponent implements OnInit {
         }
       ).toPromise();
       
+      console.log('✅ Invitación enviada exitosamente');
       alert('✅ Invitación enviada exitosamente');
+      
       this.nuevoArbitroEmail = '';
       this.refereesUpdated.emit();
-      this.cargarInvitaciones();
+      
+      await this.cargarInvitaciones();
       
     } catch (error: any) {
       console.error('❌ Error al enviar invitación:', error);
@@ -112,6 +124,7 @@ export class RefereeModalComponent implements OnInit {
       
     } finally {
       this.enviando = false;
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     }
   }
 
@@ -120,13 +133,17 @@ export class RefereeModalComponent implements OnInit {
       return;
     }
 
+    console.log('🗑️ Eliminando invitación:', idInv);
+
     try {
       await this.http.delete(
         `${this.apiUrl}/tournaments/${this.tournamentId}/referee-invites/${idInv}`
       ).toPromise();
       
+      console.log('✅ Invitación cancelada');
       alert('✅ Invitación cancelada');
-      this.cargarInvitaciones();
+      
+      await this.cargarInvitaciones();
       
     } catch (error) {
       console.error('❌ Error al eliminar invitación:', error);

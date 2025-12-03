@@ -23,7 +23,6 @@ export class TournamentSearchComponent {
   constructor(
     private searchService: TournamentSearchService,
     private router: Router,
-    private zone: NgZone,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -34,43 +33,46 @@ export class TournamentSearchComponent {
     const query = this.searchQuery.trim();
     if (!query) return;
 
+    console.log('🔍 Iniciando búsqueda:', query);
+    
     this.searching = true;
     this.hasSearched = true;
     this.match = null;
     this.suggestions = [];
+    this.cdr.detectChanges(); // ✅ Forzar actualización
 
     this.searchService.search(query).subscribe({
       next: (response: SearchResponse) => {
-        this.zone.run(() => {
-          this.match = response.match;
-          this.suggestions = response.suggestions || [];
-          this.searching = false;
-          this.cdr.detectChanges();
-        });
+        console.log('✅ Resultados recibidos:', response);
+        
+        this.match = response.match;
+        this.suggestions = response.suggestions || [];
+        this.searching = false;
+        
+        this.cdr.detectChanges(); // ✅ Forzar actualización
       },
-      error: () => {
-        this.zone.run(() => {
-          this.match = null;
-          this.suggestions = [];
-          this.searching = false;
-          this.hasSearched = true;
-          alert('Error al buscar torneos.');
-          this.cdr.detectChanges();
-        });
+      error: (err) => {
+        console.error('❌ Error en búsqueda:', err);
+        
+        this.match = null;
+        this.suggestions = [];
+        this.searching = false;
+        this.hasSearched = true;
+        
+        this.cdr.detectChanges(); // ✅ Forzar actualización
+        alert('Error al buscar torneos.');
       }
     });
   }
 
   // 🧹 Limpiar resultados
   clearResults(): void {
-    this.zone.run(() => {
-      this.searchQuery = '';
-      this.match = null;
-      this.suggestions = [];
-      this.searching = false;
-      this.hasSearched = false;
-      this.cdr.detectChanges();
-    });
+    this.searchQuery = '';
+    this.match = null;
+    this.suggestions = [];
+    this.searching = false;
+    this.hasSearched = false;
+    this.cdr.detectChanges(); // ✅ Forzar actualización
   }
 
   // 👁 Navegar al torneo

@@ -5,6 +5,7 @@ import {
   EventEmitter,
   OnChanges,
   SimpleChanges,
+  ChangeDetectorRef,
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -70,7 +71,11 @@ export class TeamModalComponent implements OnChanges {
   // Guardar jugadores originales para comparar cambios
   jugadoresOriginales: JugadorEquipo[] = [];
 
-  constructor(private http: HttpClient) {}
+
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['equipo'] && this.equipo) {
@@ -95,6 +100,7 @@ export class TeamModalComponent implements OnChanges {
       
       this.resetFormularioJugador();
       this.errorMensaje = '';
+      this.cdr.detectChanges();
     }
   }
 
@@ -106,6 +112,7 @@ export class TeamModalComponent implements OnChanges {
   onCurpInput() {
     this.nuevoJugador.curp = this.nuevoJugador.curp.toUpperCase();
     this.errorMensaje = '';
+    this.cdr.detectChanges();
   }
 
   buscarPorCURP() {
@@ -118,6 +125,7 @@ export class TeamModalComponent implements OnChanges {
 
     this.buscandoCURP = true;
     this.errorMensaje = '';
+    this.cdr.detectChanges();
 
     this.http
       .get<any>(`${this.apiUrl}/players/lookup?curp=${curp}`)
@@ -141,6 +149,7 @@ export class TeamModalComponent implements OnChanges {
             this.jugadorEncontrado = null;
             this.errorMensaje = 'CURP no encontrada. Completa los datos para registrar al jugador.';
             this.buscandoCURP = false;
+            this.cdr.detectChanges();
           }
         },
         error: (err) => {
@@ -148,6 +157,7 @@ export class TeamModalComponent implements OnChanges {
           this.jugadorEncontrado = null;
           this.errorMensaje = 'Error al buscar la CURP';
           this.buscandoCURP = false;
+          this.cdr.detectChanges();
         }
       });
   }
@@ -160,17 +170,20 @@ export class TeamModalComponent implements OnChanges {
     const curp = this.nuevoJugador.curp.trim().toUpperCase();
     if (!curp || curp.length !== 18) {
       this.errorMensaje = 'La CURP debe tener 18 caracteres';
+      this.cdr.detectChanges();
       return;
     }
 
     if (this.nuevoJugador.dorsal < 0 || this.nuevoJugador.dorsal > 99) {
       this.errorMensaje = 'El dorsal debe estar entre 0 y 99';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.jugadorEncontrado && 
         (!this.nuevoJugador.nombres.trim() || !this.nuevoJugador.ap_p.trim())) {
       this.errorMensaje = 'Debes completar nombres y apellido paterno';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -181,6 +194,7 @@ export class TeamModalComponent implements OnChanges {
 
     if (dorsalDuplicado) {
       this.errorMensaje = `El dorsal ${this.nuevoJugador.dorsal} ya está asignado en este equipo`;
+      this.cdr.detectChanges();
       return;
     }
 
@@ -191,6 +205,7 @@ export class TeamModalComponent implements OnChanges {
 
     if (curpDuplicada) {
       this.errorMensaje = `Esta persona (CURP: ${curp}) ya está en el equipo`;
+      this.cdr.detectChanges();
       return;
     }
 
@@ -218,6 +233,7 @@ export class TeamModalComponent implements OnChanges {
     console.log('📊 Total jugadores:', this.equipoTemp.jugadores.length);
 
     this.resetFormularioJugador();
+    this.cdr.detectChanges();
   }
 
   resetFormularioJugador() {
@@ -231,6 +247,7 @@ export class TeamModalComponent implements OnChanges {
       dorsal: this.siguienteDorsal()
     };
     this.errorMensaje = '';
+    this.cdr.detectChanges();
   }
 
   siguienteDorsal(): number {
@@ -242,6 +259,7 @@ export class TeamModalComponent implements OnChanges {
   toggleJugadorActivo(i: number) {
     if (!this.equipoTemp?.jugadores?.[i]) return;
     this.equipoTemp.jugadores[i].activo = !this.equipoTemp.jugadores[i].activo;
+    this.cdr.detectChanges();
   }
 
   eliminarJugadorDelEquipo(i: number) {
@@ -250,6 +268,7 @@ export class TeamModalComponent implements OnChanges {
     if (confirm('¿Eliminar este jugador del equipo?')) {
       this.equipoTemp.jugadores.splice(i, 1);
       console.log('🗑️ Jugador eliminado. Total:', this.equipoTemp.jugadores.length);
+      this.cdr.detectChanges();
     }
   }
 
