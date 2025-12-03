@@ -57,12 +57,37 @@
                 </span>
               </div>
 
-              <div *ngFor="let partido of serie.partidos" class="match-item">
-                <div class="match-info">
-                  <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
-                  <span class="match-date">{{ partido.fecha || 'Sin fecha' }}</span>
+              <!-- EQUIPOS EN SERIE -->
+              <div class="matchup-team" [class.winner]="serie.ganador === serie.equipo_1">
+                <div class="team-info">
+                  <img *ngIf="serie.equipo_local_info && serie.equipo_local_info.logo_url" 
+                       [src]="serie.equipo_local_info.logo_url" 
+                       class="team-logo"
+                       [alt]="serie.equipo_local_info.nombre">
+                  <div *ngIf="!serie.equipo_local_info || !serie.equipo_local_info.logo_url" class="team-initials">
+                    {{ getInitials(serie.equipo_local_info ? serie.equipo_local_info.nombre : '') }}
+                  </div>
+                  <span class="team-name">{{ serie.equipo_local_info ? serie.equipo_local_info.nombre : 'TBD' }}</span>
                 </div>
-                <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
+                <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
+              </div>
+
+              <div class="matchup-team" [class.winner]="serie.ganador === serie.equipo_2">
+                <div class="team-info">
+                  <img *ngIf="serie.equipo_visitante_info && serie.equipo_visitante_info.logo_url" 
+                       [src]="serie.equipo_visitante_info.logo_url" 
+                       class="team-logo"
+                       [alt]="serie.equipo_visitante_info.nombre">
+                  <div *ngIf="!serie.equipo_visitante_info || !serie.equipo_visitante_info.logo_url" class="team-initials">
+                    {{ getInitials(serie.equipo_visitante_info ? serie.equipo_visitante_info.nombre : '') }}
+                  </div>
+                  <span class="team-name">{{ serie.equipo_visitante_info ? serie.equipo_visitante_info.nombre : 'TBD' }}</span>
+                </div>
+                <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
+              </div>
+
+              <div class="serie-info" *ngIf="serie.formato">
+                <small>{{ getFormatoTexto(serie.formato) }}</small>
               </div>
 
             </div>
@@ -85,12 +110,37 @@
                 </span>
               </div>
 
-              <div *ngFor="let partido of serie.partidos" class="match-item">
-                <div class="match-info">
-                  <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
-                  <span class="match-date">{{ partido.fecha || 'Sin fecha' }}</span>
+              <!-- EQUIPOS EN SERIE -->
+              <div class="matchup-team" [class.winner]="serie.ganador === serie.equipo_1">
+                <div class="team-info">
+                  <img *ngIf="serie.equipo_local_info && serie.equipo_local_info.logo_url" 
+                       [src]="serie.equipo_local_info.logo_url" 
+                       class="team-logo"
+                       [alt]="serie.equipo_local_info.nombre">
+                  <div *ngIf="!serie.equipo_local_info || !serie.equipo_local_info.logo_url" class="team-initials">
+                    {{ getInitials(serie.equipo_local_info ? serie.equipo_local_info.nombre : '') }}
+                  </div>
+                  <span class="team-name">{{ serie.equipo_local_info ? serie.equipo_local_info.nombre : 'TBD' }}</span>
                 </div>
-                <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
+                <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
+              </div>
+
+              <div class="matchup-team" [class.winner]="serie.ganador === serie.equipo_2">
+                <div class="team-info">
+                  <img *ngIf="serie.equipo_visitante_info && serie.equipo_visitante_info.logo_url" 
+                       [src]="serie.equipo_visitante_info.logo_url" 
+                       class="team-logo"
+                       [alt]="serie.equipo_visitante_info.nombre">
+                  <div *ngIf="!serie.equipo_visitante_info || !serie.equipo_visitante_info.logo_url" class="team-initials">
+                    {{ getInitials(serie.equipo_visitante_info ? serie.equipo_visitante_info.nombre : '') }}
+                  </div>
+                  <span class="team-name">{{ serie.equipo_visitante_info ? serie.equipo_visitante_info.nombre : 'TBD' }}</span>
+                </div>
+                <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
+              </div>
+
+              <div class="serie-info" *ngIf="serie.formato">
+                <small>{{ getFormatoTexto(serie.formato) }}</small>
               </div>
 
             </div>
@@ -113,12 +163,37 @@
                 </span>
               </div>
 
-              <div *ngFor="let partido of serie.partidos" class="match-item">
-                <div class="match-info">
-                  <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
-                  <span class="match-date">{{ partido.fecha || 'Sin fecha' }}</span>
+              <!-- EQUIPOS EN SERIE -->
+              <div class="matchup-team" [class.winner]="serie.ganador === serie.equipo_1">
+                <div class="team-info">
+                  <img *ngIf="serie.equipo_local_info && serie.equipo_local_info.logo_url" 
+                       [src]="serie.equipo_local_info.logo_url" 
+                       class="team-logo"
+                       [alt]="serie.equipo_local_info.nombre">
+                  <div *ngIf="!serie.equipo_local_info || !serie.equipo_local_info.logo_url" class="team-initials">
+                    {{ getInitials(serie.equipo_local_info ? serie.equipo_local_info.nombre : '') }}
+                  </div>
+                  <span class="team-name">{{ serie.equipo_local_info ? serie.equipo_local_info.nombre : 'TBD' }}</span>
                 </div>
-                <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
+                <span class="team-wins">{{ serie.victorias_equipo_1 }}</span>
+              </div>
+
+              <div class="matchup-team" [class.winner]="serie.ganador === serie.equipo_2">
+                <div class="team-info">
+                  <img *ngIf="serie.equipo_visitante_info && serie.equipo_visitante_info.logo_url" 
+                       [src]="serie.equipo_visitante_info.logo_url" 
+                       class="team-logo"
+                       [alt]="serie.equipo_visitante_info.nombre">
+                  <div *ngIf="!serie.equipo_visitante_info || !serie.equipo_visitante_info.logo_url" class="team-initials">
+                    {{ getInitials(serie.equipo_visitante_info ? serie.equipo_visitante_info.nombre : '') }}
+                  </div>
+                  <span class="team-name">{{ serie.equipo_visitante_info ? serie.equipo_visitante_info.nombre : 'TBD' }}</span>
+                </div>
+                <span class="team-wins">{{ serie.victorias_equipo_2 }}</span>
+              </div>
+
+              <div class="serie-info" *ngIf="serie.formato">
+                <small>{{ getFormatoTexto(serie.formato) }}</small>
               </div>
 
             </div>
@@ -140,22 +215,44 @@
               </span>
             </div>
 
-            <!-- PARTIDOS DE LA FINAL -->
-            <div class="partidos-list" *ngIf="bracket.final.partidos.length > 0">
-
-              <div class="match-item" *ngFor="let partido of bracket.final.partidos">
-
-                <div class="match-info">
-                  <span>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }}</span>
-                  <span class="match-date">
-                    {{ partido.fecha ? (partido.fecha | date:'dd MMM, HH:mm') : 'Sin fecha' }}
-                  </span>
+            <!-- EQUIPOS EN FINAL -->
+            <div class="matchup-team" [class.winner]="bracket.final.ganador === bracket.final.equipo_1">
+              <div class="team-info">
+                <img *ngIf="bracket.final.equipo_local_info && bracket.final.equipo_local_info.logo_url" 
+                     [src]="bracket.final.equipo_local_info.logo_url" 
+                     class="team-logo"
+                     [alt]="bracket.final.equipo_local_info.nombre">
+                <div *ngIf="!bracket.final.equipo_local_info || !bracket.final.equipo_local_info.logo_url" class="team-initials">
+                  {{ getInitials(bracket.final.equipo_local_info ? bracket.final.equipo_local_info.nombre : '') }}
                 </div>
-
-                <button class="btn-edit" (click)="openEditMatch(partido)">✏️ Editar</button>
-
+                <span class="team-name">{{ bracket.final.equipo_local_info ? bracket.final.equipo_local_info.nombre : 'TBD' }}</span>
               </div>
+              <span class="team-wins">{{ bracket.final.victorias_equipo_1 }}</span>
+            </div>
 
+            <div class="matchup-team" [class.winner]="bracket.final.ganador === bracket.final.equipo_2">
+              <div class="team-info">
+                <img *ngIf="bracket.final.equipo_visitante_info && bracket.final.equipo_visitante_info.logo_url" 
+                     [src]="bracket.final.equipo_visitante_info.logo_url" 
+                     class="team-logo"
+                     [alt]="bracket.final.equipo_visitante_info.nombre">
+                <div *ngIf="!bracket.final.equipo_visitante_info || !bracket.final.equipo_visitante_info.logo_url" class="team-initials">
+                  {{ getInitials(bracket.final.equipo_visitante_info ? bracket.final.equipo_visitante_info.nombre : '') }}
+                </div>
+                <span class="team-name">{{ bracket.final.equipo_visitante_info ? bracket.final.equipo_visitante_info.nombre : 'TBD' }}</span>
+              </div>
+              <span class="team-wins">{{ bracket.final.victorias_equipo_2 }}</span>
+            </div>
+
+            <div class="serie-info" *ngIf="bracket.final.formato">
+              <small>{{ getFormatoTexto(bracket.final.formato) }}</small>
+            </div>
+
+            <!-- CAMPEÓN -->
+            <div class="champion-banner" *ngIf="bracket.final.ganador_info">
+              <div class="trophy">🏆</div>
+              <div class="champion-text">CAMPEÓN</div>
+              <div class="champion-name">{{ bracket.final.ganador_info.nombre }}</div>
             </div>
 
           </div>
@@ -165,14 +262,3 @@
     </div>
   </ng-container>
 </div>
-
-<!-- ========================= -->
-<!--   MODAL DE EDICIÓN       -->
-<!-- ========================= -->
-<app-edit-playoff-match
-  *ngIf="selectedMatch"
-  [match]="selectedMatch"
-  [torneoId]="tournamentId"
-  (close)="closeModal()"
-  (saved)="closeModal()">
-</app-edit-playoff-match>

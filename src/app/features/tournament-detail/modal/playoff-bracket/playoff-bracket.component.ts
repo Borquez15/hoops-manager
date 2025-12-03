@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { EditPlayoffMatchComponent } from './edit-playoff-match/edit-playoff-match.component';
+import { NgIf, NgFor } from '@angular/common';
 
 interface Equipo {
   id_equipo: number;
@@ -9,8 +9,7 @@ interface Equipo {
   logo_url?: string;
 }
 
-
-export interface Partido {
+interface Partido {
   id_partido_playoff: number;
   numero_partido: number;
   fecha?: string;
@@ -19,37 +18,27 @@ export interface Partido {
   puntos_local?: number;
   puntos_visitante?: number;
   estado: string;
-
-  // NOMBRES CORRECTOS QUE ENVÍA EL BACKEND
   equipo_local_nombre: string;
   equipo_visitante_nombre: string;
 }
-
 
 interface Serie {
   id_serie: number;
   id_torneo: number;
   fase: string;
   numero_serie: number;
-
-  // 🔥 AHORA COINCIDE CON EL BACKEND
   equipo_1: number;
   equipo_2: number;
   ganador: number | null;
-
-  // 🔥 OBJETOS QUE VIENEN EN el backend
   equipo_local_info: Equipo;
   equipo_visitante_info: Equipo;
   ganador_info?: Equipo | null;
-
   formato: string;
   victorias_equipo_1: number;
   victorias_equipo_2: number;
   estado: string;
-
   partidos: Partido[];
 }
-
 
 interface PlayoffBracket {
   id_torneo: number;
@@ -63,48 +52,42 @@ interface PlayoffBracket {
 @Component({
   selector: 'app-playoff-bracket',
   standalone: true,
-  imports: [CommonModule, EditPlayoffMatchComponent],
+  imports: [CommonModule],
   templateUrl: './playoff-bracket.component.html',
   styleUrls: ['./playoff-bracket.component.css']
 })
 export class PlayoffBracketComponent implements OnInit, OnChanges {
 
   @Input() tournamentId!: number;
-  @Output() playoffsLoaded = new EventEmitter<boolean>();
 
   private http = inject(HttpClient);
-  private cdr = inject(ChangeDetectorRef);
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
 
   bracket: PlayoffBracket | null = null;
   loading = true;
   error = '';
-  selectedMatch: any = null;
 
-  openEditMatch(match: any) {
-    this.selectedMatch = match;
-  }
-
-  closeModal() {
-    this.selectedMatch = null;
-    this.loadBracket();
-  }
-
-
-  // 🔥 SE EJECUTA SOLO UNA VEZ, NO SIRVE PARA INPUTS ASÍNCRONOS
   ngOnInit() {
-    if (this.tournamentId) this.loadBracket();
+    console.log('🎯 ngOnInit - tournamentId:', this.tournamentId);
+    if (this.tournamentId) {
+      this.loadBracket();
+    } else {
+      this.loading = false;
+      this.error = 'No se proporcionó un ID de torneo válido';
+    }
   }
 
-  // 🔥 SE EJECUTA CADA VEZ QUE cambia tournamentId → ESTA ES LA CLAVE
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['tournamentId'] && this.tournamentId) {
-      console.log('🔄 tournamentId cambió → cargando bracket…', this.tournamentId);
-      this.loadBracket();
+    if (changes['tournamentId'] && !changes['tournamentId'].firstChange) {
+      console.log('🔄 tournamentId cambió:', this.tournamentId);
+      if (this.tournamentId) {
+        this.loadBracket();
+      }
     }
   }
 
   loadBracket() {
+    console.log('📡 Cargando bracket para torneo:', this.tournamentId);
     this.loading = true;
     this.error = '';
 
@@ -114,60 +97,57 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
           console.log('✅ Bracket cargado:', data);
           this.bracket = data;
           this.loading = false;
-          this.playoffsLoaded.emit(true);
         },
         error: (e) => {
           console.error('❌ Error al cargar bracket:', e);
+          this.loading = false;
 
           if (e.status === 404) {
             this.error = 'No se han generado playoffs para este torneo';
           } else {
             this.error = e.error?.detail || 'Error al cargar el bracket de playoffs';
           }
-
-          this.loading = false;
-          this.playoffsLoaded.emit(false);
         }
       });
   }
 
-  getVictoriasNecesarias(formato: string): number {
-    switch (formato) {
-      case 'directo': return 1;
-      case 'mejor_de_3': return 2;
-      case 'mejor_de_5': return 3;
-      case 'mejor_de_7': return 4;
-      default: return 1;
-    }
+  getInitials(nombre?: string): string {
+    if (!nombre) return '?';
+    return nombre
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
   }
 
   getFormatoTexto(formato: string): string {
-    switch (formato) {
-      case 'directo': return 'Eliminación Directa';
-      case 'mejor_de_3': return 'Mejor de 3';
-      case 'mejor_de_5': return 'Mejor de 5';
-      case 'mejor_de_7': return 'Mejor de 7';
-      default: return formato;
-    }
+    const formatos: { [key: string]: string } = {
+      'directo': 'Eliminación Directa',
+      'mejor_de_3': 'Mejor de 3',
+      'mejor_de_5': 'Mejor de 5',
+      'mejor_de_7': 'Mejor de 7'
+    };
+    return formatos[formato] || formato;
   }
 
   getFaseTexto(fase: string): string {
-    switch (fase) {
-      case 'OCTAVOS': return 'Octavos de Final';
-      case 'CUARTOS': return 'Cuartos de Final';
-      case 'SEMIFINAL': return 'Semifinales';
-      case 'FINAL': return 'Final';
-      default: return fase;
-    }
+    const fases: { [key: string]: string } = {
+      'OCTAVOS': 'Octavos de Final',
+      'CUARTOS': 'Cuartos de Final',
+      'SEMIFINAL': 'Semifinales',
+      'FINAL': 'Final'
+    };
+    return fases[fase] || fase;
   }
 
   getEstadoClase(estado: string): string {
-    switch (estado) {
-      case 'PENDIENTE': return 'status-pending';
-      case 'EN_CURSO': return 'status-live';
-      case 'FINALIZADA': return 'status-finished';
-      default: return '';
-    }
+    const estados: { [key: string]: string } = {
+      'PENDIENTE': 'status-pending',
+      'EN_CURSO': 'status-live',
+      'FINALIZADA': 'status-finished'
+    };
+    return estados[estado] || '';
   }
 
   hasPlayoffs(): boolean {
