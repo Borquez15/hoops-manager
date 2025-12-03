@@ -61,6 +61,9 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
 
   @Input() tournamentId!: number;
 
+  
+  @Input() readonly: boolean = false;
+
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
   private apiUrl = 'https://hoopsbackend-production.up.railway.app';
@@ -124,6 +127,7 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
 
   // 🔥 NUEVO: abrir modal
   abrirModalEditar(partido: Partido) {
+    if (this.readonly) return;
     this.partidoSeleccionado = partido;
     this.modalEditarAbierto = true;
     this.cdr.detectChanges();

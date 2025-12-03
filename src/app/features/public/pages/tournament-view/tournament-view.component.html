@@ -289,7 +289,10 @@
           <h3>🏆 Playoff Bracket</h3>
         </div>
 
-        <app-playoff-bracket [tournamentId]="torneo.id_torneo"></app-playoff-bracket>
+        <app-playoff-bracket 
+          [tournamentId]="torneo.id_torneo" 
+          [readonly]="true">
+        </app-playoff-bracket>
       </div>
 
     </div>

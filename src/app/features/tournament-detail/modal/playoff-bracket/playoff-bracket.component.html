@@ -102,7 +102,10 @@
                       Sin programar
                     </span>
                   </div>
-                  <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                  <button 
+                      *ngIf="!readonly" 
+                      class="edit-btn" 
+                      (click)="abrirModalEditar(partido)">
                     ✏️
                   </button>
                 </div>
@@ -173,7 +176,10 @@
                       Sin programar
                     </span>
                   </div>
-                  <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                  <button 
+                        *ngIf="!readonly" 
+                        class="edit-btn" 
+                        (click)="abrirModalEditar(partido)">
                     ✏️
                   </button>
                 </div>
@@ -244,7 +250,10 @@
                       Sin programar
                     </span>
                   </div>
-                  <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                  <button 
+                      *ngIf="!readonly" 
+                      class="edit-btn" 
+                      (click)="abrirModalEditar(partido)">
                     ✏️
                   </button>
                 </div>
@@ -314,7 +323,10 @@
                     Sin programar
                   </span>
                 </div>
-                <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                <button 
+                      *ngIf="!readonly" 
+                      class="edit-btn" 
+                      (click)="abrirModalEditar(partido)">
                   ✏️
                 </button>
               </div>
