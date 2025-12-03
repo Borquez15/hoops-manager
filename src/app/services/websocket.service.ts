@@ -28,7 +28,7 @@ export class WebSocketService {
       return this.messageSubject.asObservable();
     }
 
-    const wsUrl = `ws://hoopsbackend-production.up.railway.app//tournaments/${tournamentId}/ws`;
+    const wsUrl = `wss://hoopsbackend-production.up.railway.app/tournaments/${tournamentId}/ws`;
     console.log('🔌 Conectando a WebSocket:', wsUrl);
 
     this.ws = new WebSocket(wsUrl);

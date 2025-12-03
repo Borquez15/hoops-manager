@@ -251,12 +251,13 @@
   </section>
 
     <!-- ✅ BOTONES DE ACCIÓN SEGÚN EL ESTADO -->
+
+    <!-- 🟢 1. CONFIGURANDO → Botón INICIAR TORNEO -->
     <div class="action-bar" *ngIf="tournamentStatus === 'configurando'">
       <button 
         class="btn btn-lg btn-success"
         (click)="startTournament()"
-        [disabled]="!canStartTournament()"
-      >
+        [disabled]="!canStartTournament()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M8 5v14l11-7z"/>
         </svg>
@@ -264,27 +265,70 @@
       </button>
     </div>
 
-    <!-- ✅ BOTÓN FINALIZAR TORNEO (SOLO SI ESTÁ INICIADO) -->
+    <!-- 🔵 2. ACTIVO → Botón FINALIZAR TEMPORADA REGULAR -->
     <div class="action-bar" *ngIf="tournamentStatus === 'iniciado'">
       <button 
-        class="btn btn-lg btn-danger"
-        (click)="finalizarTorneo()"
-        style="background: #dc3545; border-color: #dc3545;"
-      >
+        class="btn btn-lg btn-primary"
+        (click)="finalizarTemporadaRegular()"
+        style="background: #28a745; border-color: #28a745;">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M14.59 8L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+          <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
         </svg>
-        Finalizar Torneo
+        Finalizar Temporada Regular
       </button>
     </div>
 
+    <!-- 🟠 3. PLAYOFFS → Botón GENERAR/GESTIONAR PLAYOFFS -->
+    <div class="action-bar" *ngIf="tournamentStatus === 'playoffs'">
+      <div class="alert alert-success" style="margin-bottom: 16px;">
+        <strong>✅ Temporada Regular Finalizada</strong>
+        <p style="margin: 8px 0 0 0;">La fase regular ha concluido. Gestiona los playoffs ahora.</p>
+      </div>
+
+      <!-- ✅ Mostrar botón de generar si no están generados -->
+      <button 
+        *ngIf="!playoffsGenerated"
+        class="btn btn-lg btn-primary"
+        (click)="generarPlayoffs()"
+        [disabled]="generatingPlayoffs"
+        style="background: #FF7F00; border-color: #FF7F00;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 7v10c0 5.52 3.82 10.66 9 12 5.18-1.34 9-6.48 9-12V7l-10-5z"/>
+        </svg>
+        {{ generatingPlayoffs ? '⏳ Generando Playoffs...' : '⚡ Generar Playoffs' }}
+      </button>
+
+      <!-- ✅ Mostrar botón de gestionar si ya están generados -->
+      <button 
+        *ngIf="playoffsGenerated"
+        class="btn btn-lg btn-primary"
+        (click)="irAPlayoffs()"
+        style="background: #FF7F00; border-color: #FF7F00;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 7v10c0 5.52 3.82 10.66 9 12 5.18-1.34 9-6.48 9-12V7l-10-5z"/>
+        </svg>
+        🏆 Gestionar Playoffs
+      </button>
+
+      <!-- ✅ Botón para finalizar todo el torneo -->
+      <button 
+        class="btn btn-lg btn-danger"
+        (click)="finalizarTorneo()"
+        style="background: #dc3545; border-color: #dc3545; margin-top: 12px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+        </svg>
+        Finalizar Torneo Completo
+      </button>
+    </div>
+
+    <!-- ⚫ 4. FINALIZADO → Mensaje + Reactivar -->
     <div class="action-bar" *ngIf="tournamentStatus === 'finalizado'">
       <div class="alert" style="background: #e9ecef; border-color: #ced4da; color: #495057; text-align: center; margin-bottom: 16px;">
         <strong>🏁 Torneo Finalizado</strong>
         <p style="margin: 8px 0 0 0;">Este torneo ha concluido.</p>
       </div>
-      
-      <!-- ✅ BOTÓN PARA REACTIVAR -->
+
       <button 
         class="btn btn-lg btn-warning"
         (click)="reactivarTorneo()"
