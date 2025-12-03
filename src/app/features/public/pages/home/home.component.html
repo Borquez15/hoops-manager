@@ -1,10 +1,11 @@
+<!-- home.component.html -->
 <header class="nav" [class.nav--brand-bg]="active !== 'inicio'">
   <div class="nav__wrap">
     <a class="brand" href="" (click)="go('inicio', $event)">
       <img class="brand__img" src="/imagen/logo-hoops-manager.png" alt="HoopsManager" />
     </a>
 
-    <!-- Menú de navegación principal (siempre visible) -->
+    <!-- Menú de navegación principal (oculto en móvil) -->
     <nav class="menu">
       <a class="menu__link" [class.menu__link--active]="active==='inicio'" (click)="go('inicio', $event)">INICIO</a>
       <a class="menu__link" [class.menu__link--active]="active==='caracteristicas'" (click)="go('caracteristicas', $event)">CARACTERÍSTICAS</a>
@@ -12,7 +13,7 @@
       <a class="menu__link" [class.menu__link--active]="active==='contacto'" (click)="go('contacto', $event)">CONTÁCTANOS</a>
     </nav>
 
-    <!-- Botón de Iniciar Sesión (cuando NO está autenticado) -->
+    <!-- Botón de Iniciar Sesión (desktop, cuando NO está autenticado) -->
     <button class="btn btn-primary" *ngIf="!isAuthenticated" (click)="iniciarSesion()">
       INICIAR SESIÓN
     </button>
@@ -27,7 +28,7 @@
         <span class="user-name-header">{{ user?.nombre || 'Usuario' }}</span>
       </div>
 
-      <!-- Botón hamburguesa -->
+      <!-- Botón hamburguesa (móvil) -->
       <button 
         class="hamburger" 
         [class.open]="menuOpen" 
