@@ -90,6 +90,24 @@
                 <small>{{ getFormatoTexto(serie.formato) }}</small>
               </div>
 
+              <!-- ✅ LISTA DE PARTIDOS -->
+              <div class="partidos-lista" *ngIf="serie.partidos && serie.partidos.length > 0">
+                <div class="partido-item" *ngFor="let partido of serie.partidos">
+                  <div class="partido-info">
+                    <span class="partido-numero">Partido {{ partido.numero_partido }}</span>
+                    <span class="partido-fecha" *ngIf="partido.fecha">
+                      📅 {{ formatFecha(partido.fecha) }}
+                    </span>
+                    <span class="partido-fecha" *ngIf="!partido.fecha" style="color: #999;">
+                      Sin programar
+                    </span>
+                  </div>
+                  <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                    ✏️
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -141,6 +159,24 @@
 
               <div class="serie-info" *ngIf="serie.formato">
                 <small>{{ getFormatoTexto(serie.formato) }}</small>
+              </div>
+
+              <!-- ✅ LISTA DE PARTIDOS -->
+              <div class="partidos-lista" *ngIf="serie.partidos && serie.partidos.length > 0">
+                <div class="partido-item" *ngFor="let partido of serie.partidos">
+                  <div class="partido-info">
+                    <span class="partido-numero">Partido {{ partido.numero_partido }}</span>
+                    <span class="partido-fecha" *ngIf="partido.fecha">
+                      📅 {{ formatFecha(partido.fecha) }}
+                    </span>
+                    <span class="partido-fecha" *ngIf="!partido.fecha" style="color: #999;">
+                      Sin programar
+                    </span>
+                  </div>
+                  <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                    ✏️
+                  </button>
+                </div>
               </div>
 
             </div>
@@ -196,6 +232,24 @@
                 <small>{{ getFormatoTexto(serie.formato) }}</small>
               </div>
 
+              <!-- ✅ LISTA DE PARTIDOS -->
+              <div class="partidos-lista" *ngIf="serie.partidos && serie.partidos.length > 0">
+                <div class="partido-item" *ngFor="let partido of serie.partidos">
+                  <div class="partido-info">
+                    <span class="partido-numero">Partido {{ partido.numero_partido }}</span>
+                    <span class="partido-fecha" *ngIf="partido.fecha">
+                      📅 {{ formatFecha(partido.fecha) }}
+                    </span>
+                    <span class="partido-fecha" *ngIf="!partido.fecha" style="color: #999;">
+                      Sin programar
+                    </span>
+                  </div>
+                  <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                    ✏️
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -248,6 +302,24 @@
               <small>{{ getFormatoTexto(bracket.final.formato) }}</small>
             </div>
 
+            <!-- ✅ LISTA DE PARTIDOS -->
+            <div class="partidos-lista" *ngIf="bracket.final.partidos && bracket.final.partidos.length > 0">
+              <div class="partido-item" *ngFor="let partido of bracket.final.partidos">
+                <div class="partido-info">
+                  <span class="partido-numero">Partido {{ partido.numero_partido }}</span>
+                  <span class="partido-fecha" *ngIf="partido.fecha">
+                    📅 {{ formatFecha(partido.fecha) }}
+                  </span>
+                  <span class="partido-fecha" *ngIf="!partido.fecha" style="color: #999;">
+                    Sin programar
+                  </span>
+                </div>
+                <button class="btn-edit-partido" (click)="abrirModalEditar(partido)">
+                  ✏️
+                </button>
+              </div>
+            </div>
+
             <!-- CAMPEÓN -->
             <div class="champion-banner" *ngIf="bracket.final.ganador_info">
               <div class="trophy">🏆</div>
@@ -262,3 +334,12 @@
     </div>
   </ng-container>
 </div>
+
+<!-- ✅ MODAL DE EDITAR PARTIDO -->
+<app-edit-playoff-match
+  *ngIf="modalEditarAbierto"
+  [match]="partidoSeleccionado"
+  [torneoId]="tournamentId"
+  (close)="cerrarModalEditar()"
+  (saved)="onPartidoActualizado()">
+</app-edit-playoff-match>

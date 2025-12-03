@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { EditPlayoffMatchComponent } from './edit-playoff-match/edit-playoff-match.component';
 
 interface Equipo {
   id_equipo: number;
@@ -19,6 +20,7 @@ interface Partido {
   estado: string;
   equipo_local_nombre: string;
   equipo_visitante_nombre: string;
+  cancha_id?: number;
 }
 
 interface Serie {
@@ -51,7 +53,7 @@ interface PlayoffBracket {
 @Component({
   selector: 'app-playoff-bracket',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EditPlayoffMatchComponent],
   templateUrl: './playoff-bracket.component.html',
   styleUrls: ['./playoff-bracket.component.css']
 })
@@ -66,6 +68,10 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
   bracket: PlayoffBracket | null = null;
   loading = false;
   error = '';
+
+  // 🔥 NUEVO: Modal para editar partidos
+  modalEditarAbierto = false;
+  partidoSeleccionado: Partido | null = null;
 
   ngOnInit() {
     console.log('🎯 ngOnInit - tournamentId:', this.tournamentId);
@@ -91,7 +97,7 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
     this.loading = true;
     this.error = '';
     this.bracket = null;
-    this.cdr.detectChanges(); // ✅ Forzar actualización
+    this.cdr.detectChanges();
 
     this.http.get<PlayoffBracket>(`${this.apiUrl}/tournaments/${this.tournamentId}/playoffs`)
       .subscribe({
@@ -99,7 +105,7 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
           console.log('✅ Bracket cargado exitosamente:', data);
           this.bracket = data;
           this.loading = false;
-          this.cdr.detectChanges(); // ✅ Forzar actualización
+          this.cdr.detectChanges();
         },
         error: (e) => {
           console.error('❌ Error al cargar bracket:', e);
@@ -111,9 +117,40 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
             this.error = e.error?.detail || 'Error al cargar el bracket de playoffs';
           }
           
-          this.cdr.detectChanges(); // ✅ Forzar actualización
+          this.cdr.detectChanges();
         }
       });
+  }
+
+  // 🔥 NUEVO: abrir modal
+  abrirModalEditar(partido: Partido) {
+    this.partidoSeleccionado = partido;
+    this.modalEditarAbierto = true;
+    this.cdr.detectChanges();
+  }
+
+  // 🔥 NUEVO: cerrar modal
+  cerrarModalEditar() {
+    this.modalEditarAbierto = false;
+    this.partidoSeleccionado = null;
+    this.cdr.detectChanges();
+  }
+
+  // 🔥 NUEVO: recargar bracket después de editar
+  onPartidoActualizado() {
+    this.cerrarModalEditar();
+    this.loadBracket();
+  }
+
+  // 🔥 NUEVO: formatear fecha
+  formatFecha(fecha: string): string {
+    const d = new Date(fecha);
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    
+    return `${day}/${month} ${hours}:${minutes}`;
   }
 
   getInitials(nombre: string): string {

@@ -389,3 +389,63 @@
     font-size: 1.1rem;
   }
 }
+
+/* LISTA DE PARTIDOS */
+.partidos-lista {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.partido-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255,255,255,.02);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: background 0.2s ease;
+}
+
+.partido-item:hover {
+  background: rgba(255,255,255,.05);
+}
+
+.partido-item:last-child {
+  margin-bottom: 0;
+}
+
+.partido-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.partido-numero {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.partido-fecha {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.btn-edit-partido {
+  background: rgba(229, 127, 61, 0.2);
+  border: 1px solid #e57f3d;
+  color: #e57f3d;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-partido:hover {
+  background: #e57f3d;
+  color: #fff;
+  transform: scale(1.05);
+}

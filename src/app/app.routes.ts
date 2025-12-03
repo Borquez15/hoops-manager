@@ -37,14 +37,14 @@ export const routes: Routes = [
       import('./auth/accept-referee-invite/accept-referee-invite.component')
         .then(m => m.AcceptRefereeInviteComponent)
   },
+
   {
     path: 'torneos/:id/playoffs',
     loadComponent: () =>
-      import('./features/tournament-detail/modal/playoff-bracket/playoff-bracket.component')
-        .then(m => m.PlayoffBracketComponent),
+      import('./features/tournament-detail/modal/playoff-bracket/edit-playoff-match/edit-playoff-match.component')
+        .then(m => m.EditPlayoffMatchComponent),
     canActivate: [authGuard]   // si quieres protegerla
   },
-
 
   // Verificar email
   {
