@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,7 +24,8 @@ export class TournamentSearchComponent {
   constructor(
     private searchService: TournamentSearchService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {}
 
   onSearch(event?: Event): void {
@@ -35,40 +36,62 @@ export class TournamentSearchComponent {
 
     console.log('🔍 Iniciando búsqueda:', query);
     
-    this.searching = true;
-    this.hasSearched = true;
-    this.match = null;
-    this.suggestions = [];
-    this.cdr.detectChanges();
+    // ✅ Asegurar que los cambios se detecten
+    this.zone.run(() => {
+      this.searching = true;
+      this.hasSearched = true;
+      this.match = null;
+      this.suggestions = [];
+      this.cdr.detectChanges();
+    });
+
+    console.log('📊 Estado antes de búsqueda:', {
+      searching: this.searching,
+      hasSearched: this.hasSearched
+    });
 
     this.searchService.search(query).subscribe({
       next: (response: SearchResponse) => {
         console.log('✅ Resultados recibidos:', response);
         
-        this.match = response.match;
-        this.suggestions = response.suggestions || [];
-        this.searching = false;
-        
-        this.cdr.detectChanges();
+        this.zone.run(() => {
+          this.match = response.match;
+          this.suggestions = response.suggestions || [];
+          this.searching = false;
+          
+          console.log('📊 Estado después de búsqueda:', {
+            searching: this.searching,
+            match: this.match,
+            suggestions: this.suggestions.length
+          });
+          
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
         console.error('❌ Error en búsqueda:', err);
+        console.error('❌ Tipo de error:', err.constructor.name);
+        console.error('❌ Status:', err.status);
         
-        this.match = null;
-        this.suggestions = [];
-        this.searching = false;
-        this.hasSearched = true;
-        
-        // ✅ Manejo específico de timeout
-        if (err instanceof TimeoutError) {
-          alert('⏱️ La búsqueda tardó demasiado. Por favor, intenta de nuevo.');
-        } else if (err.status === 0) {
-          alert('❌ No se pudo conectar con el servidor. Verifica tu conexión.');
-        } else {
-          alert('❌ Error al buscar torneos.');
-        }
-        
-        this.cdr.detectChanges();
+        this.zone.run(() => {
+          this.match = null;
+          this.suggestions = [];
+          this.searching = false;
+          this.hasSearched = true;
+          
+          // ✅ Manejo específico de timeout
+          if (err instanceof TimeoutError) {
+            alert('⏱️ La búsqueda tardó demasiado. El servidor puede estar ocupado. Intenta de nuevo.');
+          } else if (err.status === 0) {
+            alert('❌ No se pudo conectar con el servidor. Verifica tu conexión a internet.');
+          } else if (err.status === 404) {
+            alert('❌ Endpoint no encontrado. Contacta a soporte.');
+          } else {
+            alert(`❌ Error al buscar torneos: ${err.message || 'Desconocido'}`);
+          }
+          
+          this.cdr.detectChanges();
+        });
       }
     });
   }
