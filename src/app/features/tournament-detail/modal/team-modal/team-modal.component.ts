@@ -12,7 +12,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
-import { NgIf, NgFor } from '@angular/common';
 
 interface HoopsJugador {
   curp: string;
@@ -68,9 +67,7 @@ export class TeamModalComponent implements OnChanges {
   buscandoCURP = false;
   errorMensaje: string = '';
 
-  // Guardar jugadores originales para comparar cambios
   jugadoresOriginales: JugadorEquipo[] = [];
-
 
   constructor(
     private http: HttpClient,
@@ -81,7 +78,6 @@ export class TeamModalComponent implements OnChanges {
     if (changes['equipo'] && this.equipo) {
       console.log('🔄 Modal recibió equipo:', this.equipo);
       
-      // Hacer una copia profunda completa
       this.equipoTemp = {
         id_equipo: this.equipo.id_equipo,
         nombre: this.equipo.nombre || '',
@@ -91,7 +87,6 @@ export class TeamModalComponent implements OnChanges {
           : []
       };
 
-      // Guardar copia de jugadores originales
       this.jugadoresOriginales = this.equipo.jugadores 
         ? JSON.parse(JSON.stringify(this.equipo.jugadores))
         : [];
@@ -120,9 +115,12 @@ export class TeamModalComponent implements OnChanges {
     
     if (curp.length !== 18) {
       this.errorMensaje = 'La CURP debe tener 18 caracteres';
+      this.cdr.detectChanges();
       return;
     }
 
+    console.log('🔍 Buscando CURP:', curp);
+    
     this.buscandoCURP = true;
     this.errorMensaje = '';
     this.cdr.detectChanges();
@@ -142,15 +140,14 @@ export class TeamModalComponent implements OnChanges {
             this.nuevoJugador.ap_m = persona.ap_m ?? '';
             this.nuevoJugador.edad = persona.edad ?? null;
             
-            setTimeout(() => {
-              this.buscandoCURP = false;
-            }, 0);
+            console.log('✅ Jugador encontrado:', this.jugadorEncontrado);
           } else {
             this.jugadorEncontrado = null;
             this.errorMensaje = 'CURP no encontrada. Completa los datos para registrar al jugador.';
-            this.buscandoCURP = false;
-            this.cdr.detectChanges();
           }
+          
+          this.buscandoCURP = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('❌ Error en búsqueda:', err);
@@ -187,7 +184,6 @@ export class TeamModalComponent implements OnChanges {
       return;
     }
 
-    // Validar dorsal duplicado
     const dorsalDuplicado = this.equipoTemp.jugadores?.some(
       j => j.dorsal === this.nuevoJugador.dorsal
     );
@@ -198,7 +194,6 @@ export class TeamModalComponent implements OnChanges {
       return;
     }
 
-    // Validar CURP duplicada
     const curpDuplicada = this.equipoTemp.jugadores?.some(
       j => j.persona.curp.toUpperCase() === curp
     );
@@ -305,10 +300,8 @@ export class TeamModalComponent implements OnChanges {
     });
 
     if (!isEdit) {
-      // ========= CREAR EQUIPO NUEVO =========
       this.crearEquipoNuevo();
     } else {
-      // ========= EDITAR EQUIPO EXISTENTE =========
       this.editarEquipoExistente();
     }
   }
@@ -324,6 +317,7 @@ export class TeamModalComponent implements OnChanges {
 
         const nuevoId = resp?.id_equipo;
         if (!nuevoId) {
+          alert('✅ Equipo creado exitosamente');
           this.equipoUpdated.emit();
           this.close();
           return;
@@ -331,6 +325,7 @@ export class TeamModalComponent implements OnChanges {
 
         const jugadores = this.equipoTemp?.jugadores ?? [];
         if (!jugadores.length) {
+          alert('✅ Equipo creado exitosamente');
           this.equipoUpdated.emit();
           this.close();
           return;
@@ -355,7 +350,7 @@ export class TeamModalComponent implements OnChanges {
         forkJoin(peticiones).subscribe({
           next: (resJugadores) => {
             console.log('✅ Jugadores creados:', resJugadores);
-            alert('Equipo y jugadores guardados exitosamente');
+            alert('✅ Equipo y jugadores guardados exitosamente');
             this.equipoUpdated.emit();
             this.close();
           },
@@ -377,7 +372,6 @@ export class TeamModalComponent implements OnChanges {
   private editarEquipoExistente() {
     const equipoId = this.equipoTemp!.id_equipo!;
     
-    // 1. Actualizar nombre del equipo
     const urlEquipo = `${this.apiUrl}/tournaments/${this.tournamentId}/teams/${equipoId}`;
     const bodyEquipo = {
       nombre: this.equipoTemp!.nombre.trim(),
@@ -387,8 +381,6 @@ export class TeamModalComponent implements OnChanges {
     this.http.put(urlEquipo, bodyEquipo).subscribe({
       next: () => {
         console.log('✅ Nombre actualizado');
-        
-        // 2. Sincronizar jugadores
         this.sincronizarJugadores(equipoId);
       },
       error: (err) => {
@@ -403,26 +395,19 @@ export class TeamModalComponent implements OnChanges {
     const jugadoresOriginales = this.jugadoresOriginales;
 
     console.log('🔄 Sincronizando jugadores para equipo:', equipoId);
-    console.log('📊 Jugadores actuales:', jugadoresActuales);
-    console.log('📊 Jugadores originales:', jugadoresOriginales);
 
-    // Identificar jugadores a AGREGAR (no estaban en originales)
     const jugadoresAgregar = jugadoresActuales.filter(actual => {
-      const yaExistia = jugadoresOriginales.some(orig => 
+      return !jugadoresOriginales.some(orig => 
         orig.persona.curp === actual.persona.curp
       );
-      console.log(`  Jugador ${actual.persona.curp} - Ya existía: ${yaExistia}`);
-      return !yaExistia;
     });
 
-    // Identificar jugadores a ELIMINAR
     const jugadoresEliminar = jugadoresOriginales.filter(orig => {
       return !jugadoresActuales.some(actual =>
         actual.persona.curp === orig.persona.curp
       );
     });
 
-    // Identificar jugadores a ACTUALIZAR
     const jugadoresActualizar = jugadoresActuales.filter(actual => {
       const orig = jugadoresOriginales.find(o => 
         o.persona.curp === actual.persona.curp
@@ -436,14 +421,9 @@ export class TeamModalComponent implements OnChanges {
       actualizar: jugadoresActualizar.length
     });
 
-    console.log('➕ Jugadores a agregar:', jugadoresAgregar);
-    console.log('➖ Jugadores a eliminar:', jugadoresEliminar);
-    console.log('🔄 Jugadores a actualizar:', jugadoresActualizar);
-
     const peticiones: any[] = [];
 
-    // AGREGAR nuevos jugadores
-    jugadoresAgregar.forEach((j, index) => {
+    jugadoresAgregar.forEach((j) => {
       const payload = {
         curp: j.persona.curp.toUpperCase(),
         dorsal: j.dorsal,
@@ -453,8 +433,6 @@ export class TeamModalComponent implements OnChanges {
         edad: j.persona.edad || null,
       };
 
-      console.log(`📤 [${index + 1}] POST /teams/${equipoId}/players`, payload);
-
       peticiones.push(
         this.http.post(
           `${this.apiUrl}/teams/${equipoId}/players`,
@@ -463,10 +441,7 @@ export class TeamModalComponent implements OnChanges {
       );
     });
 
-    // ELIMINAR jugadores
     jugadoresEliminar.forEach(j => {
-      console.log(`🗑️  DELETE /teams/${equipoId}/players/${j.dorsal}`);
-      
       peticiones.push(
         this.http.delete(
           `${this.apiUrl}/teams/${equipoId}/players/${j.dorsal}`
@@ -474,7 +449,6 @@ export class TeamModalComponent implements OnChanges {
       );
     });
 
-    // ACTUALIZAR jugadores
     jugadoresActualizar.forEach(j => {
       const orig = jugadoresOriginales.find(o => 
         o.persona.curp === j.persona.curp
@@ -486,8 +460,6 @@ export class TeamModalComponent implements OnChanges {
           activo: j.activo
         };
 
-        console.log(`🔄 PUT /teams/${equipoId}/players/${orig.dorsal}`, payload);
-
         peticiones.push(
           this.http.put(
             `${this.apiUrl}/teams/${equipoId}/players/${orig.dorsal}`,
@@ -497,17 +469,12 @@ export class TeamModalComponent implements OnChanges {
       }
     });
 
-    console.log(`🎯 Total de peticiones a ejecutar: ${peticiones.length}`);
-
     if (peticiones.length === 0) {
-      console.log('ℹ️ No hay cambios en jugadores');
-      alert('Equipo actualizado exitosamente (sin cambios en jugadores)');
+      alert('✅ Equipo actualizado (sin cambios en jugadores)');
       this.equipoUpdated.emit();
       this.close();
       return;
     }
-
-    console.log('🚀 Ejecutando peticiones...');
 
     forkJoin(peticiones).subscribe({
       next: (results) => {
@@ -518,13 +485,11 @@ export class TeamModalComponent implements OnChanges {
       },
       error: (err) => {
         console.error('❌ Error al sincronizar jugadores:', err);
-        console.error('Error completo:', JSON.stringify(err, null, 2));
         this.mostrarErrorBackend(err);
         this.equipoUpdated.emit();
         this.close();
       }
     });
-  
   }
 
   close() {
@@ -532,6 +497,7 @@ export class TeamModalComponent implements OnChanges {
     this.jugadoresOriginales = [];
     this.resetFormularioJugador();
     this.errorMensaje = '';
+    document.body.style.overflow = ''; // ✅ Desbloquear scroll
     this.closeModal.emit();
   }
 }

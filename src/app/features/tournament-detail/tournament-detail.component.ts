@@ -1,4 +1,4 @@
-// tournament-detail.component.ts - COMPLETO CON TODAS LAS FEATURES
+// tournament-detail.component.ts - COMPLETO CON ChangeDetectorRef
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,7 +12,6 @@ import { ConfigModalComponent } from './modal/config-modal/config-modal.componen
 import { TeamModalComponent } from './modal/team-modal/team-modal.component';
 import { RefereeModalComponent } from './modal/referee-modal/referee-modal.component';
 import { ProximosJuegosComponent } from './proximos-juegos/proximos-juegos.component';
-import { NgIf, NgFor } from '@angular/common';
 
 interface Arbitro {
   id_arbitro?: number;
@@ -113,6 +112,7 @@ export class TournamentDetailComponent implements OnInit {
     console.log('🔵 Iniciando carga del torneo:', this.tournamentId);
     this.loading = true;
     this.error = null;
+    this.cdr.detectChanges(); // ✅ Forzar actualización
     
     try {
       const tournamentData = await this.tournamentService
@@ -129,20 +129,20 @@ export class TournamentDetailComponent implements OnInit {
       console.log('📊 Estado del torneo:', this.tournament.estado);
       
       if (this.tournament.estado) {
-      const estado = this.tournament.estado.toUpperCase();
-      
-      if (estado === 'DRAFT' || estado === 'CONFIGURANDO') {
-        this.tournamentStatus = 'configurando';
-      } else if (estado === 'ACTIVO' || estado === 'INICIADO' || estado === 'EN_CURSO') {
-        this.tournamentStatus = 'iniciado';  // ✅ Se mantiene 'iniciado' en el componente
-      } else if (estado === 'PLAYOFFS') {
-        this.tournamentStatus = 'playoffs';
-      } else if (estado === 'FINALIZADO' || estado === 'TERMINADO') {
-        this.tournamentStatus = 'finalizado';
-      } else {
-        this.tournamentStatus = 'configurando';
+        const estado = this.tournament.estado.toUpperCase();
+        
+        if (estado === 'DRAFT' || estado === 'CONFIGURANDO') {
+          this.tournamentStatus = 'configurando';
+        } else if (estado === 'ACTIVO' || estado === 'INICIADO' || estado === 'EN_CURSO') {
+          this.tournamentStatus = 'iniciado';
+        } else if (estado === 'PLAYOFFS') {
+          this.tournamentStatus = 'playoffs';
+        } else if (estado === 'FINALIZADO' || estado === 'TERMINADO') {
+          this.tournamentStatus = 'finalizado';
+        } else {
+          this.tournamentStatus = 'configurando';
+        }
       }
-    }
       
       console.log('🎯 Estado mapeado a:', this.tournamentStatus);
       
@@ -160,7 +160,7 @@ export class TournamentDetailComponent implements OnInit {
       this.error = error?.message || 'Error al cargar';
     } finally {
       this.loading = false;
-      this.cdr.detectChanges();
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     }
   }
 
@@ -182,9 +182,11 @@ export class TournamentDetailComponent implements OnInit {
       }
       
       console.log('✅ Equipos cargados:', this.equipos.length);
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     } catch (error) {
       console.error('❌ Error al cargar equipos:', error);
       this.equipos = [];
+      this.cdr.detectChanges();
     }
   }
 
@@ -202,8 +204,11 @@ export class TournamentDetailComponent implements OnInit {
           activo: j.activo,
           persona: j.persona
         }));
+        this.cdr.detectChanges(); // ✅ Forzar actualización
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error('❌ Error al cargar jugadores:', error);
+    }
   }
 
   async loadArbitros(): Promise<void> {
@@ -214,8 +219,10 @@ export class TournamentDetailComponent implements OnInit {
       
       this.arbitros = response || [];
       console.log('✅ Árbitros cargados:', this.arbitros.length);
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     } catch (error) {
       this.arbitros = [];
+      this.cdr.detectChanges();
     }
   }
 
@@ -227,9 +234,11 @@ export class TournamentDetailComponent implements OnInit {
       
       this.canchas = response || [];
       console.log('✅ Canchas cargadas:', this.canchas.length);
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     } catch (error) {
       console.error('❌ Error al cargar canchas:', error);
       this.canchas = [];
+      this.cdr.detectChanges();
     }
   }
 
@@ -241,8 +250,10 @@ export class TournamentDetailComponent implements OnInit {
       
       this.calendarGenerated = (response || []).length > 0;
       console.log('📅 Calendario:', this.calendarGenerated ? 'GENERADO' : 'NO GENERADO');
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     } catch (error) {
       this.calendarGenerated = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -252,10 +263,12 @@ export class TournamentDetailComponent implements OnInit {
       return;
     }
     this.modalConfigAbierto = true;
+    this.cdr.detectChanges();
   }
 
   cerrarModalConfig(): void {
     this.modalConfigAbierto = false;
+    this.cdr.detectChanges();
   }
 
   async actualizarConfiguracion(data: Partial<Tournament>): Promise<void> {
@@ -290,6 +303,7 @@ export class TournamentDetailComponent implements OnInit {
     };
     this.indiceEquipoEditando = -1;
     this.modalEquipoAbierto = true;
+    this.cdr.detectChanges();
   }
 
   editarEquipo(index: number): void {
@@ -301,17 +315,21 @@ export class TournamentDetailComponent implements OnInit {
     this.indiceEquipoEditando = index;
     this.equipoEditando = { ...this.equipos[index] };
     this.modalEquipoAbierto = true;
+    this.cdr.detectChanges();
   }
 
   cerrarModalEquipo(): void {
     this.modalEquipoAbierto = false;
     this.equipoEditando = null;
     this.indiceEquipoEditando = -1;
+    this.cdr.detectChanges();
   }
 
   async onEquipoUpdated(): Promise<void> {
+    console.log('🔄 Equipo actualizado, recargando datos...');
     await this.loadEquipos();
     this.cerrarModalEquipo();
+    this.cdr.detectChanges(); // ✅ Forzar actualización CRÍTICA
   }
 
   async eliminarEquipo(index: number, id?: number): Promise<void> {
@@ -327,6 +345,7 @@ export class TournamentDetailComponent implements OnInit {
         `${this.apiUrl}/tournaments/${this.tournamentId}/teams/${id}`
       ).toPromise();
       await this.loadEquipos();
+      this.cdr.detectChanges(); // ✅ Forzar actualización
     } catch (error) {
       alert('❌ Error al eliminar equipo');
     }
@@ -334,172 +353,168 @@ export class TournamentDetailComponent implements OnInit {
 
   abrirModalArbitro(): void {
     this.modalArbitroAbierto = true;
+    this.cdr.detectChanges();
   }
 
   cerrarModalArbitro(): void {
     this.modalArbitroAbierto = false;
+    this.cdr.detectChanges();
   }
 
   async onArbitrosUpdated(): Promise<void> {
     await this.loadArbitros();
+    this.cdr.detectChanges(); // ✅ Forzar actualización
   }
 
   async generateCalendar(): Promise<void> {
-  const minimumTeams = this.getMinimumTeams();
-  
-  if (this.equipos.length < minimumTeams) {
-    alert(`⚠️ Necesitas al menos ${minimumTeams} equipos`);
-    return;
-  }
-  
-  // 🔥 PRIMER INTENTO: Sin confirm (para recibir advertencias)
-  try {
-    const firstAttempt = await this.tournamentService
-      .autoSchedule(this.tournamentId, undefined, false) // ← confirm=false
-      .toPromise();
+    const minimumTeams = this.getMinimumTeams();
     
-    // Si tiene warnings, mostrar confirmación
-    if (firstAttempt && !firstAttempt.ok && firstAttempt.requires_confirmation) {
-      const warnings = firstAttempt.warnings.join('\n\n');
-      const mensaje = `⚠️ ADVERTENCIAS:\n\n${warnings}\n\n¿Deseas continuar de todos modos?`;
-      
-      if (!confirm(mensaje)) {
-        return; // Usuario canceló
-      }
-      
-      // Usuario confirmó, generar con confirm=true
-      await this.generateCalendarConfirmed();
-    } else {
-      // No hay warnings, generar directamente
-      await this.generateCalendarConfirmed();
+    if (this.equipos.length < minimumTeams) {
+      alert(`⚠️ Necesitas al menos ${minimumTeams} equipos`);
+      return;
     }
-  } catch (error) {
-    console.error('❌ Error en primera validación:', error);
-    alert('❌ Error al validar configuración');
-  }
-}
-
-// 🔥 MÉTODO AUXILIAR: Generar calendario con confirm=true
-private async generateCalendarConfirmed(): Promise<void> {
-  let progressInterval: any = null;
-  
-  try {
-    console.log('🚀 Generando calendario...');
     
-    this.generatingCalendar = true;
-    this.calendarProgress = 0;
-    this.calendarProgressMessage = 'Iniciando...';
-    this.cdr.detectChanges();
-    
-    progressInterval = setInterval(() => {
-      if (this.calendarProgress < 90) {
-        this.calendarProgress += 10;
+    try {
+      const firstAttempt = await this.tournamentService
+        .autoSchedule(this.tournamentId, undefined, false)
+        .toPromise();
+      
+      if (firstAttempt && !firstAttempt.ok && firstAttempt.requires_confirmation) {
+        const warnings = firstAttempt.warnings.join('\n\n');
+        const mensaje = `⚠️ ADVERTENCIAS:\n\n${warnings}\n\n¿Deseas continuar de todos modos?`;
         
-        if (this.calendarProgress <= 30) {
-          this.calendarProgressMessage = '🔍 Analizando equipos...';
-        } else if (this.calendarProgress <= 60) {
-          this.calendarProgressMessage = '⚙️ Generando partidos...';
-        } else {
-          this.calendarProgressMessage = '📅 Asignando fechas...';
+        if (!confirm(mensaje)) {
+          return;
         }
         
-        this.cdr.detectChanges();
+        await this.generateCalendarConfirmed();
+      } else {
+        await this.generateCalendarConfirmed();
       }
-    }, 300);
-    
-    // ✅ GENERAR CON CONFIRM=TRUE
-    await this.http.post(
-  `${this.apiUrl}/tournaments/${this.tournamentId}/matches/auto-schedule?confirm=true`,
-      {}
-    ).toPromise();
-
-    
-    console.log('✅ Calendario generado');
-    
-    if (progressInterval) clearInterval(progressInterval);
-    
-    this.calendarProgress = 100;
-    this.calendarProgressMessage = '✅ ¡Calendario generado!';
-    this.cdr.detectChanges();
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    await this.checkCalendarStatus();
-    
-    alert('✅ Calendario generado exitosamente');
-    
-  } catch (error) {
-    console.error('❌ Error:', error);
-    
-    if (progressInterval) clearInterval(progressInterval);
-    
-    this.calendarProgress = 100;
-    this.calendarProgressMessage = '❌ Error al generar';
-    this.cdr.detectChanges();
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    alert('❌ Error al generar calendario');
-  } finally {
-    setTimeout(() => {
-      this.generatingCalendar = false;
-      this.calendarProgress = 0;
-      this.calendarProgressMessage = '';
-      this.cdr.detectChanges();
-    }, 2000);
+    } catch (error) {
+      console.error('❌ Error en primera validación:', error);
+      alert('❌ Error al validar configuración');
+    }
   }
-}
+
+  private async generateCalendarConfirmed(): Promise<void> {
+    let progressInterval: any = null;
+    
+    try {
+      console.log('🚀 Generando calendario...');
+      
+      this.generatingCalendar = true;
+      this.calendarProgress = 0;
+      this.calendarProgressMessage = 'Iniciando...';
+      this.cdr.detectChanges();
+      
+      progressInterval = setInterval(() => {
+        if (this.calendarProgress < 90) {
+          this.calendarProgress += 10;
+          
+          if (this.calendarProgress <= 30) {
+            this.calendarProgressMessage = '🔍 Analizando equipos...';
+          } else if (this.calendarProgress <= 60) {
+            this.calendarProgressMessage = '⚙️ Generando partidos...';
+          } else {
+            this.calendarProgressMessage = '📅 Asignando fechas...';
+          }
+          
+          this.cdr.detectChanges();
+        }
+      }, 300);
+      
+      await this.http.post(
+        `${this.apiUrl}/tournaments/${this.tournamentId}/matches/auto-schedule?confirm=true`,
+        {}
+      ).toPromise();
+      
+      console.log('✅ Calendario generado');
+      
+      if (progressInterval) clearInterval(progressInterval);
+      
+      this.calendarProgress = 100;
+      this.calendarProgressMessage = '✅ ¡Calendario generado!';
+      this.cdr.detectChanges();
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      await this.checkCalendarStatus();
+      
+      alert('✅ Calendario generado exitosamente');
+      
+    } catch (error) {
+      console.error('❌ Error:', error);
+      
+      if (progressInterval) clearInterval(progressInterval);
+      
+      this.calendarProgress = 100;
+      this.calendarProgressMessage = '❌ Error al generar';
+      this.cdr.detectChanges();
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      alert('❌ Error al generar calendario');
+    } finally {
+      setTimeout(() => {
+        this.generatingCalendar = false;
+        this.calendarProgress = 0;
+        this.calendarProgressMessage = '';
+        this.cdr.detectChanges();
+      }, 2000);
+    }
+  }
 
   async reactivarTorneo(): Promise<void> {
-  if (this.tournamentStatus !== 'finalizado') {
-    alert('⚠️ Solo se pueden reactivar torneos finalizados');
-    return;
-  }
+    if (this.tournamentStatus !== 'finalizado') {
+      alert('⚠️ Solo se pueden reactivar torneos finalizados');
+      return;
+    }
 
-  if (!confirm('¿Reactivar el torneo? Volverá al estado ACTIVO y podrás registrar más resultados.')) {
-    return;
-  }
+    if (!confirm('¿Reactivar el torneo? Volverá al estado ACTIVO y podrás registrar más resultados.')) {
+      return;
+    }
 
-  try {
-    await this.http.post(
-      `${this.apiUrl}/tournaments/${this.tournamentId}/reactivate`,
-      {},
-      { withCredentials: true }
-    ).toPromise();
+    try {
+      await this.http.post(
+        `${this.apiUrl}/tournaments/${this.tournamentId}/reactivate`,
+        {},
+        { withCredentials: true }
+      ).toPromise();
 
-    alert('✅ ¡Torneo reactivado exitosamente!');
-    await this.loadTournamentData();
-  } catch (error: any) {
-    const mensaje = error?.error?.detail || 'Error al reactivar torneo';
-    alert(`❌ ${mensaje}`);
-  }
+      alert('✅ ¡Torneo reactivado exitosamente!');
+      await this.loadTournamentData();
+    } catch (error: any) {
+      const mensaje = error?.error?.detail || 'Error al reactivar torneo';
+      alert(`❌ ${mensaje}`);
+    }
   }
 
   async finalizarTemporadaRegular(): Promise<void> {
-  if (this.tournamentStatus !== 'iniciado') {
-    alert('⚠️ El torneo debe estar iniciado');
-    return;
+    if (this.tournamentStatus !== 'iniciado') {
+      alert('⚠️ El torneo debe estar iniciado');
+      return;
+    }
+
+    if (!confirm('¿Finalizar la Temporada Regular?\n\nEsto marcará el fin de la fase regular y habilitará los playoffs.')) {
+      return;
+    }
+
+    try {
+      await this.http.post(
+        `${this.apiUrl}/tournaments/${this.tournamentId}/finish-regular-season`,
+        {},
+        { withCredentials: true }
+      ).toPromise();
+
+      alert('✅ ¡Temporada Regular finalizada!\n\nAhora puedes gestionar los playoffs.');
+      await this.loadTournamentData();
+    } catch (error: any) {
+      const mensaje = error?.error?.detail || 'Error al finalizar temporada';
+      alert(`❌ ${mensaje}`);
+    }
   }
 
-  if (!confirm('¿Finalizar la Temporada Regular?\n\nEsto marcará el fin de la fase regular y habilitará los playoffs.')) {
-    return;
-  }
-
-  try {
-    await this.http.post(
-      `${this.apiUrl}/tournaments/${this.tournamentId}/finish-regular-season`,
-      {},
-      { withCredentials: true }
-    ).toPromise();
-
-    alert('✅ ¡Temporada Regular finalizada!\n\nAhora puedes gestionar los playoffs.');
-    await this.loadTournamentData();
-  } catch (error: any) {
-    const mensaje = error?.error?.detail || 'Error al finalizar temporada';
-    alert(`❌ ${mensaje}`);
-  }
-}
-
-irAPlayoffs(): void {
-  this.router.navigate([`/torneos/${this.tournamentId}/playoffs`]);
+  irAPlayoffs(): void {
+    this.router.navigate([`/torneos/${this.tournamentId}/playoffs`]);
   }
 
   getMinimumTeams(): number {
@@ -525,7 +540,6 @@ irAPlayoffs(): void {
     if (!this.equipos.every(eq => (eq.jugadores?.length || 0) >= 7)) {
       return 'Todos los equipos deben tener al menos 7 jugadores.';
     }
-
     
     return null;
   }
@@ -539,8 +553,6 @@ irAPlayoffs(): void {
     const hasMinTeams = this.equipos.length >= this.getMinimumTeams();
     const hasCalendar = this.calendarGenerated;
     const isConfiguring = this.tournamentStatus === 'configurando';
-
-    // 🔥 NUEVO: validar que todos los equipos tengan al menos 7 jugadores
     const allTeamsHaveMinPlayers = this.equipos.every(
       eq => (eq.jugadores?.length || 0) >= 7
     );
@@ -549,31 +561,28 @@ irAPlayoffs(): void {
       hasMinTeams,
       hasCalendar,
       isConfiguring,
-      allTeamsHaveMinPlayers,   // 👈 agregado
+      allTeamsHaveMinPlayers,
       tournamentStatus: this.tournamentStatus,
       equipos: this.equipos.length,
       minTeams: this.getMinimumTeams()
     });
 
-    // 🔥 SE AGREGA A TU VALIDACIÓN EXISTENTE
     return hasMinTeams && hasCalendar && isConfiguring && allTeamsHaveMinPlayers;
   }
 
-
   getStatusBadge(): { text: string; class: string } {
-  switch (this.tournamentStatus) {
-    case 'iniciado':
-      return { text: '🟢 Iniciado', class: 'badge-success' };
-    case 'playoffs':
-      return { text: '🟠 Playoffs', class: 'badge-playoffs' };
-    case 'finalizado':
-      return { text: '⚫ Finalizado', class: 'badge-finished' };
-    case 'configurando':
-    default:
-      return { text: '🔴 Configurando', class: 'badge-warning' };
+    switch (this.tournamentStatus) {
+      case 'iniciado':
+        return { text: '🟢 Iniciado', class: 'badge-success' };
+      case 'playoffs':
+        return { text: '🟠 Playoffs', class: 'badge-playoffs' };
+      case 'finalizado':
+        return { text: '⚫ Finalizado', class: 'badge-finished' };
+      case 'configurando':
+      default:
+        return { text: '🔴 Configurando', class: 'badge-warning' };
     }
   }
-
 
   async startTournament(): Promise<void> {
     if (!this.canStartTournament()) {
@@ -599,8 +608,6 @@ irAPlayoffs(): void {
       alert(`❌ ${mensaje}`);
     }
   }
-
-  
 
   async finalizarTorneo(): Promise<void> {
     if (this.tournamentStatus !== 'iniciado') {
@@ -635,26 +642,14 @@ irAPlayoffs(): void {
     this.router.navigate(['/mis-torneos']);
   }
 
-  // ========================================
-  // ✅ MÉTODOS DE PLAYOFFS - NUEVOS
-  // ========================================
-
-  /**
-   * Callback cuando el bracket notifica si existen playoffs
-   */
   onPlayoffsLoaded(exists: boolean) {
-  console.log('🏆 Playoffs cargados:', exists);
-  
-  this.playoffsGenerated = exists;
-  this.loadingPlayoffs = false; // ⬅️ ESTA ES LA PARTE QUE FALTABA
+    console.log('🏆 Playoffs cargados:', exists);
+    
+    this.playoffsGenerated = exists;
+    this.loadingPlayoffs = false;
+    this.cdr.detectChanges(); // ✅ Forzar actualización
+  }
 
-  this.cdr.detectChanges();
-}
-
-
-  /**
-   * Genera el bracket de playoffs
-   */
   generarPlayoffs() {
     if (!this.tournament || this.generatingPlayoffs) return;
 
@@ -675,6 +670,7 @@ irAPlayoffs(): void {
     }
 
     this.generatingPlayoffs = true;
+    this.cdr.detectChanges(); // ✅ Mostrar estado de carga
 
     this.http.post<any>(
       `${this.apiUrl}/tournaments/${this.tournamentId}/playoffs/generate`,
@@ -686,16 +682,15 @@ irAPlayoffs(): void {
         
         this.playoffsGenerated = true;
         this.generatingPlayoffs = false;
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // ✅ Forzar actualización
         
-        // Recargar la página para ver el bracket
         window.location.reload();
       },
       error: (error) => {
         console.error('❌ Error al generar playoffs:', error);
         alert(`❌ Error: ${error.error?.detail || 'No se pudieron generar los playoffs'}`);
         this.generatingPlayoffs = false;
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // ✅ Forzar actualización
       }
     });
   }
