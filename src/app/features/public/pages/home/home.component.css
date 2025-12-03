@@ -506,8 +506,11 @@ section {
 }
 
 .snap__section {
-    scroll-snap-align: start;
-    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: var(--nav-h); /* evita que quede debajo del header */
+    box-sizing: border-box;
 }
 
 /* ========================================
