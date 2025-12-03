@@ -343,80 +343,106 @@ export class TournamentDetailComponent implements OnInit {
   }
 
   async generateCalendar(): Promise<void> {
-    const minimumTeams = this.getMinimumTeams();
-    
-    if (this.equipos.length < minimumTeams) {
-      alert(`⚠️ Necesitas al menos ${minimumTeams} equipos`);
-      return;
-    }
-    
-    if (!confirm('¿Generar calendario? Esto puede tardar unos segundos.')) {
-      return;
-    }
-    
-    let progressInterval: any = null;
-    
-    try {
-      console.log('🚀 Generando calendario...');
-      
-      this.generatingCalendar = true;
-      this.calendarProgress = 0;
-      this.calendarProgressMessage = 'Iniciando...';
-      this.cdr.detectChanges();
-      
-      progressInterval = setInterval(() => {
-        if (this.calendarProgress < 90) {
-          this.calendarProgress += 10;
-          
-          if (this.calendarProgress <= 30) {
-            this.calendarProgressMessage = '🔍 Analizando equipos...';
-          } else if (this.calendarProgress <= 60) {
-            this.calendarProgressMessage = '⚙️ Generando partidos...';
-          } else {
-            this.calendarProgressMessage = '📅 Asignando fechas...';
-          }
-          
-          this.cdr.detectChanges();
-        }
-      }, 300);
-      
-      await this.tournamentService
-        .autoSchedule(this.tournamentId, undefined, true)
-        .toPromise();
-      
-      console.log('✅ Calendario generado');
-      
-      if (progressInterval) clearInterval(progressInterval);
-      
-      this.calendarProgress = 100;
-      this.calendarProgressMessage = '✅ ¡Calendario generado!';
-      this.cdr.detectChanges();
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      await this.checkCalendarStatus();
-      
-      alert('✅ Calendario generado exitosamente');
-      
-    } catch (error) {
-      console.error('❌ Error:', error);
-      
-      if (progressInterval) clearInterval(progressInterval);
-      
-      this.calendarProgress = 100;
-      this.calendarProgressMessage = '❌ Error al generar';
-      this.cdr.detectChanges();
-      
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert('❌ Error al generar calendario');
-    } finally {
-      setTimeout(() => {
-        this.generatingCalendar = false;
-        this.calendarProgress = 0;
-        this.calendarProgressMessage = '';
-        this.cdr.detectChanges();
-      }, 2000);
-    }
+  const minimumTeams = this.getMinimumTeams();
+  
+  if (this.equipos.length < minimumTeams) {
+    alert(`⚠️ Necesitas al menos ${minimumTeams} equipos`);
+    return;
   }
+  
+  // 🔥 PRIMER INTENTO: Sin confirm (para recibir advertencias)
+  try {
+    const firstAttempt = await this.tournamentService
+      .autoSchedule(this.tournamentId, undefined, false) // ← confirm=false
+      .toPromise();
+    
+    // Si tiene warnings, mostrar confirmación
+    if (firstAttempt && !firstAttempt.ok && firstAttempt.requires_confirmation) {
+      const warnings = firstAttempt.warnings.join('\n\n');
+      const mensaje = `⚠️ ADVERTENCIAS:\n\n${warnings}\n\n¿Deseas continuar de todos modos?`;
+      
+      if (!confirm(mensaje)) {
+        return; // Usuario canceló
+      }
+      
+      // Usuario confirmó, generar con confirm=true
+      await this.generateCalendarConfirmed();
+    } else {
+      // No hay warnings, generar directamente
+      await this.generateCalendarConfirmed();
+    }
+  } catch (error) {
+    console.error('❌ Error en primera validación:', error);
+    alert('❌ Error al validar configuración');
+  }
+}
+
+// 🔥 MÉTODO AUXILIAR: Generar calendario con confirm=true
+private async generateCalendarConfirmed(): Promise<void> {
+  let progressInterval: any = null;
+  
+  try {
+    console.log('🚀 Generando calendario...');
+    
+    this.generatingCalendar = true;
+    this.calendarProgress = 0;
+    this.calendarProgressMessage = 'Iniciando...';
+    this.cdr.detectChanges();
+    
+    progressInterval = setInterval(() => {
+      if (this.calendarProgress < 90) {
+        this.calendarProgress += 10;
+        
+        if (this.calendarProgress <= 30) {
+          this.calendarProgressMessage = '🔍 Analizando equipos...';
+        } else if (this.calendarProgress <= 60) {
+          this.calendarProgressMessage = '⚙️ Generando partidos...';
+        } else {
+          this.calendarProgressMessage = '📅 Asignando fechas...';
+        }
+        
+        this.cdr.detectChanges();
+      }
+    }, 300);
+    
+    // ✅ GENERAR CON CONFIRM=TRUE
+    await this.tournamentService
+      .autoSchedule(this.tournamentId, undefined, true)
+      .toPromise();
+    
+    console.log('✅ Calendario generado');
+    
+    if (progressInterval) clearInterval(progressInterval);
+    
+    this.calendarProgress = 100;
+    this.calendarProgressMessage = '✅ ¡Calendario generado!';
+    this.cdr.detectChanges();
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await this.checkCalendarStatus();
+    
+    alert('✅ Calendario generado exitosamente');
+    
+  } catch (error) {
+    console.error('❌ Error:', error);
+    
+    if (progressInterval) clearInterval(progressInterval);
+    
+    this.calendarProgress = 100;
+    this.calendarProgressMessage = '❌ Error al generar';
+    this.cdr.detectChanges();
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    alert('❌ Error al generar calendario');
+  } finally {
+    setTimeout(() => {
+      this.generatingCalendar = false;
+      this.calendarProgress = 0;
+      this.calendarProgressMessage = '';
+      this.cdr.detectChanges();
+    }, 2000);
+  }
+}
 
   async reactivarTorneo(): Promise<void> {
   if (this.tournamentStatus !== 'finalizado') {
