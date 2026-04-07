@@ -1,5 +1,8 @@
+const isLocalhost = typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 export const environment = {
-  production: true,  // Para producción
+  production: true,
   firebase: {
     apiKey: 'AIzaSyCFBZMRfbzsTrUmyRX8XNOltqzSLK0-p3A',
     authDomain: 'hoopsmanager-7fd19.firebaseapp.com',
@@ -8,5 +11,5 @@ export const environment = {
     messagingSenderId: '91417343471',
     appId: '1:91417343471:web:9abef41b66cf9e17b7321a',
   },
-  apiBase: 'https://hoopsbackend-production.up.railway.app'  // ← URL de Railway
+  apiBase: isLocalhost ? 'http://127.0.0.1:8000' : 'https://hoopsbackend-production.up.railway.app'
 };
