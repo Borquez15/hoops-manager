@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { ApiConfigService } from '../../../services/api-config.service';
 
 interface ReporteIncidencia {
   tipo: 'LESION' | 'FALTA_TECNICA' | 'FALTA_ANTIDEPORTIVA' | 'DESCALIFICACION' | 'PROTESTA' | 'OTRO';
@@ -31,7 +32,8 @@ interface Partido {
   styleUrls: ['./match-report.component.css']
 })
 export class MatchReportComponent implements OnInit {
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  private apiConfig = inject(ApiConfigService);
+  private apiUrl = this.apiConfig.apiBase;
   private partidoId!: number;
 
   partido?: Partido;

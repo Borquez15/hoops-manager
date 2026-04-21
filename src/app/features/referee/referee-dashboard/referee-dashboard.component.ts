@@ -1,8 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
+import { ApiConfigService } from '../../../services/api-config.service';
 
 interface Torneo {
   id_torneo: number;
@@ -33,8 +34,8 @@ type FiltroFecha = 'HOY' | 'MANANA' | 'SEMANA' | 'TODOS';
   styleUrls: ['./referee-dashboard.component.css']
 })
 export class RefereeDashboardComponent implements OnInit {
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-  
+  private apiConfig = inject(ApiConfigService);
+  private apiUrl = this.apiConfig.apiBase;
   userName = '';
   torneos: Torneo[] = [];
   partidos: Partido[] = [];

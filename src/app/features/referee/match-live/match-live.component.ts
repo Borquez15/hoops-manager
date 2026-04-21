@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { interval, Subscription } from 'rxjs';
+import { ApiConfigService } from '../../../services/api-config.service';
 
 interface Jugador {
   id_jugador: number;
@@ -52,7 +53,8 @@ interface Partido {
   styleUrls: ['./match-live.component.css']
 })
 export class MatchLiveComponent implements OnInit, OnDestroy {
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  private apiConfig = inject(ApiConfigService);
+  private apiUrl = this.apiConfig.apiBase;
   private partidoId!: number;
   private timerSubscription?: Subscription;
 

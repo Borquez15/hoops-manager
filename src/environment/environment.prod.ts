@@ -1,6 +1,3 @@
-const isLocalhost = typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
 export const environment = {
   production: true,
   firebase: {
@@ -12,6 +9,5 @@ export const environment = {
     appId: '1:91417343471:web:9abef41b66cf9e17b7321a',
   },
 
-  apiBase: 'http://127.0.0.1:8000'  // ← URL de Railway
-
+  apiBase: 'https://hoopsbackend-production.up.railway.app'
 };
