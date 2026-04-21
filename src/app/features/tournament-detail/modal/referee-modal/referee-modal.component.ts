@@ -29,7 +29,7 @@ export class RefereeModalComponent implements OnInit {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   nuevoArbitroEmail = '';
   enviando = false;
   

@@ -32,7 +32,7 @@ export class ProfileComponent implements OnInit {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   user: UserProfile | null = null;
   loading = true;
   saving = false;

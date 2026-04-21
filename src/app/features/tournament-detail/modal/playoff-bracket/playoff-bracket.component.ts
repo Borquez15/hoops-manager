@@ -68,7 +68,7 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
   private apiConfig = inject(ApiConfigService);
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   bracket: PlayoffBracket | null = null;
   loading = false;
   error = '';

@@ -37,7 +37,7 @@ export class CalendarModalComponent implements OnChanges {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   calendario: CalendarMonth | null = null;
   anio = new Date().getFullYear();
   mes = new Date().getMonth() + 1;

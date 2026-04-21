@@ -20,7 +20,7 @@ export class EditPlayoffMatchComponent {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   fecha: string = '';
   hora: string = '';
   cancha: number | null = null;

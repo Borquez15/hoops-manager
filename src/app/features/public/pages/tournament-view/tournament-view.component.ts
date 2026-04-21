@@ -64,7 +64,7 @@ export class TournamentViewComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private wsService = inject(WebSocketService);
   private apiConfig = inject(ApiConfigService);
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
 
   loading = true;
   error = '';

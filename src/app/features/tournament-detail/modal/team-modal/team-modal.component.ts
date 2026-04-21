@@ -46,7 +46,7 @@ export class TeamModalComponent implements OnChanges {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   equipoTemp: EquipoConJugadores | null = null;
 
   nuevoJugador: any = {

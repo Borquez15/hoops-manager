@@ -28,7 +28,7 @@ export const SKIP_AUTH = 'SKIP_AUTH';
 })
 export class TournamentSearchService {
   private apiConfig = inject(ApiConfigService);
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   constructor(private http: HttpClient) {}
 
   search(query: string): Observable<SearchResponse> {

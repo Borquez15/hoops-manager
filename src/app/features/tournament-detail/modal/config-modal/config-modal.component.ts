@@ -34,7 +34,7 @@ export class ConfigModalComponent implements OnInit, OnChanges {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   editForm: Partial<Tournament> = {
     nombre: '',
     vueltas: 1,

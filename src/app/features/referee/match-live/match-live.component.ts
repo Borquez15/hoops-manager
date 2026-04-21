@@ -54,7 +54,7 @@ interface Partido {
 })
 export class MatchLiveComponent implements OnInit, OnDestroy {
   private apiConfig = inject(ApiConfigService);
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   private partidoId!: number;
   private timerSubscription?: Subscription;
 

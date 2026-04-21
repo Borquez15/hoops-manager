@@ -10,7 +10,7 @@ import { ApiConfigService } from './api-config.service';
 })
 export class TournamentService {
   private apiConfig = inject(ApiConfigService);
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   constructor(private http: HttpClient) {
     console.log('🔵 TournamentService inicializado');
     console.log('🔵 API URL:', this.apiUrl);
