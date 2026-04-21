@@ -66,7 +66,7 @@ interface EquipoConJugadores {
 })
 export class TournamentDetailComponent implements OnInit {
   private apiConfig = inject(ApiConfigService);
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   tournamentId!: number;
   tournament: Tournament | null = null;
   equipos: EquipoConJugadores[] = [];

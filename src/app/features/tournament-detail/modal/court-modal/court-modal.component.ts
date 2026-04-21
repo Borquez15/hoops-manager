@@ -25,7 +25,7 @@ export class CourtModalComponent {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   nuevaCancha: Cancha = { nombre: '', ubicacion: '', activa: true };
   loading = false;
   error: string | null = null;

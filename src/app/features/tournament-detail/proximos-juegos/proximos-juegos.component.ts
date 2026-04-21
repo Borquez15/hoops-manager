@@ -53,7 +53,7 @@ export class ProximosJuegosComponent implements OnChanges {
 
   private apiConfig = inject(ApiConfigService);
 
-  private apiUrl = this.apiConfig.apiBase;
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   partidos: Match[] = [];
   partidosFiltrados: Match[] = [];
   loading = false;
