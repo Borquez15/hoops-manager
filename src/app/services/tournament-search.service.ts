@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap, timeout } from 'rxjs/operators';
+import { ApiConfigService } from './api-config.service';
 
 export interface TorneoPublico {
   id_torneo: number;
@@ -26,8 +27,8 @@ export const SKIP_AUTH = 'SKIP_AUTH';
   providedIn: 'root'
 })
 export class TournamentSearchService {
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-
+  private apiConfig = inject(ApiConfigService);
+  private apiUrl = this.apiConfig.apiBase;
   constructor(private http: HttpClient) {}
 
   search(query: string): Observable<SearchResponse> {

@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetec
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { EditPlayoffMatchComponent } from './edit-playoff-match/edit-playoff-match.component';
+import { ApiConfigService } from '../../../../services/api-config.service';
 
 interface Equipo {
   id_equipo: number;
@@ -66,8 +67,8 @@ export class PlayoffBracketComponent implements OnInit, OnChanges {
 
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-
+  private apiConfig = inject(ApiConfigService);
+  private apiUrl = this.apiConfig.apiBase;
   bracket: PlayoffBracket | null = null;
   loading = false;
   error = '';

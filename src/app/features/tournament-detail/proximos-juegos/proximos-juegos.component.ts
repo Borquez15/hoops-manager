@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { NgIf, NgFor } from '@angular/common';
+import { ApiConfigService } from '../../../services/api-config.service';
 
 interface Equipo {
   id: number;
@@ -50,7 +51,9 @@ type FiltroEstado = 'todos' | 'PROGRAMADO' | 'EN_CURSO' | 'JUGADO';
 export class ProximosJuegosComponent implements OnChanges {
   @Input() tournamentId!: number;
 
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  private apiConfig = inject(ApiConfigService);
+
+  private apiUrl = this.apiConfig.apiBase;
   partidos: Match[] = [];
   partidosFiltrados: Match[] = [];
   loading = false;
