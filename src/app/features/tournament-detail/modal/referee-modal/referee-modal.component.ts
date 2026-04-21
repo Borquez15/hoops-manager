@@ -1,8 +1,9 @@
 // referee-modal.component.ts
-import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ApiConfigService } from '../../../../services/api-config.service';
 
 interface Invitation {
   id_inv: number;
@@ -26,8 +27,9 @@ export class RefereeModalComponent implements OnInit {
   @Output() closeModal = new EventEmitter<void>();
   @Output() refereesUpdated = new EventEmitter<void>();
 
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-  
+  private apiConfig = inject(ApiConfigService);
+
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   nuevoArbitroEmail = '';
   enviando = false;
   

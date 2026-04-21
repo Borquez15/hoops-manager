@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { ApiConfigService } from '../../services/api-config.service';
 
 interface UserProfile {
   id_usuario: number;
@@ -29,8 +30,9 @@ export class ProfileComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  private apiUrl = 'http://localhost:8000';
+  private apiConfig = inject(ApiConfigService);
 
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   user: UserProfile | null = null;
   loading = true;
   saving = false;

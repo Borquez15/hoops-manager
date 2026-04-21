@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { interval, Subscription } from 'rxjs';
+import { ApiConfigService } from '../../services/api-config.service';
 
 interface Jugador {
   id_jugador: number;
@@ -50,7 +51,8 @@ interface Accion {
   styleUrls: ['./match-live.component.css']
 })
 export class MatchLiveComponent implements OnInit, OnDestroy {
-  private apiUrl = 'http://localhost:8000';
+  private apiConfig = inject(ApiConfigService);
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   private partidoId!: number;
   private updateSubscription?: Subscription;
 

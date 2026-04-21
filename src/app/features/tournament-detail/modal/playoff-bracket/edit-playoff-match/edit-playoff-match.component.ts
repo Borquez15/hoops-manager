@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ApiConfigService } from '../../../../../services/api-config.service';
 
 @Component({
   selector: 'app-edit-playoff-match',
@@ -17,8 +18,9 @@ export class EditPlayoffMatchComponent {
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
-  apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  private apiConfig = inject(ApiConfigService);
 
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   fecha: string = '';
   hora: string = '';
   cancha: number | null = null;

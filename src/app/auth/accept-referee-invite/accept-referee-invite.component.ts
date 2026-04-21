@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { ApiConfigService } from '../../services/api-config.service';
 
 interface InvitationStatus {
   torneo: string;
@@ -26,8 +27,9 @@ export class AcceptRefereeInviteComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);  // ✅ AGREGAR
   auth = inject(AuthService);
 
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-  
+  private apiConfig = inject(ApiConfigService);
+
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   token = '';
   loading = true;
   procesando = false;

@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { RefereeModalComponent } from '../tournament-detail/modal/referee-modal/referee-modal.component';
 import { NgIf, NgFor } from '@angular/common';
+import { ApiConfigService } from '../../services/api-config.service';
 
 
 
@@ -72,8 +73,8 @@ interface LookupResponse {
   styleUrls: ['./create-tournament.component.css']
 })
 export class CrearTorneoComponent implements OnInit {
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-  
+  private apiConfig = inject(ApiConfigService);
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   modalArbitrosAbierto = false;
 
   // ========== CONFIGURACIÓN DEL TORNEO ==========

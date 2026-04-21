@@ -1,16 +1,16 @@
 // src/app/services/tournament.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { environment } from '../../environment/environment.prod';
 import { Tournament, Equipo, Arbitro, Match } from '../models/tournament.model';
+import { ApiConfigService } from './api-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TournamentService {
-  private apiUrl = environment.apiBase || 'http://localhost:8000';
-
+  private apiConfig = inject(ApiConfigService);
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   constructor(private http: HttpClient) {
     console.log('🔵 TournamentService inicializado');
     console.log('🔵 API URL:', this.apiUrl);

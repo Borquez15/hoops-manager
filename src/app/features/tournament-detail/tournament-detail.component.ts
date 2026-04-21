@@ -1,5 +1,5 @@
 // tournament-detail.component.ts - COMPLETO CON ChangeDetectorRef
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import { ConfigModalComponent } from './modal/config-modal/config-modal.componen
 import { TeamModalComponent } from './modal/team-modal/team-modal.component';
 import { RefereeModalComponent } from './modal/referee-modal/referee-modal.component';
 import { ProximosJuegosComponent } from './proximos-juegos/proximos-juegos.component';
+import { ApiConfigService } from '../../services/api-config.service';
 
 interface Arbitro {
   id_arbitro?: number;
@@ -64,8 +65,8 @@ interface EquipoConJugadores {
   styleUrls: ['./tournament-detail.component.css']
 })
 export class TournamentDetailComponent implements OnInit {
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-  
+  private apiConfig = inject(ApiConfigService);
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   tournamentId!: number;
   tournament: Tournament | null = null;
   equipos: EquipoConJugadores[] = [];

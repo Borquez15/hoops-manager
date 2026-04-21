@@ -1,17 +1,10 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges,
-  SimpleChanges,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
+import { ApiConfigService } from '../../../../services/api-config.service';
 
 interface HoopsJugador {
   curp: string;
@@ -51,7 +44,9 @@ export class TeamModalComponent implements OnChanges {
   @Output() closeModal = new EventEmitter<void>();
   @Output() equipoUpdated = new EventEmitter<void>();
 
-  apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  private apiConfig = inject(ApiConfigService);
+
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   equipoTemp: EquipoConJugadores | null = null;
 
   nuevoJugador: any = {

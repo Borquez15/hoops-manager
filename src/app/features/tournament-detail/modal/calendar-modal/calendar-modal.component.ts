@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
+import { ApiConfigService } from '../../../../services/api-config.service';
 
 interface CalendarDay {
   dia: number;
@@ -34,7 +35,9 @@ export class CalendarModalComponent implements OnChanges {
   @Input() tournamentId!: number;
   @Output() closeModal = new EventEmitter<void>();
 
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  private apiConfig = inject(ApiConfigService);
+
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   calendario: CalendarMonth | null = null;
   anio = new Date().getFullYear();
   mes = new Date().getMonth() + 1;

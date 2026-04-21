@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environment/environment.prod';
+import { ApiConfigService } from './api-config.service';
 
 export interface Player {
   id_equipo: number;
@@ -19,8 +19,8 @@ export interface Player {
 
 @Injectable({ providedIn: 'root' })
 export class TeamPlayersService {
-  private apiUrl = environment.apiBase || 'http://localhost:8000';
-
+  private apiConfig = inject(ApiConfigService);
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   constructor(private http: HttpClient) {}
 
   listarJugadores(id_equipo: number): Observable<Player[]> {

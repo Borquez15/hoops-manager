@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
+import { ApiConfigService } from '../../../../services/api-config.service';
 
 export interface Cancha {
   id_cancha?: number; nombre: string; ubicacion: string; activa: boolean;
@@ -22,7 +23,9 @@ export class CourtModalComponent {
   @Output() closeModal = new EventEmitter<void>();
   @Output() canchasUpdated = new EventEmitter<void>();
 
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
+  private apiConfig = inject(ApiConfigService);
+
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   nuevaCancha: Cancha = { nombre: '', ubicacion: '', activa: true };
   loading = false;
   error: string | null = null;

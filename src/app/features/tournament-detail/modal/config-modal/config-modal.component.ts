@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Tournament } from '../../../../models/tournament.model';
 import { ModalBaseComponent } from '../shared/modal-base/modal-base.component';
 import { NgIf, NgFor } from '@angular/common';
+import { ApiConfigService } from '../../../../services/api-config.service';
 interface Cancha {
   id_cancha?: number;
   nombre: string;
@@ -31,8 +32,9 @@ export class ConfigModalComponent implements OnInit, OnChanges {
   @Output() canchasUpdated = new EventEmitter<void>();
   @Output() regenerateCalendar = new EventEmitter<void>();
 
-  private apiUrl = 'https://hoopsbackend-production.up.railway.app';
-  
+  private apiConfig = inject(ApiConfigService);
+
+  private get apiUrl(): string { return this.apiConfig.apiBase; }
   editForm: Partial<Tournament> = {
     nombre: '',
     vueltas: 1,
